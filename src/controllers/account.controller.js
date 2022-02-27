@@ -42,7 +42,7 @@ exports.signup = async (req, res) => {
           }
           res.send({
             errorCode: 0,
-            message: 'User was registered successfully'
+            message: 'Account was registered successfully'
           })
         })
       })

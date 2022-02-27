@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const { Role } = require('./role')
+const { Role } = require('./role.schema')
 
 exports.connectDB = async () =>{
     try {
@@ -40,19 +40,19 @@ function initial(){
                 }
                 console.log('added QA of IT to role colection')
             })
-            new Role({name: 'QA of personel'})
+            new Role({name: 'QA of business'})
             .save(err =>{
                 if(err) {
                     console.log('error: ', err)
                 }
-                console.log('added QA of personelto role colection')
+                console.log('added QA of business to role colection')
             })
-            new Role({name: 'QA of the system'})
+            new Role({name: 'QA of graphic design'})
             .save(err =>{
                 if(err) {
                     console.log('error: ', err)
                 }
-                console.log('added QA of system to role colection')
+                console.log('added QA of graphic design to role colection')
             })
             new Role({name: 'admin'})
             .save(err =>{

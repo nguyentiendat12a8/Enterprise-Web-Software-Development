@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 mongoose.Promise = global.Promise
 const { Account } = require("./account")
-const { Role } = require("./role")
+const { Role } = require("./role.schema")
 
 const db = {}
 

@@ -191,5 +191,8 @@ isQAOfPersonel = (req, res, next) => {
     })
 }
 
-
+const jwt = {
+    verifyToken
+}
+module.exports = jwt
 
