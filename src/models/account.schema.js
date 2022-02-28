@@ -10,7 +10,7 @@ exports.Account = mongoose.model(
         gender:String,
         DOB: Date,
         avatar: String,
-        roles: [{
+        roleID: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Role'
         }]

@@ -8,10 +8,10 @@ const bcrypt = require('bcryptjs')
 
 exports.signup = async (req, res) => {
   const user = new Account({
-    username: req.body.username,
-    email: req.body.email,
-    password: bcrypt.hashSync(req.body.password, 8),
-    avatar: req.file.path
+    accountEmail: req.body.accountEmail,
+    accountPassword: bcrypt.hashSync(req.body.accountPassword, 8),
+    phone: req.body.phone,
+    //avatar: req.file.path
   })
 
   user.save((err, user) => {
@@ -22,9 +22,9 @@ exports.signup = async (req, res) => {
       })
     }
 
-    if (req.body.roles) {
+    if (req.body.roleID) {
       Role.find({
-        name: { $in: req.body.roles }
+        roleName: { $in: req.body.roleID }
       }, (err, roles) => {
         if (err) {
           return res.status(500).send({
@@ -32,7 +32,7 @@ exports.signup = async (req, res) => {
             message: err
           })
         }
-        user.roles = roles.map(role => role._id)
+        user.roleID = roles._id
         user.save(err => {
           if (err) {
             return res.status(500).send({
@@ -42,20 +42,20 @@ exports.signup = async (req, res) => {
           }
           res.send({
             errorCode: 0,
-            message: 'Account was registered successfully'
+            message: `${roles.roleName} was registered successfully`
           })
         })
       })
     }
     else {
-      Role.findOne({ name: 'staff' }, (err, role) => {
+      Role.findOne({ roleName: 'staff' }, (err, role) => {
         if (err) {
           return res.status(500).send({
             errorCode: 500,
             message: err
           })
         }
-        user.roles = [role._id];
+        user.roleID = [role._id];
         user.save(err => {
           if (err) {
             res.status(500).send({
@@ -77,14 +77,14 @@ exports.signup = async (req, res) => {
 
 exports.signin = async (req, res, next) => {
   try {
-    const { username, password } = req.body;
-    if (!(username && password)) {
+    const { accountEmail, accountPassword } = req.body;
+    if (!(accountEmail && accountPassword)) {
       res.status(500).json({
         errorCode: 500,
         message: "All input is required",
       });
     }
-    const user = await Account.findOne({ username: username });
+    const user = await Account.findOne({ accountEmail: accountEmail });
     if (!user) {
       res.status(404).json({
         errorCode: "404",
@@ -92,7 +92,7 @@ exports.signin = async (req, res, next) => {
       });
     }
 
-    if (bcrypt.compareSync(password, user.password)) {
+    if (bcrypt.compareSync(accountPassword, user.accountPassword)) {
       const token = jwt.sign({ id: user._id }, process.env.TOKEN_KEY, {
         expiresIn: process.env.tokenLife,
       });
@@ -103,9 +103,9 @@ exports.signin = async (req, res, next) => {
           expiresIn: process.env.RefreshTokenLife,
         }
       );
-      const role = await Role.findById(user.roles).then((response) => {
+      const role = await Role.findById(user.roleID).then((response) => {
         console.log("response", response);
-        return response.name;
+        return response.roleName;
       });
       return res.status(200).json({
         errorCode: 0,
@@ -129,10 +129,10 @@ exports.updatePassword = async (req, res, next) => {
     //const { id } = req.params
     const id = req.body.id
     const user = await Account.findOne({ _id: id })
-    const password = req.body.password
-    const newPassword = bcrypt.hashSync(req.body.newPassword, 8)
-    if (bcrypt.compareSync(password, user.password)) {
-      await Account.findByIdAndUpdate({ _id: id }, { password: newPassword }, { new: true })
+    const password = req.body.accountPassword
+    const newAccountPassword = bcrypt.hashSync(req.body.newAccountPassword, 8)
+    if (bcrypt.compareSync(password, user.accountPassword)) {
+      await Account.findByIdAndUpdate({ _id: id }, { accountPassword: newAccountPassword }, { new: true })
       return res.status(200).send({ message: 'Change password successfully!' })
     }
     else {

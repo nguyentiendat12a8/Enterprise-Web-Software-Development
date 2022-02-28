@@ -3,32 +3,19 @@ const db = require('../models/index')
 const Account = db.account
 const ROLES = db.ROLES
 
-checkDuplicateUsernameOrEmail = (req, res, next) => {
+checkDuplicateEmail = (req, res, next) => {
     Account.findOne({
-        username: req.body.username
+        accountEmail: req.body.accountEmail
     }).exec((err, user) => {
         if (err) {
             res.status(500).send({ message: err })
             return
         }
-
         if (user) {
-            res.status(400).send({ message: 'Failed! username is already in use' })
+            res.status(400).send({ message: 'Failed! Email is already in use' })
             return
         }
-        Account.findOne({
-            email: req.body.email
-        }).exec((err, user) => {
-            if (err) {
-                res.status(500).send({ message: err })
-                return
-            }
-            if (user) {
-                res.status(400).send({ message: 'failed! email is already in use' })
-                return
-            }
-            next()
-        })
+        next()
     })
 }
 
@@ -49,7 +36,7 @@ checkRolesExisted = (req, res, next) => {
 
 const verifySignUp = 
 {
-    checkDuplicateUsernameOrEmail,
+    checkDuplicateEmail,
     checkRolesExisted
 }
 module.exports = verifySignUp
