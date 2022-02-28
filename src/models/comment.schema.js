@@ -1,18 +1,17 @@
 const mongoose = require('mongoose')
 
-exports.Account = mongoose.model(
-    'Account',
+exports.Comment = mongoose.model(
+    'Comment',
     new mongoose.Schema({
-        accountEmail: {type: String, required: true},
-        accountPassword: {type: String, required: true},
-        phone: {type: Number, required: true},
-        address: String,
-        gender:String,
-        DOB: Date,
-        avatar: String,
-        roles: [{
+        commentText: {type: String, required: true},
+        commentTimeUp: {type: Date, default: Date.now()},
+        accountID: [{
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Role'
+            ref: 'Account'
+        }],
+        ideasID: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Ideas'
         }]
     })
 )

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { Department } = require('./department.schema')
 const { Role } = require('./role.schema')
 
 exports.connectDB = async () =>{
@@ -19,47 +20,74 @@ exports.connectDB = async () =>{
 function initial(){
     Role.estimatedDocumentCount((err,count) =>{
         if(!err && count === 0){
-            new Role({name: 'staff'})
+            new Role({roleName: 'staff'})
             .save(err =>{
                 if(err) {
                     console.log('error: ', err)
                 }
                 console.log('added Staff to role colection')
             })
-            new Role({name: 'QA'})
+            new Role({roleName: 'QA'})
             .save(err =>{
                 if(err) {
                     console.log('error: ', err)
                 }
                 console.log('added QA to role colection')
             })
-            new Role({name: 'QA of IT'})
+            new Role({roleName: 'QA of IT'})
             .save(err =>{
                 if(err) {
                     console.log('error: ', err)
                 }
                 console.log('added QA of IT to role colection')
             })
-            new Role({name: 'QA of business'})
+            new Role({roleName: 'QA of business'})
             .save(err =>{
                 if(err) {
                     console.log('error: ', err)
                 }
                 console.log('added QA of business to role colection')
             })
-            new Role({name: 'QA of graphic design'})
+            new Role({roleName: 'QA of graphic design'})
             .save(err =>{
                 if(err) {
                     console.log('error: ', err)
                 }
                 console.log('added QA of graphic design to role colection')
             })
-            new Role({name: 'admin'})
+            new Role({roleName: 'admin'})
             .save(err =>{
                 if(err) {
                     console.log('error: ', err)
                 }
                 console.log('added admin to role colection')
+            })
+        }
+    })
+//Department addin 
+    Department.estimatedDocumentCount((err, count)=>{
+        if(!err && count ==0){
+            //department adding
+            new Department({departmentName: 'IT'})
+            .save(err =>{
+                if(err){
+                    console.log('err: ', err)
+                }
+                console.log("added IT to department")
+            })
+            new Department({departmentName: 'business'})
+            .save(err =>{
+                if(err){
+                    console.log('err: ', err)
+                }
+                console.log("added business to department")
+            })
+            new Department({departmentName: 'graphic design'})
+            .save(err =>{
+                if(err){
+                    console.log('err: ', err)
+                }
+                console.log("added graphic design to department")
             })
         }
     })

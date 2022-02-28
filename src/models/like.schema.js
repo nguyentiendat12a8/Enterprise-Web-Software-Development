@@ -1,18 +1,17 @@
 const mongoose = require('mongoose')
 
-exports.Account = mongoose.model(
-    'Account',
+exports.Like = mongoose.model(
+    'Like',
     new mongoose.Schema({
-        accountEmail: {type: String, required: true},
-        accountPassword: {type: String, required: true},
-        phone: {type: Number, required: true},
-        address: String,
-        gender:String,
-        DOB: Date,
-        avatar: String,
-        roles: [{
+        like: {type: Boolean},
+        dislike: {type: Boolean},
+        ideasID: [{
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Role'
+            ref: 'Ideas'
+        }],
+        accountID: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Account'
         }]
     })
 )

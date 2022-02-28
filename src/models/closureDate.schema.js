@@ -1,18 +1,17 @@
 const mongoose = require('mongoose')
 
-exports.Account = mongoose.model(
-    'Account',
+exports.ClosureDate = mongoose.model(
+    'ClosureDate',
     new mongoose.Schema({
-        accountEmail: {type: String, required: true},
-        accountPassword: {type: String, required: true},
-        phone: {type: Number, required: true},
-        address: String,
-        gender:String,
-        DOB: Date,
-        avatar: String,
-        roles: [{
+        firstClosureDate: {type: Date, required: true},
+        finalClosureDate: {type: Date, required: true},
+        accountID: [{
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Role'
+            ref: 'Account'
+        }],
+        departmentID: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Department'
         }]
     })
 )
