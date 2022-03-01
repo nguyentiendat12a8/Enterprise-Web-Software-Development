@@ -133,7 +133,7 @@ isQAOfIT = (req, res, next) => {
     })
 }
 
-isQAOfTheSystem = (req, res, next) => {
+isQAOfBusiness = (req, res, next) => {
     User.findById(req.userId).exec((err, user) => {
         if (err) {
             return res.status(500).send({ message: err })
@@ -149,20 +149,20 @@ isQAOfTheSystem = (req, res, next) => {
                 }
 
                 for (let i = 0; i < roles.length; i++) {
-                    if (roles[i].name === 'QA of the system') {
+                    if (roles[i].name === 'QA of business') {
                         next()
                         return
                     }
                 }
 
-                res.status(403).send({ message: 'Require QA of the system role!' })
+                res.status(403).send({ message: 'Require QA of business role!' })
                 return
             })
 
     })
 }
 
-isQAOfPersonel = (req, res, next) => {
+isQAOfGraphicDesign = (req, res, next) => {
     User.findById(req.userId).exec((err, user) => {
         if (err) {
             return res.status(500).send({ message: err })
@@ -178,13 +178,13 @@ isQAOfPersonel = (req, res, next) => {
                 }
 
                 for (let i = 0; i < roles.length; i++) {
-                    if (roles[i].name === 'QA of personel') {
+                    if (roles[i].name === 'QA of graphic design') {
                         next()
                         return
                     }
                 }
 
-                res.status(403).send({ message: 'Require QA of personel role!' })
+                res.status(403).send({ message: 'Require QA of graphic design role!' })
                 return
             })
 

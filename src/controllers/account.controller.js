@@ -2,9 +2,14 @@
 const db = require('../models/index')
 const Account = db.account
 const Role = db.role
+const ResetPassword = db.resetPassword
 const ROLES = db.ROLES
 var jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
+
+const sendEmail = require("../utils/mailer");
+const crypto = require("crypto");
+const Joi = require("joi");
 
 exports.signup = async (req, res) => {
   const user = new Account({
@@ -23,8 +28,8 @@ exports.signup = async (req, res) => {
     }
 
     if (req.body.roleID) {
-      Role.find({
-        roleName: { $in: req.body.roleID }
+      Role.findOne({
+        roleName: req.body.roleID 
       }, (err, roles) => {
         if (err) {
           return res.status(500).send({
@@ -195,6 +200,62 @@ exports.deleteAccount = async (req, res, next) => {
   catch(err){
     
   }
+}
+
+
+exports.sendEmailResetPass = async (req, res) =>{
+  try {
+    const schema = Joi.object({ accountEmail: Joi.string().email().required()});
+    const { error } = schema.validate(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
+    const user = await Account.findOne({ accountEmail: req.body.accountEmail });
+    if (!user)
+        return res.status(400).send("user with given email doesn't exist");
+
+    let token = await ResetPassword.findOne({ accountID: user._id });
+    if (!token) {
+        token = await new ResetPassword({
+          accountID: user._id,
+          token: crypto.randomBytes(32).toString("hex"),
+        }).save();
+    }
+
+    const link = `${process.env.BASE_URL}/user/confirmLink/${user._id}/${token.token}`;
+    await sendEmail(user.accountEmail, "Password reset", link);
+
+    res.send("password reset link sent to your email account");
+} catch (error) {
+    res.send("An error occured");
+    console.log(error);
+}
+}
+
+
+exports.confirmLink = async (req, res) =>{
+  try {
+    const schema = Joi.object({ accountPassword: Joi.string().required() });
+    const { error } = schema.validate(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
+    const user = await Account.findById(req.params.accountID);
+    if (!user) return res.status(400).send("invalid link or expired");
+
+    const token = await ResetPassword.findOne({
+      accountID: user._id,
+      token: req.params.token,
+    });
+    if (!token) return res.status(400).send("Invalid link or expired");
+
+    user.accountPassword = bcrypt.hashSync(req.body.accountPassword, 8)
+    await user.save();
+    await token.delete();
+
+    res.send("password reset sucessfully.");
+} catch (error) {
+    res.send("An error occured");
+    console.log(error);
+}
 }
 
 

@@ -20,12 +20,12 @@ checkDuplicateEmail = (req, res, next) => {
 }
 
 checkRolesExisted = (req, res, next) => {
-    if (req.body.roles) {
+    if (req.body.roleID) {
         //thu thay for = if (req.body.roles.length > 0)
         //for(let i = 0; i < req.body.roles.length; i++){
-        if (!ROLES.includes(req.body.roles)) {
+        if (!ROLES.includes(req.body.roleID)) {
             res.status(400).send({
-                message: `Failed! Role ${req.body.roles} does not exist!`
+                message: `Failed! Role ${req.body.roleID} does not exist!`
             })
             return
         }

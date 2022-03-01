@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Joi = require("joi")
 
 exports.Account = mongoose.model(
     'Account',
@@ -16,3 +17,14 @@ exports.Account = mongoose.model(
         }]
     })
 )
+
+// exports.validateAccount = (account) =>{
+//     const schema = Joi.object({
+//         accountEmail: Joi.string().email().max(30).required(),
+//         accountPassword: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$')).required(),
+//         phone: Joi.string().required(),
+//         gender: Joi.options([male,female]),
+
+//     })
+//     return schema.validate(user)
+// }
