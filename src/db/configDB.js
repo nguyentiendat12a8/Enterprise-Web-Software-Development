@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
-const { Department } = require('./department.schema')
-const { Role } = require('./role.schema')
+const { Department } = require('../models/department.schema')
+const { Role } = require('../models/role.schema')
 
 exports.connectDB = async () =>{
     try {
