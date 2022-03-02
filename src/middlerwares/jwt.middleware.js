@@ -18,7 +18,7 @@ verifyToken = async (req, res, next) => {
             }
             return res.status(401).send({message: err.message})
         }
-        req.userId = decoded.id
+        req.accountID = decoded.id
         //return res.send({token : token})
         next()
     })
@@ -64,7 +64,6 @@ isAdmin = (req, res, next) => {
                     if (roles[i].name === 'admin') {
                         next()
                         return res.json(roles)
-                        return
                     }
                 }
 
@@ -192,3 +191,9 @@ isQAOfGraphicDesign = (req, res, next) => {
 }
 
 
+const jwt = {
+    verifyToken,
+    verifyRefreshToken,
+    
+}
+module.exports = jwt

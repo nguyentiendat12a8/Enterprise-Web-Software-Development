@@ -202,6 +202,21 @@ exports.deleteAccount = async (req, res, next) => {
   }
 }
 
+exports.listAccount = async(req,res) =>{
+  Account.find({}, (err, list)=>{
+    if(err){
+      return res.status(500).send({
+        errorCode : '500',
+        message: err
+      })
+    }
+    return res.status(200).send({
+      errorCode: 0,
+      data : list
+    })
+  })
+}
+
 
 exports.sendEmailResetPass = async (req, res) =>{
   try {
@@ -250,7 +265,6 @@ exports.confirmLink = async (req, res) =>{
     user.accountPassword = bcrypt.hashSync(req.body.accountPassword, 8)
     await user.save();
     await token.delete();
-
     res.send("password reset sucessfully.");
 } catch (error) {
     res.send("An error occured");

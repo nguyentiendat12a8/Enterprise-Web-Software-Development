@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-exports.resetPassword = mongoose.model(
+exports.ResetPassword = mongoose.model(
     'ResetPassword',
     new mongoose.Schema({
         accountID: {

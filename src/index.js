@@ -1,6 +1,6 @@
 const express = require('express')
-const db = require('./models/configDB')
-const route = require('./routers/index.routers')
+const db = require('../src/db/configDB')
+const route = require('./routers/index.router')
 const app = express()
 
 

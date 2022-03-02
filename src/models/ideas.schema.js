@@ -5,8 +5,8 @@ exports.Ideas = mongoose.model(
     new mongoose.Schema({
         ideasContent: {type: String, required: true},
         ideasFile: {type: String},
-        numberOfLike: {type: Number, default: 0},
-        numberOfDislike: {type: Number, default: 0},
+        numberOfLike: {type: Number},
+        numberOfDislike: {type: Number},
         closureDateID: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'ClosureDate'
