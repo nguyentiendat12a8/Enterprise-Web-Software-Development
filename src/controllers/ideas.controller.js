@@ -47,50 +47,25 @@ exports.likeIdeas = async (req, res) => {
         const ideasID = req.body.ideasID //params ?
         const accountID = req.body.accountID // req.accountID
 
-        const tim = await Like.findOne({
-            accountID: accountID,
-            ideasID: ideasID
-        }, (err, check) => {
-            if (err) return res.status(500).send({
-                errorCode: 500,
-                message: 'check like dont work'
-            })
-            if (check.dislike === true) {
-                check.dislike = false
-                check.like = true
-                await check.save()
-                const addLike = await Ideas.findById({ _id: ideasID })
-                const numberOfLike = addLike.numberOfLike + 1
-                await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfLike }, { new: true })
-                return res.status(200).send({
-                    errorCode: 0,
-                    message: 'number of like update successfully'
-                })
-            } else if (check.like === true) {
-                check.deleteOne()
-            }
-            // return res.status(200).send({
-            //     errorCode: 0,
-            //     message: 'click like successfully!'
-            // })
+        const like = new Like({
+            like: true,
+            //dislike: false,
+            ideasID: ideasID,
+            accountID: accountID
         })
-        // xóa bản ghi like và dislike là false
-        // const deleteLike = Like.find({like: false, dislike: false})
-        // deleteLike.delete()
-
-        //hiện tại ở đây đang là tạo object mới nên sẽ k có trường hợp dòng 59.
-        // cần xét thêm trường hợp tìm accountid và ideasID đã tạo và chỉnh sửa dislike nếu nó là true
-        if (!tim) {
-            const like = new Like({ like: true })
-            await like.save()
-            const addLike = await Ideas.findById({ _id: ideasID })
-            const numberOfLike = addLike.numberOfLike + 1
-            await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfLike }, { new: true })
-            return res.status(200).send({
-                errorCode: 0,
-                message: 'number of like update successfully'
-            })
-        }
+        await like.save()
+        const number = await Like.find({ideasID : ideasID})
+        let sum = 0
+        number.forEach(e =>{
+            if(e.ike === true){
+                sum = sum+1
+            }
+        })
+        await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfLike: sum }, { new: true })
+        return res.status(200).send({
+            errorCode: 0,
+            message: 'number of like update successfully'
+        })
     }
     catch (err) {
         console.log(err)
@@ -102,45 +77,31 @@ exports.dislikeIdeas = async (req, res) => {
         const ideasID = req.body.ideasID //params ?
         const accountID = req.body.accountID // req.accountID
 
-        const tim = await Like.findOne({
-            accountID: accountID,
-            ideasID: ideasID
-        }, (err, check) => {
-            if (err) return res.status(500).send({
-                errorCode: 500,
-                message: 'check like dont work'
-            })
-            if (check.like === true) {
-                check.like = false
-                check.dislike = true
-                await check.save()
-                const addLike = await Ideas.findById({ _id: ideasID })
-                const numberOfLike = addLike.numberOfDislike + 1
-                await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfDislike }, { new: true })
-                return res.status(200).send({
-                    errorCode: 0,
-                    message: 'number of dislike update successfully'
-                })
-            } else if (check.dislike === true) {
-                check.deleteOne()
+        const dislike = new Like({
+            dislike: true,
+            ideasID: ideasID,
+            accountID: accountID
+        })
+        await dislike.save()
+        const number = await Like.find({ideasID : ideasID})
+        let sum = 0
+        number.forEach(e =>{
+            if(e.dislike === true){
+                sum = sum+1
             }
         })
-        if (!tim) {
-            const like = new Like({ dislike: true })
-            await like.save()
-            const addLike = await Ideas.findById({ _id: ideasID })
-            const numberOfLike = addLike.numberOfDislike + 1
-            await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfDislike }, { new: true })
-            return res.status(200).send({
-                errorCode: 0,
-                message: 'number of dislike update successfully'
-            })
-        }
+        await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfDislike: sum }, { new: true })
+        return res.status(200).send({
+            errorCode: 0,
+            message: 'number of like update successfully'
+        })
     }
     catch (err) {
         console.log(err)
     }
 }
+
+
 
 exports.downloadIdeas = (req, res) => {
     Ideas.findAll().then((objs) => {
