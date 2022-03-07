@@ -22,6 +22,6 @@ db.department = Department
 db.ideas = Ideas 
 db.like = Like 
 
-db.ROLES = ['staff', 'admin','QA', 'QA of IT','QA of business','QA of graphic design']
+// db.ROLES = ['staff', 'admin','QA', 'QA of IT','QA of business','QA of graphic design']
 
 module.exports = db

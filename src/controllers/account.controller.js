@@ -16,6 +16,10 @@ exports.signup = async (req, res) => {
     accountEmail: req.body.accountEmail,
     accountPassword: bcrypt.hashSync(req.body.accountPassword, 8),
     phone: req.body.phone,
+    address: req.body.address,
+    gender:req.body.gender,
+    DOB: req.body.DOB,
+    //roleID: req.body.roleID
     //avatar: req.file.path
   })
 

@@ -1,10 +1,11 @@
+const timespan = require('jsonwebtoken/lib/timespan')
 const mongoose = require('mongoose')
 
 exports.Comment = mongoose.model(
     'Comment',
     new mongoose.Schema({
-        commentText: {type: String, required: true},
-        commentTimeUp: {type: Date, default: Date.now()},
+        commentText: { type: String, required: true },
+        //commentTimeUp: {type: Date, default: Date.now()},
         accountID: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Account'
@@ -13,5 +14,8 @@ exports.Comment = mongoose.model(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Ideas'
         }]
-    })
+    }, {
+        timestamps: true
+    }
+    )
 )

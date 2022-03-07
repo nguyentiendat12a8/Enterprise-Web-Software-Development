@@ -7,6 +7,7 @@ exports.Ideas = mongoose.model(
         ideasFile: {type: String},
         numberOfLike: {type: Number},
         numberOfDislike: {type: Number},
+        numberOfComment: {type: Number},
         closureDateID: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'ClosureDate'

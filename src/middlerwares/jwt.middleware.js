@@ -4,7 +4,7 @@ const db = require('../models/index')
 const User = db.user
 const Role = db.role
 
-verifyToken = async (req, res, next) => {
+exports.verifyToken = async (req, res, next) => {
     let token = req.body.token || req.query.token ||req.headers["x-access-token"];
     //const token = req.cookies.access_token
     //const token = req.body.access_token
@@ -24,7 +24,7 @@ verifyToken = async (req, res, next) => {
     })
 }
 
-verifyRefreshToken = (req, res, next) => {
+exports.verifyRefreshToken = (req, res, next) => {
     let refreshToken = req.body.refreshToken || req.query.refreshToken
     //const refreshToken = req.cookies.access_token
     //const token = req.body.access_token
@@ -45,7 +45,7 @@ verifyRefreshToken = (req, res, next) => {
     })
 }
 
-isAdmin = (req, res, next) => {
+exports.isAdmin = (req, res, next) => {
     User.findById(req.userId).exec((err, user) => {
         if (err) {
             return res.status(500).send({ message: err })
@@ -74,7 +74,7 @@ isAdmin = (req, res, next) => {
     })
 }
 
-isQA = (req, res, next) => {
+exports.isQA = (req, res, next) => {
     User.findById(req.userId).exec((err, user) => {
         if (err) {
             return res.status(500).send({ message: err })
@@ -103,7 +103,7 @@ isQA = (req, res, next) => {
     })
 }
 
-isQAOfIT = (req, res, next) => {
+exports.isQAOfIT = (req, res, next) => {
     User.findById(req.userId).exec((err, user) => {
         if (err) {
             return res.status(500).send({ message: err })
@@ -132,7 +132,7 @@ isQAOfIT = (req, res, next) => {
     })
 }
 
-isQAOfBusiness = (req, res, next) => {
+exports.isQAOfBusiness = (req, res, next) => {
     User.findById(req.userId).exec((err, user) => {
         if (err) {
             return res.status(500).send({ message: err })
@@ -161,7 +161,7 @@ isQAOfBusiness = (req, res, next) => {
     })
 }
 
-isQAOfGraphicDesign = (req, res, next) => {
+exports.isQAOfGraphicDesign = (req, res, next) => {
     User.findById(req.userId).exec((err, user) => {
         if (err) {
             return res.status(500).send({ message: err })
@@ -189,11 +189,3 @@ isQAOfGraphicDesign = (req, res, next) => {
 
     })
 }
-
-
-const jwt = {
-    verifyToken,
-    verifyRefreshToken,
-    
-}
-module.exports = jwt

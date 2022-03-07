@@ -11,17 +11,16 @@ const storage = multer.diskStorage({
     }
 })
 
-var upload = multer({
+exports.upload = multer({
     storage: storage,
     fileFilter: function(req, file, callback) {
         if(
-            file.mimetype =="image/png" || 
-            file.mimetype =="image/gif" ||
-            file.mimetype =="image/jpeg"
+            file.mimetype =="application/pdf" ||
+            file.mimetype == 'application/msword'
         ){
             callback(null, true)
         }else {
-            console.log('only png/gif/jpg file supported')
+            console.log('only doc/pdf file supported')
             callback(null,false)
         }
     },
@@ -39,13 +38,12 @@ const storageAvatar = multer.diskStorage({
         cb(null, Date.now()+ext)
     }
 })
-var uploadAvatar = multer({
+exports.uploadAvatar = multer({
     storage: storageAvatar,
     fileFilter: function(req, file, callback) {
         if(
-            file.mimetype =="image/png" || 
-            file.mimetype =="image/gif" ||
-            file.mimetype =="image/jpeg"
+            file.mimetype =="application/pdf" ||
+            file.mimetype == 'application/msword'
         ){
             callback(null, true)
         }else {
@@ -57,6 +55,3 @@ var uploadAvatar = multer({
     //     fileSize: 1024 * 1024 * 2
     // }
 })
-
-module.exports = upload
-module.exports = uploadAvatar
