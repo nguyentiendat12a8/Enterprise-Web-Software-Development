@@ -11,11 +11,11 @@ const router = express.Router();
 
 router.post('/signup',[verifySignUp.checkDuplicateEmail], signup)
 router.post('/signin', signin)
-router.patch('/updatePassword',[verifyToken], updatePassword)
-router.get('/editAccount', [verifyToken],editAccount)
-router.patch('/updateAccount', [verifyToken], updateAccount)
-router.get('/listAccount',[verifyToken, isAdmin], listAccount)
-router.post('/sendEmailResetPassword',verifyToken, sendEmailResetPass)
+router.patch('/update-password',[verifyToken], updatePassword)
+router.get('/edit-account', [verifyToken],editAccount)
+router.patch('/update-account', [verifyToken], updateAccount)
+router.get('/list-account',[verifyToken, isAdmin], listAccount)
+router.post('/send-email-reset-password',verifyToken, sendEmailResetPass)
 router.post('/confirmLink/:accountID/:token', confirmLink)
 
 

@@ -3,6 +3,6 @@ const { createClousureDate } = require('../controllers/closureDate.controller');
 const {verifyToken, isAdmin } = require('../middlerwares/jwt.middleware');
 const router = express.Router();
 
-router.post('/createClosureDate',[verifyToken, isAdmin], createClousureDate)
+router.post('/create-closure-date',[verifyToken, isAdmin], createClousureDate)
 
 module.exports = router

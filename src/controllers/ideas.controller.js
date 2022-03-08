@@ -204,6 +204,22 @@ exports.commentIdeas = async (req, res) => {
     }
 }
 
+exports.listCommentIdeas = (req, res) => {
+    const ideasID = req.params.ideasID
+    Comment.findById({ideasID}, (err, listComment) =>{
+        if(err){
+            return res.status(500).send({
+                errorCode : 500,
+                message: 'Ideas server is error'
+            })
+        }
+        return res.status(200).send({
+            errorCode : 0,
+            data: listComment
+        })
+    })
+}
+
 exports.editCommentIdeas = (req, res) => {
     const ideasID = req.body.ideasID //params ?
     const accountID = req.body.accountID // req.accountID
