@@ -21,7 +21,7 @@ exports.createIdeas = async (req, res) => {
         numberOfLike: 0,
         numberOfDislike: 0,
         closureDateID: closureDate._id,
-        accountID: req.body.accountID, // req.accountID,
+        accountID: req.accountID, // req.accountID,
         departmentID: department._id,
         //categoryID: category._id
     })
@@ -75,6 +75,7 @@ exports.listIdeas = async (req, res) => {
             errorCode: 0,
             message: 'Ideas server is error'
         })
+
         return res.status(200).send({
             errorCode: 0,
             data: list
@@ -84,8 +85,8 @@ exports.listIdeas = async (req, res) => {
 
 exports.likeIdeas = async (req, res) => {
     try {
-        const ideasID = req.body.ideasID //params ?
-        const accountID = req.body.accountID // req.accountID
+        const ideasID = req.params.ideasID //params ?
+        const accountID = req.accountID // req.accountID
 
         const like = new Like({
             like: true,
@@ -126,8 +127,8 @@ exports.likeIdeas = async (req, res) => {
 
 exports.dislikeIdeas = async (req, res) => {
     try {
-        const ideasID = req.body.ideasID //params ?
-        const accountID = req.body.accountID // req.accountID
+        const ideasID = req.params.ideasID //params ?
+        const accountID = req.accountID // req.accountID
 
         const dislike = new Like({
             dislike: true,
@@ -166,7 +167,7 @@ exports.dislikeIdeas = async (req, res) => {
 }
 
 exports.commentIdeas = async (req, res) => {
-    const ideasID = req.body.ideasID //params ?
+    const ideasID = req.params.ideasID //params ?
     //const accountID = req.body.accountID // req.accountID
 
     const comment = new Comment({

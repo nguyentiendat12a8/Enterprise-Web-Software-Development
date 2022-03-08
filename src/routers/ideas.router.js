@@ -7,8 +7,8 @@ const { upload } = require('../utils/uploadFile')
 const router = express.Router();
 
 router.post('/uploadIdeas',[verifyToken,upload.single('ideasFile')] ,createIdeas)
-router.post('/likeIdeas',[verifyToken,checkLike], likeIdeas)
-router.post('/dislikeIdeas',[verifyToken,checkDislike], dislikeIdeas)
-router.post('/commentIdeas',[verifyToken], commentIdeas)
+router.post('/likeIdeas/:ideasID',[verifyToken,checkLike], likeIdeas)
+router.post('/dislikeIdeas/:ideasID',[verifyToken,checkDislike], dislikeIdeas)
+router.post('/commentIdeas/:ideasID',[verifyToken], commentIdeas)
 
 module.exports = router

@@ -136,7 +136,7 @@ exports.signin = async (req, res, next) => {
 exports.updatePassword = async (req, res, next) => {
   try {
     //const { id } = req.params
-    const id = req.body.id
+    const id = req.accountID
     const user = await Account.findOne({ _id: id })
     const password = req.body.accountPassword
     const newAccountPassword = bcrypt.hashSync(req.body.newAccountPassword, 8)
@@ -156,10 +156,17 @@ exports.updatePassword = async (req, res, next) => {
 }
 
 exports.editAccount = async (req, res, next) => {
-  const id = req.userId
+  const id = req.accountID
+  if(!id) return res.status(400).send({
+    errorCode: '401',
+    message: 'Unauthentication'
+  })
   Account.findById({ _id: id }).then(accInfo => {
     const acc = {
-      avatar: accInfo.avatar,
+      phone: accInfo.phone,
+      address: accInfo.address,
+      gender: accInfo.gender,
+      DOB: accInfo.DOB
     } 
     return res.status(200).send({
       errorCode: 0,
@@ -178,55 +185,61 @@ exports.editAccount = async (req, res, next) => {
 exports.updateAccount = async (req, res, next) => {
   try {
     //const { id } = req.params
-    const id = req.body.id
+    const id = req.accountID
     console.log(id)
-    const avatar = req.file.path
-    await Account.findByIdAndUpdate({ _id: id }, { avatar: avatar,phone:phone }, { new: true })
+    const phone = req.body.phone
+    const address = req.body.address
+    const gender  = req.body.gender
+    const DOB = req.body.DOB
+    await Account.findByIdAndUpdate({ _id: id }, { 
+      phone, address,gender, DOB 
+    }, { new: true })
     return res.status(200).send({ message: 'Change info successfully!' })
   } catch (error) {
     console.log(error)
   }
 }
 
-
-
-exports.deleteAccount = async (req, res, next) => {
-  try {
-    const id = req.params.id
-    Account.deleteOne({_id: id})
-    .then(()=>{
-      return res.status(200).send({
-        errorCode: 0,
-        message: 'Delete account successfully!'
-      })
-    })
-  }
-  catch(err){
+// exports.deleteAccount = async (req, res, next) => {
+//   try {
+//     const id = req.params.id
+//     Account.deleteOne({_id: id})
+//     .then(()=>{
+//       return res.status(200).send({
+//         errorCode: 0,
+//         message: 'Delete account successfully!'
+//       })
+//     })
+//   }
+//   catch(err){
     
-  }
-}
+//   }
+// }
 
-exports.listAccount = async(req,res) =>{
-  Account.find({}, (err, list)=>{
-    if(err){
-      return res.status(500).send({
-        errorCode : '500',
-        message: err
-      })
-    }
-    return res.status(200).send({
-      errorCode: 0,
-      data : list
-    })
-  })
-}
+// exports.listAccount = async(req,res) =>{
+//   Account.find({}, (err, list)=>{
+//     if(err){
+//       return res.status(500).send({
+//         errorCode : '500',
+//         message: err
+//       })
+//     }
+//     return res.status(200).send({
+//       errorCode: 0,
+//       data : list
+//     })
+//   })
+// }
 
 
 exports.sendEmailResetPass = async (req, res) =>{
   try {
     const schema = Joi.object({ accountEmail: Joi.string().email().required()});
     const { error } = schema.validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error) return res.status(400).send({
+      errorCode: 400,
+      message: error.details[0].message
+    });
 
     const user = await Account.findOne({ accountEmail: req.body.accountEmail });
     if (!user)
@@ -255,7 +268,10 @@ exports.confirmLink = async (req, res) =>{
   try {
     const schema = Joi.object({ accountPassword: Joi.string().required() });
     const { error } = schema.validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error) return res.status(400).send({
+      errorCode: 400,
+      message: error.details[0].message
+    })
 
     const user = await Account.findById(req.params.accountID);
     if (!user) return res.status(400).send("invalid link or expired");
