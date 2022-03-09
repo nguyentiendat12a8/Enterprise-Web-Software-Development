@@ -20,7 +20,6 @@ exports.signup = async (req, res) => {
     gender:req.body.gender,
     DOB: req.body.DOB,
     //roleID: req.body.roleID
-    //avatar: req.file.path
   })
 
   user.save((err, user) => {
@@ -142,7 +141,7 @@ exports.updatePassword = async (req, res, next) => {
     const newAccountPassword = bcrypt.hashSync(req.body.newAccountPassword, 8)
     if (bcrypt.compareSync(password, user.accountPassword)) {
       await Account.findByIdAndUpdate({ _id: id }, { accountPassword: newAccountPassword }, { new: true })
-      return res.status(200).send({ message: 'Change password successfully!' })
+      return res.status(200).send({ message: 'Change password successfully!'})
     }
     else {
       return res.status(400).send({
@@ -216,20 +215,20 @@ exports.updateAccount = async (req, res, next) => {
 //   }
 // }
 
-// exports.listAccount = async(req,res) =>{
-//   Account.find({}, (err, list)=>{
-//     if(err){
-//       return res.status(500).send({
-//         errorCode : '500',
-//         message: err
-//       })
-//     }
-//     return res.status(200).send({
-//       errorCode: 0,
-//       data : list
-//     })
-//   })
-// }
+exports.listAccount = async(req,res) =>{
+  Account.find({}, (err, list)=>{
+    if(err){
+      return res.status(500).send({
+        errorCode : '500',
+        message: err
+      })
+    }
+    return res.status(200).send({
+      errorCode: 0,
+      data : list
+    })
+  })
+}
 
 
 exports.sendEmailResetPass = async (req, res) =>{

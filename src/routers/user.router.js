@@ -1,8 +1,7 @@
 const express = require('express');
-const { signup, signin, sendEmailResetPass, confirmLink, listAccount, updatePassword, editAccount, updateAccount } = require('../controllers/account.controller');
-const {uploadAvatar, upload} = require('../utils/uploadFile');
-const { createIdeas } = require('../controllers/ideas.controller')
-
+const { signup, signin, sendEmailResetPass,
+     confirmLink, listAccount, updatePassword,
+    editAccount, updateAccount } = require('../controllers/account.controller');
 const verifySignUp = require('../middlerwares/verifySignUp.middleware');
 const { verifyToken, isAdmin } = require('../middlerwares/jwt.middleware');
 

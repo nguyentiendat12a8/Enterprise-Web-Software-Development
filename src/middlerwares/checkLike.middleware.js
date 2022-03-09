@@ -7,8 +7,8 @@ const Like = db.like
 
 exports.checkLike = async (req, res, next) => {
 
-    const ideasID = req.body.ideasID //params ?
-    const accountID = req.body.accountID // req.accountID
+    const ideasID = req.params.ideasID //params ?
+    const accountID = req.accountID // req.accountID
 
     const check = await Like.findOne({
         accountID: accountID,
@@ -60,8 +60,8 @@ exports.checkLike = async (req, res, next) => {
 
 exports.checkDislike = async (req, res, next) => {
 
-    const ideasID = req.body.ideasID //params ?
-    const accountID = req.body.accountID // req.accountID
+    const ideasID = req.params.ideasID //params ?
+    const accountID = req.accountID // req.accountID
 
     const check = await Like.findOne({
         accountID: accountID,

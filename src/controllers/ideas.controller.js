@@ -75,10 +75,33 @@ exports.listIdeas = async (req, res) => {
             errorCode: 0,
             message: 'Ideas server is error'
         })
-
+        listShow = []
+        list.forEach(async (e) =>{
+            await Department.findById({_id: e.departmentID}, async (err, department)=>{
+                if (err) return res.status(500).send({
+                    errorCode: 0,
+                    message: 'Ideas server is error'
+                })
+                await Category.findById({_id: e.categoryID}, (err, category)=>{
+                    if (err) return res.status(500).send({
+                        errorCode: 0,
+                        message: 'Ideas server is error'
+                    })
+                    const listInfo = {
+                        ideasContent: e.ideasContent,
+                        ideasFile : e.ideasFile,
+                        numberOfLike: e.numberOfLike,
+                        numberOfDislike: e.numberOfDislike,
+                        numberOfComment: e.numberOfComment,
+                        departmentName: department.departmentName
+                    }
+                    listShow.append(listInfo)
+                })
+            })
+        })
         return res.status(200).send({
             errorCode: 0,
-            data: list
+            data: listShow
         })
     })
 }
@@ -95,10 +118,10 @@ exports.likeIdeas = async (req, res) => {
             accountID: accountID
         })
         const d = new Date()
-        const ideas = await Ideas.findById(ideasID)
-        const closureDate = await ClosureDate.findById({ closureDateID: ideas.closureDateID })
+        const ideas = await Ideas.findById({_id:ideasID})
+        const closureDate = await ClosureDate.findById({ _id: ideas.closureDateID })
         const finalDate = await closureDate.finalClosureDate.split('/')
-        if (parseInt(finalDate[0]) < parseInt(d.getDate())) {
+        if (parseInt(finalDate[0]) > parseInt(d.getDate())) {
             await like.save()
             const number = await Like.find({ ideasID: ideasID })
             let sum = 0
@@ -136,8 +159,8 @@ exports.dislikeIdeas = async (req, res) => {
             accountID: accountID
         })
         const d = new Date()
-        const ideas = await Ideas.findById(ideasID)
-        const closureDate = await ClosureDate.findById({ closureDateID: ideas.closureDateID })
+        const ideas = await Ideas.findById({_id:ideasID})
+        const closureDate = await ClosureDate.findById({ _id: ideas.closureDateID })
         const finalDate = await closureDate.finalClosureDate.split('/')
         if (parseInt(finalDate[0]) < parseInt(d.getDate())) {
             await dislike.save()
@@ -151,7 +174,7 @@ exports.dislikeIdeas = async (req, res) => {
             await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfDislike: sum }, { new: true })
             return res.status(200).send({
                 errorCode: 0,
-                message: 'number of like update successfully'
+                message: 'number of dislike update successfully'
             })
         } else {
             return res.status(401).send({

@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const config = process.env
 const db = require('../models/index')
-const User = db.user
+const Account = db.account
 const Role = db.role
 
 exports.verifyToken = async (req, res, next) => {
@@ -46,13 +46,13 @@ exports.verifyRefreshToken = (req, res, next) => {
 }
 
 exports.isAdmin = (req, res, next) => {
-    User.findById(req.userId).exec((err, user) => {
+    Account.findById(req.accountID).exec((err, user) => {
         if (err) {
             return res.status(500).send({ message: err })
         }
 
         Role.find({
-            _id: { $in: user.roles }
+            _id: user.roleID
         },
             (err, roles) => {
                 if (err) {
@@ -61,27 +61,25 @@ exports.isAdmin = (req, res, next) => {
                 }
 
                 for (let i = 0; i < roles.length; i++) {
-                    if (roles[i].name === 'admin') {
+                    if (roles[i].roleName === 'admin') {
                         next()
                         return res.json(roles)
                     }
                 }
-
-                res.status(403).send({ message: 'Require admin role!' })
-                return
+                return res.status(403).send({ message: 'Require admin role!' })
             })
 
     })
 }
 
 exports.isQA = (req, res, next) => {
-    User.findById(req.userId).exec((err, user) => {
+    Account.findById(req.accountID).exec((err, user) => {
         if (err) {
             return res.status(500).send({ message: err })
         }
 
         Role.find({
-            _id: { $in: user.roles }
+            _id: { $in: user.roleID }
         },
             (err, roles) => {
                 if (err) {
@@ -90,7 +88,7 @@ exports.isQA = (req, res, next) => {
                 }
 
                 for (let i = 0; i < roles.length; i++) {
-                    if (roles[i].name === 'QA') {
+                    if (roles[i].roleName === 'QA') {
                         next()
                         return
                     }
@@ -104,13 +102,13 @@ exports.isQA = (req, res, next) => {
 }
 
 exports.isQAOfIT = (req, res, next) => {
-    User.findById(req.userId).exec((err, user) => {
+    Account.findById(req.accountID).exec((err, user) => {
         if (err) {
             return res.status(500).send({ message: err })
         }
 
         Role.find({
-            _id: { $in: user.roles }
+            _id: { $in: user.roleID }
         },
             (err, roles) => {
                 if (err) {
@@ -119,7 +117,7 @@ exports.isQAOfIT = (req, res, next) => {
                 }
 
                 for (let i = 0; i < roles.length; i++) {
-                    if (roles[i].name === 'QA of IT') {
+                    if (roles[i].roleName === 'QA of IT') {
                         next()
                         return
                     }
@@ -133,13 +131,13 @@ exports.isQAOfIT = (req, res, next) => {
 }
 
 exports.isQAOfBusiness = (req, res, next) => {
-    User.findById(req.userId).exec((err, user) => {
+    Account.findById(req.accountID).exec((err, user) => {
         if (err) {
             return res.status(500).send({ message: err })
         }
 
         Role.find({
-            _id: { $in: user.roles }
+            _id: { $in: user.roleID }
         },
             (err, roles) => {
                 if (err) {
@@ -148,7 +146,7 @@ exports.isQAOfBusiness = (req, res, next) => {
                 }
 
                 for (let i = 0; i < roles.length; i++) {
-                    if (roles[i].name === 'QA of business') {
+                    if (roles[i].roleName === 'QA of business') {
                         next()
                         return
                     }
@@ -162,13 +160,13 @@ exports.isQAOfBusiness = (req, res, next) => {
 }
 
 exports.isQAOfGraphicDesign = (req, res, next) => {
-    User.findById(req.userId).exec((err, user) => {
+    Account.findById(req.accountID).exec((err, user) => {
         if (err) {
             return res.status(500).send({ message: err })
         }
 
         Role.find({
-            _id: { $in: user.roles }
+            _id: { $in: user.roleID }
         },
             (err, roles) => {
                 if (err) {
@@ -177,7 +175,7 @@ exports.isQAOfGraphicDesign = (req, res, next) => {
                 }
 
                 for (let i = 0; i < roles.length; i++) {
-                    if (roles[i].name === 'QA of graphic design') {
+                    if (roles[i].roleName === 'QA of graphic design') {
                         next()
                         return
                     }
