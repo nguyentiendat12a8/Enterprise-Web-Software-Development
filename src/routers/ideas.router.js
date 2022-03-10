@@ -1,5 +1,5 @@
 const express = require('express');
-const { createIdeas, likeIdeas, dislikeIdeas, commentIdeas, listCommentIdeas, listIdeas, viewSubmitIdeas, downloadIdeas } = require('../controllers/ideas.controller');
+const { createIdeas, likeIdeas, dislikeIdeas, commentIdeas, listCommentIdeas, listIdeas, viewSubmitIdeas, downloadIdeas, deleteCommentIdeas } = require('../controllers/ideas.controller');
 const { checkLike, checkDislike } = require('../middlerwares/checkLike.middleware');
 const { verifyToken } = require('../middlerwares/jwt.middleware');
 const { upload } = require('../utils/uploadFile')
@@ -10,6 +10,8 @@ router.post('/upload-ideas',[verifyToken,upload.single('ideasFile')] ,createIdea
 router.post('/like-ideas/:ideasID',[verifyToken,checkLike], likeIdeas)
 router.post('/dislike-ideas/:ideasID',[verifyToken,checkDislike], dislikeIdeas)
 router.post('/comment-ideas/:ideasID',[verifyToken], commentIdeas)
+router.post('/delete-comment/:commnetID', deleteCommentIdeas)
+
 router.get('/list-comment-ideas/:ideasID',[verifyToken], listCommentIdeas)
 router.get('/list-ideas',[verifyToken], listIdeas) // lỗi 10/3
 

@@ -148,6 +148,22 @@ exports.listIdeas = async (req, res) => {
                 errorCode: 0,
                 message: 'category server is error'
             })
+            // const numberLike = await Like.find({ ideasID: list[i]._id })
+            // let sumLike = 0
+            // let sumDislike = 0
+            // numberLike.forEach(e => {
+            //     if (e.like === true) {
+            //         sumLike = sumLike + 1
+            //     } else if(e.dislike === true){
+            //         sumDislike = sumDislike +1
+            //     }
+            // })
+            // const numberComment = await Comment.find({ ideasID: list[i]._id })
+            // let sumComment = 0
+            // numberComment.forEach(e=>{
+            //     sumComment +=1
+            // })
+
             var listInfo = {
                 _id: list[i]._id,
                 ideasContent: list[i].ideasContent,
@@ -326,8 +342,17 @@ exports.updateCommentIdeas = (req, res) => {
 
 }
 
-exports.deleteCommentIdeas = (req, res) => {
-
+exports.deleteCommentIdeas = async (req, res) => {
+    const comment = await Comment.findById('622a10e1f965150f29d40efa')
+    if(!comment) return res.status(500).send({
+        errorCode: 500,
+        message: 'Comment server is error'
+    })
+    await comment.delete()
+    return res.status(200).send({
+        errorCode: 0,
+        message: 'Comment delete successfully'
+    })
 }
 
 exports.downloadIdeas = (req, res) => {

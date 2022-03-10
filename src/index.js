@@ -13,6 +13,9 @@ app.use(express.urlencoded({
 }))
 app.use(express.json())
 
+const cors = require('cors')
+app.use(cors())
+
 db.connectDB()
 
 app.get('/',(req,res)=>{

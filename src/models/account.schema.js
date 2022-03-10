@@ -15,13 +15,10 @@ exports.Account = mongoose.model(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Role'
         }]
+    }, {
+        timestamps: true
     })
 )
-const softDelete = require('mongoose-delete')
-mongoose.plugin(softDelete, {
-    deleteAt: true,
-    overrideMethods : 'all'
-})
 
 // exports.validateAccount = (account) =>{
 //     const schema = Joi.object({
