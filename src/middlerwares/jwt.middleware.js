@@ -46,144 +46,86 @@ exports.verifyRefreshToken = (req, res, next) => {
 }
 
 exports.isAdmin = (req, res, next) => {
-    Account.findById(req.accountID).exec((err, user) => {
+    Account.findById(req.accountID, (err,user)=>{
         if (err) {
             return res.status(500).send({ message: err })
         }
-
-        Role.find({
-            _id: user.roleID
-        },
-            (err, roles) => {
-                if (err) {
-                    res.status(500).send({ message: err })
-                    return
-                }
-
-                for (let i = 0; i < roles.length; i++) {
-                    if (roles[i].roleName === 'admin') {
-                        next()
-                        return res.json(roles)
-                    }
-                }
-                return res.status(403).send({ message: 'Require admin role!' })
-            })
-
+        Role.findById(user.roleID, (err, role)=>{
+            if (err) {
+                return res.status(500).send({ message: err })
+            }
+            if(role.roleName === 'admin'){
+                return next()
+            }
+            return res.status(403).send({ message: 'Require admin role!' })
+        })
     })
 }
 
 exports.isQA = (req, res, next) => {
-    Account.findById(req.accountID).exec((err, user) => {
+    Account.findById(req.accountID, (err,user)=>{
         if (err) {
             return res.status(500).send({ message: err })
         }
-
-        Role.find({
-            _id: { $in: user.roleID }
-        },
-            (err, roles) => {
-                if (err) {
-                    res.status(500).send({ message: err })
-                    return
-                }
-
-                for (let i = 0; i < roles.length; i++) {
-                    if (roles[i].roleName === 'QA') {
-                        next()
-                        return
-                    }
-                }
-
-                res.status(403).send({ message: 'Require QA role!' })
-                return
-            })
-
+        Role.findById(user.roleID, (err, role)=>{
+            if (err) {
+                return res.status(500).send({ message: err })
+            }
+            if(role.roleName === 'QA'){
+                return next()
+            }
+            return res.status(403).send({ message: 'Require QA role!' })
+        })
     })
 }
 
 exports.isQAOfIT = (req, res, next) => {
-    Account.findById(req.accountID).exec((err, user) => {
+    Account.findById(req.accountID, (err,user)=>{
         if (err) {
             return res.status(500).send({ message: err })
         }
-
-        Role.find({
-            _id: { $in: user.roleID }
-        },
-            (err, roles) => {
-                if (err) {
-                    res.status(500).send({ message: err })
-                    return
-                }
-
-                for (let i = 0; i < roles.length; i++) {
-                    if (roles[i].roleName === 'QA of IT') {
-                        next()
-                        return
-                    }
-                }
-
-                res.status(403).send({ message: 'Require QA of IT role!' })
-                return
-            })
-
+        Role.findById(user.roleID, (err, role)=>{
+            if (err) {
+                return res.status(500).send({ message: err })
+            }
+            if(role.roleName === 'QA of IT'){
+                return next()
+            }
+            return res.status(403).send({ message: 'Require QA of IT role!' })
+        })
     })
 }
 
 exports.isQAOfBusiness = (req, res, next) => {
-    Account.findById(req.accountID).exec((err, user) => {
+    Account.findById(req.accountID, (err,user)=>{
         if (err) {
             return res.status(500).send({ message: err })
         }
-
-        Role.find({
-            _id: { $in: user.roleID }
-        },
-            (err, roles) => {
-                if (err) {
-                    res.status(500).send({ message: err })
-                    return
-                }
-
-                for (let i = 0; i < roles.length; i++) {
-                    if (roles[i].roleName === 'QA of business') {
-                        next()
-                        return
-                    }
-                }
-
-                res.status(403).send({ message: 'Require QA of business role!' })
-                return
-            })
-
+        Role.findById(user.roleID, (err, role)=>{
+            if (err) {
+                return res.status(500).send({ message: err })
+            }
+            if(role.roleName === 'QA of business'){
+                return next()
+            }
+            return res.status(403).send({ message: 'Require QA of business role!' })
+        })
     })
 }
 
 exports.isQAOfGraphicDesign = (req, res, next) => {
-    Account.findById(req.accountID).exec((err, user) => {
+    Account.findById(req.accountID, (err,user)=>{
         if (err) {
             return res.status(500).send({ message: err })
         }
-
-        Role.find({
-            _id: { $in: user.roleID }
-        },
-            (err, roles) => {
-                if (err) {
-                    res.status(500).send({ message: err })
-                    return
-                }
-
-                for (let i = 0; i < roles.length; i++) {
-                    if (roles[i].roleName === 'QA of graphic design') {
-                        next()
-                        return
-                    }
-                }
-
-                res.status(403).send({ message: 'Require QA of graphic design role!' })
-                return
-            })
-
+        Role.findById(user.roleID, (err, role)=>{
+            if (err) {
+                return res.status(500).send({ message: err })
+            }
+            if(role.roleName === 'QA of graphic design'){
+                return next()
+            }
+            return res.status(403).send({ message: 'Require QA of graphic design role!' })
+        })
     })
 }

@@ -1,12 +1,13 @@
 const db =require('../models/index')
 const Category = db.category
+const Department = db.department
 
-exports.createCategory = (req, res) =>{
+exports.createCategory = async (req, res) =>{
     try {
-        const departmentID = req.body.departmentID 
+        const department = await Department.findOne({departmentName: req.body.departmentName})
         const category = new Category({
             categoryName : req.body.categoryName,
-            departmentID,
+            departmentID: department._id,
         })
         category.save(err =>{
             if(err){
@@ -26,20 +27,12 @@ exports.createCategory = (req, res) =>{
     }
 }
 
-exports.updateCategory = (req,res) =>{
-     
-}
-
-exports.editCategory = (req,res) =>{
-    
-}
-
 exports.deleteCategory = (req,res) =>{
-    const categoryDelete = req.params.id 
+    const categoryDelete = req.params.categoryID
     Category.deleteOne({_id: categoryDelete}, (err) =>{
         if(err) return res.status(500).send({
             errorCode: 500,
-            message: 'Category server is error'
+            message: err
         })
         return res.status(200).send({
             errorCode: 0,
@@ -48,12 +41,12 @@ exports.deleteCategory = (req,res) =>{
     })
 }
 
-exports.ListCategory = (req,res) =>{
-    const department = req.body.department
-    Category.find(({}), (err,list) => {
+exports.ListCategory = async (req,res) =>{
+    const department = await Department.findOne({departmentName: req.body.departmentName})
+    Category.find(({departmentID: department._id}), (err,list) => {
         if(err) return res.status(500).send({
             errorCode: 500,
-            message: 'Category server is error'
+            message: err
         })
         return res.status(200).send({
             errorCode: 0,

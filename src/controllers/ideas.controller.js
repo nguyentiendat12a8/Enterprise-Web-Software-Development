@@ -1,4 +1,5 @@
 
+const { array } = require('joi')
 const db = require('../models/index')
 const sendEmail = require('../utils/mailer')
 const CsvParser = require('json2csv').Parser
@@ -13,52 +14,71 @@ const Account = db.account
 
 exports.createIdeas = async (req, res) => {
     const department = await Department.findOne({ departmentName: req.body.departmentName })
-    //const category = Category.findOne({categoryName: req.body.categoryName})
+    if (!department){
+        return res.status(500).send({
+            errorCode: 500,
+            message: 'Department server is error'
+        })
+    }
+    const category = await Category.findOne({categoryName: req.body.categoryName})
+    if (!category){
+        return res.status(500).send({
+            errorCode: 500,
+            message: 'Category server is error'
+        })
+    }
     const closureDate = await ClosureDate.findOne({ departmentID: department._id })
+    if (!closureDate){
+        return res.status(500).send({
+            errorCode: 500,
+            message: 'Closure date server is error'
+        })
+    }
     const ideas = new Ideas({
         ideasContent: req.body.ideasContent,
-        ideasFile: req.file.path,
+        //ideasFile: req.file.path,
         numberOfLike: 0,
         numberOfDislike: 0,
         closureDateID: closureDate._id,
         accountID: req.accountID, // req.accountID,
         departmentID: department._id,
-        //categoryID: category._id
+        categoryID: category._id
     })
     // xử lý ngày để cho đăng ideas lên
     const d = new Date()
     const date = await closureDate.firstClosureDate.split('/')
-    if (parseInt(date[0]) >  parseInt(d.getDate())) {
-        ideas.save()
-            .then(async () => {
-                if (req.body.departmentName === 'IT') {
-                    const role = await Role.findOne({ roleName: 'QA of IT' })
-                    const user = await Account.findOne({ roleID: role._id })
-                    const email = user.accountEmail
-                    await sendEmail(email, 'New ideas uploaded', '')
-                }
-                else if (req.body.departmentName === 'business') {
-                    const role = await Role.findOne({ roleName: 'QA of business' })
-                    const user = await Account.findOne({ roleID: role._id })
-                    const email = user.accountEmail
-                    await sendEmail(email, 'New ideas uploaded', '')
-                }
-                else {
-                    const role = await Role.findOne({ roleName: 'QA of graphic design' })
-                    const user = await Account.findOne({ roleID: role._id })
-                    const email = user.accountEmail
-                    await sendEmail(email, 'New ideas uploaded', '')
-                }
-
-                res.status(200).send({
-                    errorCode: 0,
-                    message: 'add ideas successfuly'
-                })
-            }
-            )
-            .catch(err => {
-                console.log(err)
+    if (parseInt(date[0]) > parseInt(d.getDate())) {
+        ideas.save(async (err,ideas)=>{
+            if(err) res.status(500).send({
+                errorCode: 500,
+                message: err
             })
+            if (req.body.departmentName === 'IT') {
+                const role = await Role.findOne({ roleName: 'QA of IT' })
+                const user = await Account.findOne({ roleID: role._id })
+                const email = 'nguyentiendat12a8@gmail.com'
+                const link = `localhost:1000/ideas/${ideas._id}`
+                await sendEmail(email, 'New ideas uploaded', link)
+            }
+            else if (req.body.departmentName === 'business') {
+                const role = await Role.findOne({ roleName: 'QA of business' })
+                const user = await Account.findOne({ roleID: role._id })
+                const email = user.accountEmail
+                const link = `localhost:1000/ideas/${ideas._id}`
+                await sendEmail(email, 'New ideas uploaded', link)
+            }
+            else {
+                const role = await Role.findOne({ roleName: 'QA of graphic design' })
+                const user = await Account.findOne({ roleID: role._id })
+                const email = user.accountEmail
+                const link = `localhost:1000/ideas/${ideas._id}`
+                await sendEmail(email, 'New ideas uploaded', link)
+            }
+            res.status(200).send({
+                errorCode: 0,
+                message: 'add ideas successfuly'
+            })
+        })
     }
     else {
         return res.status(401).send({
@@ -68,43 +88,89 @@ exports.createIdeas = async (req, res) => {
     }
 }
 
+exports.viewSubmitIdeas = async (req,res) =>{
+    Ideas.findById(req.params.ideasID, async (err,ideas)=>{
+        if (err) return res.status(500).send({
+            errorCode: 0,
+            message: err
+        })
+        var department = await Department.findById(ideas.departmentID)
+        if (!department){
+            return res.status(500).send({
+                errorCode: 500,
+                message: 'Department server is error'
+            })
+        }
+        var category = await Category.findById(ideas.categoryID)
+        if (!category){
+            return res.status(500).send({
+                errorCode: 500,
+                message: 'Category server is error'
+            })
+        }
+        var ideasShow = {
+            ideasContent: ideas.ideasContent,
+            ideasFile: ideas.ideasFile,
+            numberOfLike: ideas.numberOfLike,
+            numberOfDislike: ideas.numberOfDislike,
+            numberOfComment: ideas.numberOfComment,
+            departmentName: department.departmentName,
+            categoryName: category.categoryName
+        }
+        return res.status(200).send({
+            errorCode: 0,
+            data: ideasShow
+        })       
+    })
+}
 
 exports.listIdeas = async (req, res) => {
-    Ideas.find({}, (err, list) => {
+    let perPage = 5
+    let page = req.params.page || 1
+    Ideas.find()
+    .skip((perPage * page) - perPage)
+    .limit(perPage)
+    .exec(async (err, list) =>{
         if (err) return res.status(500).send({
             errorCode: 0,
             message: 'Ideas server is error'
         })
-        listShow = []
-        list.forEach(async (e) =>{
-            await Department.findById({_id: e.departmentID}, async (err, department)=>{
-                if (err) return res.status(500).send({
+        var listShow = []
+        for (i = 0; i < list.length; i++) {
+            var department = await Department.findById({ _id: list[i].departmentID })
+            if (!department)
+                return res.status(500).send({
                     errorCode: 0,
                     message: 'Ideas server is error'
                 })
-                await Category.findById({_id: e.categoryID}, (err, category)=>{
-                    if (err) return res.status(500).send({
-                        errorCode: 0,
-                        message: 'Ideas server is error'
-                    })
-                    const listInfo = {
-                        ideasContent: e.ideasContent,
-                        ideasFile : e.ideasFile,
-                        numberOfLike: e.numberOfLike,
-                        numberOfDislike: e.numberOfDislike,
-                        numberOfComment: e.numberOfComment,
-                        departmentName: department.departmentName
-                    }
-                    listShow.append(listInfo)
-                })
+            let category = await Category.findById({ _id: e.categoryID })
+            if (!category) return res.status(500).send({
+                errorCode: 0,
+                message: 'Ideas server is error'
             })
-        })
-        return res.status(200).send({
-            errorCode: 0,
-            data: listShow
+            var listInfo = {
+                _id: list[i]._id,
+                ideasContent: list[i].ideasContent,
+                ideasFile: list[i].ideasFile,
+                numberOfLike: list[i].numberOfLike,
+                numberOfDislike: list[i].numberOfDislike,
+                numberOfComment: list[i].numberOfComment,
+                departmentName: department.departmentName,
+                categoryName: category.categoryName
+            }
+            listShow.push(listInfo)
+        }
+        Ideas.countDocuments((err, count) =>{
+            return res.status(200).send({
+                errorCode: 0,
+                data: listShow,
+                current: page,
+                pages: Math.ceil(count/page)
+            })
         })
     })
 }
+
 
 exports.likeIdeas = async (req, res) => {
     try {
@@ -118,7 +184,7 @@ exports.likeIdeas = async (req, res) => {
             accountID: accountID
         })
         const d = new Date()
-        const ideas = await Ideas.findById({_id:ideasID})
+        const ideas = await Ideas.findById({ _id: ideasID })
         const closureDate = await ClosureDate.findById({ _id: ideas.closureDateID })
         const finalDate = await closureDate.finalClosureDate.split('/')
         if (parseInt(finalDate[0]) > parseInt(d.getDate())) {
@@ -159,7 +225,7 @@ exports.dislikeIdeas = async (req, res) => {
             accountID: accountID
         })
         const d = new Date()
-        const ideas = await Ideas.findById({_id:ideasID})
+        const ideas = await Ideas.findById({ _id: ideasID })
         const closureDate = await ClosureDate.findById({ _id: ideas.closureDateID })
         const finalDate = await closureDate.finalClosureDate.split('/')
         if (parseInt(finalDate[0]) < parseInt(d.getDate())) {
@@ -194,21 +260,28 @@ exports.commentIdeas = async (req, res) => {
     //const accountID = req.body.accountID // req.accountID
 
     const comment = new Comment({
-        commentText,
+        commentText: req.body.commentText,
         ideasID,
-        accountID: req.userId
+        accountID: req.accountID
     })
     const d = new Date()
     const ideas = await Ideas.findById(ideasID)
-    const closureDate = await ClosureDate.findById({ closureDateID: ideas.closureDateID })
+    const closureDate = await ClosureDate.findById(ideas.closureDateID)
     const finalDate = await closureDate.finalClosureDate.split('/')
-    if (parseInt(finalDate[0]) < parseInt(d.getDate())) {
-        await comment.save(err => {
+    if (parseInt(finalDate[0]) > parseInt(d.getDate())) {
+        await comment.save((err,comment) => {
             if (err) return res.status(500).send({
                 errorCode: 0,
                 message: 'Comment server is error'
             })
         })
+        const user = await Account.findById(req.accountID)
+        if(!user) return res.status(500).send({
+            errorCode: 500,
+            message: err
+        })
+        link = `localhost:1000/ideas/list-comment-ideas/${ideasID}`
+        await sendEmail(user.accountEmail,'Someone commented on your idea', link)
         const number = await Comment.find({ ideasID: ideasID })
         let sum = 0
         number.forEach(e => {
@@ -219,7 +292,7 @@ exports.commentIdeas = async (req, res) => {
             errorCode: 0,
             message: 'number of comment update successfully'
         })
-    }else {
+    } else {
         return res.status(401).send({
             errorCode: 0,
             message: 'Time comment is expired!'
@@ -229,15 +302,15 @@ exports.commentIdeas = async (req, res) => {
 
 exports.listCommentIdeas = (req, res) => {
     const ideasID = req.params.ideasID
-    Comment.findById({ideasID}, (err, listComment) =>{
-        if(err){
+    Comment.find({ ideasID }, (err, listComment) => {
+        if (err) {
             return res.status(500).send({
-                errorCode : 500,
-                message: 'Ideas server is error'
+                errorCode: 500,
+                message: err
             })
         }
         return res.status(200).send({
-            errorCode : 0,
+            errorCode: 0,
             data: listComment
         })
     })

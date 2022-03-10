@@ -17,7 +17,7 @@ exports.signup = async (req, res) => {
     accountPassword: bcrypt.hashSync(req.body.accountPassword, 8),
     phone: req.body.phone,
     address: req.body.address,
-    gender:req.body.gender,
+    gender: req.body.gender,
     DOB: req.body.DOB,
     //roleID: req.body.roleID
   })
@@ -32,7 +32,7 @@ exports.signup = async (req, res) => {
 
     if (req.body.roleID) {
       Role.findOne({
-        roleName: req.body.roleID 
+        roleName: req.body.roleID
       }, (err, roles) => {
         if (err) {
           return res.status(500).send({
@@ -124,7 +124,7 @@ exports.signin = async (req, res, next) => {
     } else {
       return res.status(400).json({
         errorCode: 400,
-        message: "Invalid Credentials, password",
+        message: "Invalid password",
       })
     }
   } catch (err) {
@@ -141,7 +141,7 @@ exports.updatePassword = async (req, res, next) => {
     const newAccountPassword = bcrypt.hashSync(req.body.newAccountPassword, 8)
     if (bcrypt.compareSync(password, user.accountPassword)) {
       await Account.findByIdAndUpdate({ _id: id }, { accountPassword: newAccountPassword }, { new: true })
-      return res.status(200).send({ message: 'Change password successfully!'})
+      return res.status(200).send({ message: 'Change password successfully!' })
     }
     else {
       return res.status(400).send({
@@ -156,7 +156,7 @@ exports.updatePassword = async (req, res, next) => {
 
 exports.editAccount = async (req, res, next) => {
   const id = req.accountID
-  if(!id) return res.status(400).send({
+  if (!id) return res.status(400).send({
     errorCode: '401',
     message: 'Unauthentication'
   })
@@ -166,13 +166,13 @@ exports.editAccount = async (req, res, next) => {
       address: accInfo.address,
       gender: accInfo.gender,
       DOB: accInfo.DOB
-    } 
+    }
     return res.status(200).send({
       errorCode: 0,
       acc
     })
   })
-    .catch(err =>{
+    .catch(err => {
       return res.status(500).send({
         errorCode: '500',
         message: err
@@ -188,10 +188,10 @@ exports.updateAccount = async (req, res, next) => {
     console.log(id)
     const phone = req.body.phone
     const address = req.body.address
-    const gender  = req.body.gender
+    const gender = req.body.gender
     const DOB = req.body.DOB
-    await Account.findByIdAndUpdate({ _id: id }, { 
-      phone, address,gender, DOB 
+    await Account.findByIdAndUpdate({ _id: id }, {
+      phone, address, gender, DOB
     }, { new: true })
     return res.status(200).send({ message: 'Change info successfully!' })
   } catch (error) {
@@ -211,29 +211,147 @@ exports.updateAccount = async (req, res, next) => {
 //     })
 //   }
 //   catch(err){
-    
+
 //   }
 // }
 
-exports.listAccount = async(req,res) =>{
-  Account.find({}, (err, list)=>{
-    if(err){
+exports.listAccount = async (req, res) => {
+  let perPage = 5
+  let page = req.params.page || 1
+  Account.find({})
+    .skip((perPage * page) - perPage)
+    .limit(perPage)
+    .exec(async (err, list) => {
+      if (err) return res.status(500).send({
+        errorCode: 0,
+        message: err
+      })
+      var listShow = []
+      for (i = 0; i < list.length; i++) {
+        var role = await Role.findById({ _id: list[i].roleID })
+        if (!role)
+          return res.status(500).send({
+            errorCode: 0,
+            message: 'invalid role'
+          })
+        var listInfo = {
+          _id: list[i]._id,
+          accountEmail: list[i].accountEmail,
+          phone: list[i].phone,
+          address: list[i].address,
+          DOB: list[i].DOB,
+          gender: list[i].gender,
+          roleName: role.roleName
+        }
+        listShow.push(listInfo)
+      }
+      Account.countDocuments((err, count)=>{
+        if(err) return res.status(500).send({
+          errorCode: 500,
+          message: err
+        })
+        return res.status(200).send({
+          errorCode: 0,
+          data: listShow,
+          current: page,
+          pages: Math.ceil(count / perPage)
+        })
+      })
+      
+    })
+}
+
+exports.deleteUserAccount = async (req, res) => {
+  Account.delete({ _id: req.params.accountID }, err => {
+    if (err) {
       return res.status(500).send({
-        errorCode : '500',
+        errorCode: '500',
         message: err
       })
     }
     return res.status(200).send({
       errorCode: 0,
-      data : list
+      message: 'Delete account successfully!'
+    })
+  })
+}
+
+exports.trashUserAccount = (req, res) => {
+  let perPage = 5
+  let page = req.params.page || 1
+  Account.findDeleted({})
+    .skip((perPage * page) - perPage)
+    .limit(perPage)
+    .exec(async (err, listDelete) => {
+      if (err) return res.status(500).send({
+        errorCode: 0,
+        message: err
+      })
+      var listDeleteShow = []
+      for (i = 0; i < listDelete.length; i++) {
+        var role = await Role.findById({ _id: listDelete[i].roleID })
+        if (!role)
+          return res.status(500).send({
+            errorCode: 500,
+            message: 'invalid role'
+          })
+        var listInfo = {
+          _id: listDelete[i]._id,
+          accountEmail: listDelete[i].accountEmail,
+          phone: listDelete[i].phone,
+          address: listDelete[i].address,
+          DOB: listDelete[i].DOB,
+          gender: listDelete[i].gender,
+          roleName: role.roleName
+        }
+        listDeleteShow.push(listInfo)
+      }
+      Account.countDocuments((err, count)=>{
+        if(err) return res.status(500).send({
+          errorCode: 500,
+          message: err
+        })
+        return res.status(200).send({
+          errorCode: 0,
+          data: listDeleteShow,
+          current: page,
+          pages: Math.ceil(count / perPage)
+        })
+      })
+      
+    })
+}
+
+exports.restoreUserAccount = (req, res) => {
+  Account.restore({_id: req.params.accountID}, (err)=>{
+    if(err) return res.status(500).send({
+      errorCode: 500,
+      message: err
+    })
+    return res.status(200).send({
+      errorCode: 0,
+      message: 'Restore account successfully!'
+    })
+  })
+}
+
+exports.forceDeleteUserAccount = (req, res) => {
+  Account.deleteOne({_id: req.params.accountID}, (err)=>{
+    if(err) return res.status(500).send({
+      errorCode: 500,
+      message: err
+    })
+    return res.status(200).send({
+      errorCode: 0,
+      message: 'Force delete account successfully!'
     })
   })
 }
 
 
-exports.sendEmailResetPass = async (req, res) =>{
+exports.sendEmailResetPass = async (req, res) => {
   try {
-    const schema = Joi.object({ accountEmail: Joi.string().email().required()});
+    const schema = Joi.object({ accountEmail: Joi.string().email().required() });
     const { error } = schema.validate(req.body);
     if (error) return res.status(400).send({
       errorCode: 400,
@@ -242,28 +360,28 @@ exports.sendEmailResetPass = async (req, res) =>{
 
     const user = await Account.findOne({ accountEmail: req.body.accountEmail });
     if (!user)
-        return res.status(400).send("user with given email doesn't exist");
+      return res.status(400).send("user with given email doesn't exist");
 
     let token = await ResetPassword.findOne({ accountID: user._id });
     if (!token) {
-        token = await new ResetPassword({
-          accountID: user._id,
-          token: crypto.randomBytes(32).toString("hex"),
-        }).save();
+      token = await new ResetPassword({
+        accountID: user._id,
+        token: crypto.randomBytes(32).toString("hex"),
+      }).save();
     }
 
     const link = `${process.env.BASE_URL}/user/confirmLink/${user._id}/${token.token}`;
     await sendEmail(user.accountEmail, "Password reset", link);
 
     res.send("password reset link sent to your email account");
-} catch (error) {
+  } catch (error) {
     res.send("An error occured");
     console.log(error);
-}
+  }
 }
 
 
-exports.confirmLink = async (req, res) =>{
+exports.confirmLink = async (req, res) => {
   try {
     const schema = Joi.object({ accountPassword: Joi.string().required() });
     const { error } = schema.validate(req.body);
@@ -285,10 +403,10 @@ exports.confirmLink = async (req, res) =>{
     await user.save();
     await token.delete();
     res.send("password reset sucessfully.");
-} catch (error) {
+  } catch (error) {
     res.send("An error occured");
     console.log(error);
-}
+  }
 }
 
 

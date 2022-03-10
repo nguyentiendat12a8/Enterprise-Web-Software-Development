@@ -8,7 +8,7 @@ function route(app) {
     app.use('/user', user)
     app.use('/ideas',ideas)
     app.use('/closureDate',closureDate)
-    //app.use('/department',department)
+    app.use('/department',department)
     app.use('/category',category)
 }
 

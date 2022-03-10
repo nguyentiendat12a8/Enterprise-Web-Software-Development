@@ -4,7 +4,7 @@ const { verifyToken, isQA } = require('../middlerwares/jwt.middleware');
 const router = express.Router();
 
 router.post('/create-category', [verifyToken, isQA], createCategory )
-router.delete('/delete-category', [verifyToken, isQA], deleteCategory )
-router.get('/list-category/:departmentID', [verifyToken, isQA], ListCategory )
+router.delete('/delete-category/:categoryID', [verifyToken, isQA], deleteCategory )
+router.get('/list-category', [verifyToken, isQA], ListCategory )
 
 module.exports = router
