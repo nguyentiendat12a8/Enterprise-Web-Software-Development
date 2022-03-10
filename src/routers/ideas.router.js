@@ -13,9 +13,9 @@ router.post('/comment-ideas/:ideasID',[verifyToken], commentIdeas)
 router.post('/delete-comment/:commnetID', deleteCommentIdeas)
 
 router.get('/list-comment-ideas/:ideasID',[verifyToken], listCommentIdeas)
-router.get('/list-ideas',[verifyToken], listIdeas) // lỗi 10/3
+router.get('/list-ideas/:page',[verifyToken], listIdeas) 
 
-router.get('/view-submit-ideas/:ideasID', [verifyToken], viewSubmitIdeas) //tự test
+router.get('/view-submit-ideas/:ideasID', [verifyToken], viewSubmitIdeas) 
 
 router.get('/download-ideas', downloadIdeas) //chưa test
 

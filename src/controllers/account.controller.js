@@ -224,7 +224,7 @@ exports.updateAccount = async (req, res, next) => {
 exports.listAccount = async (req, res) => {
   let perPage = 5
   let page = req.params.page || 1
-  Account.find({})
+  Account.find({ deleted: { $ne: true } })
     .skip((perPage * page) - perPage)
     .limit(perPage)
     .exec(async (err, list) => {
@@ -251,7 +251,7 @@ exports.listAccount = async (req, res) => {
         }
         listShow.push(listInfo)
       }
-      Account.countDocuments((err, count) => {
+      Account.countDocuments({ deleted: false }, (err, count) => {
         if (err) return res.status(500).send({
           errorCode: 500,
           message: err
@@ -268,14 +268,13 @@ exports.listAccount = async (req, res) => {
 }
 
 exports.deleteUserAccount = async (req, res) => {
-  const account = await Account.findById(req.params.accountID)
+  const account = await Account.findByIdAndUpdate(req.params.accountID, { deleted: true }, { new: true })
   if (!account) {
     return res.status(500).send({
       errorCode: '500',
-      message: 'khong tim thay account delete'
+      message: 'user not found'
     })
   }
-  await account.delete()
   return res.status(200).send({
     errorCode: 0,
     message: 'Delete account successfully!'
@@ -285,7 +284,7 @@ exports.deleteUserAccount = async (req, res) => {
 exports.trashUserAccount = (req, res) => {
   let perPage = 5
   let page = req.params.page || 1
-  Account.findDeleted({})
+  Account.find({ deleted: true })
     .skip((perPage * page) - perPage)
     .limit(perPage)
     .exec(async (err, listDelete) => {
@@ -312,7 +311,7 @@ exports.trashUserAccount = (req, res) => {
         }
         listDeleteShow.push(listInfo)
       }
-      Account.countDocuments((err, count) => {
+      Account.countDocuments({ deleted: true }, (err, count) => {
         if (err) return res.status(500).send({
           errorCode: 500,
           message: err
@@ -329,7 +328,7 @@ exports.trashUserAccount = (req, res) => {
 }
 
 exports.restoreUserAccount = (req, res) => {
-  Account.restore({ _id: req.params.accountID }, (err) => {
+  Account.findByIdAndUpdate(req.params.accountID, { deleted: false }, { new: true }, (err) => {
     if (err) return res.status(500).send({
       errorCode: 500,
       message: err
@@ -341,16 +340,16 @@ exports.restoreUserAccount = (req, res) => {
   })
 }
 
-exports.forceDeleteUserAccount = (req, res) => {
-  Account.deleteOne({ _id: req.params.accountID }, (err) => {
-    if (err) return res.status(500).send({
-      errorCode: 500,
-      message: err
-    })
-    return res.status(200).send({
-      errorCode: 0,
-      message: 'Force delete account successfully!'
-    })
+exports.forceDeleteUserAccount = async (req, res) => {
+  const accountDelete = await Account.findOne({ _id: req.params.accountID, deleted: true })
+  if (!accountDelete) return res.status(500).send({
+    errorCode: 500,
+    message: 'delete function invalid or account server is error'
+  })
+  await accountDelete.deleteOne()
+  return res.status(200).send({
+    errorCode: 0,
+    message: 'Force delete account successfully!'
   })
 }
 

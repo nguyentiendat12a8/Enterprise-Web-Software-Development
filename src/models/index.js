@@ -11,11 +11,12 @@ const {Ideas} = require('./ideas.schema')
 const {Like} = require('./like.schema')
 const db = {}
 
-const softDelete = require('mongoose-delete')
-mongoose.plugin(softDelete, {
-    deleteAt: true,
-    overrideMethods : 'all'
-})
+// const softDelete = require('mongoose-delete')
+// mongoose.plugin(softDelete, {
+//     deleteAt: true,
+//     overrideMethods: 'all'
+    
+// })
 
 db.mongoose = mongoose
 db.account = Account

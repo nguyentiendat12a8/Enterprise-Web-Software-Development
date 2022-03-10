@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const Joi = require("joi")
+const { boolean } = require('joi')
 
 exports.Account = mongoose.model(
     'Account',
@@ -11,6 +12,7 @@ exports.Account = mongoose.model(
         gender:String,
         DOB: Date,
         avatar: String,
+        deleted: {type: Boolean, default: false},
         roleID: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Role'
