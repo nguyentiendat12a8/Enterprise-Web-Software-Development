@@ -86,7 +86,7 @@ exports.checkDislike = async (req, res, next) => {
             await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfDislike: sumDislike, numberOfLike: sumLike }, { new: true })
             return res.status(200).send({
                 errorCode: 0,
-                message: 'number of like update successfully'
+                message: 'number of dislike update successfully'
             })
         } else if (check.dislike === true) {
             await check.delete()

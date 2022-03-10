@@ -3,7 +3,6 @@ const db = require('../models/index')
 const Account = db.account
 const Role = db.role
 const ResetPassword = db.resetPassword
-const ROLES = db.ROLES
 var jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 
@@ -30,9 +29,9 @@ exports.signup = async (req, res) => {
       })
     }
 
-    if (req.body.roleID) {
+    if (req.body.roleName) {
       Role.findOne({
-        roleName: req.body.roleID
+        roleName: req.body.roleName
       }, (err, roles) => {
         if (err) {
           return res.status(500).send({
@@ -138,9 +137,16 @@ exports.updatePassword = async (req, res, next) => {
     const id = req.accountID
     const user = await Account.findOne({ _id: id })
     const password = req.body.accountPassword
-    const newAccountPassword = bcrypt.hashSync(req.body.newAccountPassword, 8)
+    const newAccountPassword = req.body.newAccountPassword
+    const newAccountPasswordAgain = req.body.newAccountPasswordAgain
+    if (newAccountPassword !== newAccountPasswordAgain) {
+      return res.status(400).send({
+        errorCode: 400,
+        message: 'New password invalid'
+      })
+    }
     if (bcrypt.compareSync(password, user.accountPassword)) {
-      await Account.findByIdAndUpdate({ _id: id }, { accountPassword: newAccountPassword }, { new: true })
+      await Account.findByIdAndUpdate({ _id: id }, { accountPassword: bcrypt.hashSync(newAccountPassword) }, { new: true })
       return res.status(200).send({ message: 'Change password successfully!' })
     }
     else {
@@ -245,8 +251,8 @@ exports.listAccount = async (req, res) => {
         }
         listShow.push(listInfo)
       }
-      Account.countDocuments((err, count)=>{
-        if(err) return res.status(500).send({
+      Account.countDocuments((err, count) => {
+        if (err) return res.status(500).send({
           errorCode: 500,
           message: err
         })
@@ -257,22 +263,22 @@ exports.listAccount = async (req, res) => {
           pages: Math.ceil(count / perPage)
         })
       })
-      
+
     })
 }
 
 exports.deleteUserAccount = async (req, res) => {
-  Account.delete({ _id: req.params.accountID }, err => {
-    if (err) {
-      return res.status(500).send({
-        errorCode: '500',
-        message: err
-      })
-    }
-    return res.status(200).send({
-      errorCode: 0,
-      message: 'Delete account successfully!'
+  const account = await Account.findById(req.params.accountID)
+  if (!account) {
+    return res.status(500).send({
+      errorCode: '500',
+      message: 'khong tim thay account delete'
     })
+  }
+  await account.delete()
+  return res.status(200).send({
+    errorCode: 0,
+    message: 'Delete account successfully!'
   })
 }
 
@@ -306,8 +312,8 @@ exports.trashUserAccount = (req, res) => {
         }
         listDeleteShow.push(listInfo)
       }
-      Account.countDocuments((err, count)=>{
-        if(err) return res.status(500).send({
+      Account.countDocuments((err, count) => {
+        if (err) return res.status(500).send({
           errorCode: 500,
           message: err
         })
@@ -318,13 +324,13 @@ exports.trashUserAccount = (req, res) => {
           pages: Math.ceil(count / perPage)
         })
       })
-      
+
     })
 }
 
 exports.restoreUserAccount = (req, res) => {
-  Account.restore({_id: req.params.accountID}, (err)=>{
-    if(err) return res.status(500).send({
+  Account.restore({ _id: req.params.accountID }, (err) => {
+    if (err) return res.status(500).send({
       errorCode: 500,
       message: err
     })
@@ -336,8 +342,8 @@ exports.restoreUserAccount = (req, res) => {
 }
 
 exports.forceDeleteUserAccount = (req, res) => {
-  Account.deleteOne({_id: req.params.accountID}, (err)=>{
-    if(err) return res.status(500).send({
+  Account.deleteOne({ _id: req.params.accountID }, (err) => {
+    if (err) return res.status(500).send({
       errorCode: 500,
       message: err
     })
@@ -370,7 +376,7 @@ exports.sendEmailResetPass = async (req, res) => {
       }).save();
     }
 
-    const link = `${process.env.BASE_URL}/user/confirmLink/${user._id}/${token.token}`;
+    const link = `localhost:${process.env.BASE_URL}/user/confirmLink/${user._id}/${token.token}`;
     await sendEmail(user.accountEmail, "Password reset", link);
 
     res.send("password reset link sent to your email account");

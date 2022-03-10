@@ -36,7 +36,7 @@ exports.createIdeas = async (req, res) => {
     }
     const ideas = new Ideas({
         ideasContent: req.body.ideasContent,
-        //ideasFile: req.file.path,
+        ideasFile: req.file.path,
         numberOfLike: 0,
         numberOfDislike: 0,
         closureDateID: closureDate._id,
@@ -56,7 +56,7 @@ exports.createIdeas = async (req, res) => {
             if (req.body.departmentName === 'IT') {
                 const role = await Role.findOne({ roleName: 'QA of IT' })
                 const user = await Account.findOne({ roleID: role._id })
-                const email = 'nguyentiendat12a8@gmail.com'
+                const email = user.accountEmail
                 const link = `localhost:1000/ideas/${ideas._id}`
                 await sendEmail(email, 'New ideas uploaded', link)
             }
@@ -141,12 +141,12 @@ exports.listIdeas = async (req, res) => {
             if (!department)
                 return res.status(500).send({
                     errorCode: 0,
-                    message: 'Ideas server is error'
+                    message: 'department server is error'
                 })
-            let category = await Category.findById({ _id: e.categoryID })
+            let category = await Category.findById({ _id: list[i].categoryID })
             if (!category) return res.status(500).send({
                 errorCode: 0,
-                message: 'Ideas server is error'
+                message: 'category server is error'
             })
             var listInfo = {
                 _id: list[i]._id,
@@ -331,7 +331,7 @@ exports.deleteCommentIdeas = (req, res) => {
 }
 
 exports.downloadIdeas = (req, res) => {
-    Ideas.findAll().then((objs) => {
+    Ideas.find().then((objs) => {
         let ideas = []
         objs.forEach((obj) => {
             const { _id, ideasContent } = obj
@@ -339,10 +339,10 @@ exports.downloadIdeas = (req, res) => {
         })
         const csvFields = ["Id", "ideasContent"];
         const csvParser = new CsvParser({ csvFields })
-        const csvData = csvParser.parse(tutorials)
+        const csvData = csvParser.parse(ideas)
         res.setHeader("Content-Type", "text/csv")
         res.setHeader("Content-Disposition", "attachment; filename=ideas.csv")
-        res.status(200).end(csvData)
+        res.status(200).send(csvData)
     })
         .catch(err => {
             console.log(err)

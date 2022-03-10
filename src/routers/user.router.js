@@ -20,7 +20,7 @@ router.get('/trash-user-account', [verifyToken, isAdmin], trashUserAccount)
 router.post('/restore-user-account/:accountID', [verifyToken, isAdmin], restoreUserAccount)
 router.delete('/force-delete-user-account/:accountID', [verifyToken, isAdmin], forceDeleteUserAccount)
 
-router.post('/send-email-reset-password',verifyToken, sendEmailResetPass)
+router.post('/send-email-reset-password',sendEmailResetPass)
 router.post('/confirmLink/:accountID/:token', confirmLink)
 
 

@@ -17,6 +17,11 @@ exports.Account = mongoose.model(
         }]
     })
 )
+const softDelete = require('mongoose-delete')
+mongoose.plugin(softDelete, {
+    deleteAt: true,
+    overrideMethods : 'all'
+})
 
 // exports.validateAccount = (account) =>{
 //     const schema = Joi.object({
