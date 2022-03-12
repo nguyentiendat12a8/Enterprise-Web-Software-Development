@@ -358,6 +358,7 @@ exports.downloadIdeas = (req, res) => {
         const csvData = csvParser.parse(ideas)
         res.setHeader("Content-Type", "text/csv")
         res.setHeader("Content-Disposition", "attachment; filename=ideas.csv")
+        //res.pipe(csvData)
         res.status(200).send(csvData)
     })
         .catch(err => {

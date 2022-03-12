@@ -414,4 +414,26 @@ exports.confirmLink = async (req, res) => {
   }
 }
 
+exports.searchUser = async (req,res) =>{
+  console.log(req.query)
+  // var name_search = req.query.email // lấy giá trị của key name trong query parameters gửi lên
+  // console.log(name_search)
+  // if(name_search){
+  //   await Account.find({accountEmail : name_search}, (err,user)=>{
+  //     if(err) return res.status(400).send({message: err})
+  //     return res.status(200).send({data: user})
+  //   })
+  // }
 
+  //   return res.status(200).send('loi roi')
+  // }
+	// var result = users.filter( (user) => {
+	// 	// tìm kiếm chuỗi name_search trong user name. 
+	// 	// Lưu ý: Chuyển tên về cùng in thường hoặc cùng in hoa để không phân biệt hoa, thường khi tìm kiếm
+	// 	return user.name.toLowerCase().indexOf(name_search.toLowerCase()) !== -1
+	// })
+
+	// res.render('users/index', {
+	// 	users: result // render lại trang users/index với biến users bây giờ chỉ bao gồm các kết quả phù hợp
+	// })
+}

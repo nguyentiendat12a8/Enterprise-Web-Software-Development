@@ -1,7 +1,7 @@
 const express = require('express');
 const { signup, signin, sendEmailResetPass,
      confirmLink, listAccount, updatePassword,
-    editAccount, updateAccount, deleteUserAccount, trashUserAccount, restoreUserAccount, forceDeleteUserAccount } = require('../controllers/account.controller');
+    editAccount, updateAccount, deleteUserAccount, trashUserAccount, restoreUserAccount, forceDeleteUserAccount, searchUser } = require('../controllers/account.controller');
 const verifySignUp = require('../middlerwares/verifySignUp.middleware');
 const { verifyToken, isAdmin } = require('../middlerwares/jwt.middleware');
 
@@ -23,6 +23,7 @@ router.delete('/force-delete-user-account/:accountID', [verifyToken, isAdmin], f
 router.post('/send-email-reset-password',sendEmailResetPass)
 router.post('/confirmLink/:accountID/:token', confirmLink)
 
+router.get('/search', searchUser)
 
 
 module.exports = router

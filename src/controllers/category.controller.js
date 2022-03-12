@@ -4,7 +4,7 @@ const Department = db.department
 
 exports.createCategory = async (req, res) =>{
     try {
-        const department = await Department.findOne({departmentName: req.body.departmentName})
+        const department = await Department.findOne({departmentName: req.query.departmentName})
         const category = new Category({
             categoryName : req.body.categoryName,
             departmentID: department._id,
@@ -42,7 +42,7 @@ exports.deleteCategory = (req,res) =>{
 }
 
 exports.ListCategory = async (req,res) =>{
-    const department = await Department.findOne({departmentName: req.body.departmentName})
+    const department = await Department.findOne({departmentName: req.query.departmentName})
     Category.find(({departmentID: department._id}), (err,list) => {
         if(err) return res.status(500).send({
             errorCode: 500,
