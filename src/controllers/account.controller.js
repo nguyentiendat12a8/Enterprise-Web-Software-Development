@@ -11,6 +11,7 @@ const crypto = require("crypto");
 const Joi = require("joi");
 
 exports.signup = async (req, res) => {
+
   const user = new Account({
     accountEmail: req.body.accountEmail,
     accountPassword: bcrypt.hashSync(req.body.accountPassword, 8),
@@ -356,6 +357,8 @@ exports.forceDeleteUserAccount = async (req, res) => {
 
 exports.sendEmailResetPass = async (req, res) => {
   try {
+
+    //code validate
     const schema = Joi.object({ accountEmail: Joi.string().email().required() });
     const { error } = schema.validate(req.body);
     if (error) return res.status(400).send({

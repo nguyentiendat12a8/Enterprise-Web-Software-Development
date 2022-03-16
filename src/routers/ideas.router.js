@@ -1,7 +1,7 @@
 const express = require('express');
 const { createIdeas, likeIdeas, dislikeIdeas, commentIdeas, listCommentIdeas, listIdeas, viewSubmitIdeas, downloadIdeas, deleteCommentIdeas } = require('../controllers/ideas.controller');
 const { checkLike, checkDislike } = require('../middlerwares/checkLike.middleware');
-const { verifyToken } = require('../middlerwares/jwt.middleware');
+const { verifyToken, isQA } = require('../middlerwares/jwt.middleware');
 const { upload } = require('../utils/uploadFile')
 
 const router = express.Router();
@@ -17,6 +17,6 @@ router.get('/list-ideas/:page',[verifyToken], listIdeas)
 
 router.get('/view-submit-ideas/:ideasID', [verifyToken], viewSubmitIdeas) 
 
-router.get('/download-ideas', downloadIdeas) //chưa test
+router.get('/download-ideas',[verifyToken, isQA], downloadIdeas) 
 
 module.exports = router

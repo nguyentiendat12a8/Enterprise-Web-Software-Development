@@ -4,6 +4,7 @@ const Department = db.department
 
 exports.createClousureDate = async  (req,res) =>{
     try{
+        //10-2-2020
         const department = await Department.findOne({departmentName: req.body.departmentName})
         const closureDate = new ClosureDate({
             firstClosureDate: req.body.firstClosureDate,

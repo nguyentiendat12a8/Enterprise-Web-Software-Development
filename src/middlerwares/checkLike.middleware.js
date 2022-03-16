@@ -1,8 +1,6 @@
 const db = require('../models/index')
 
 const Ideas = db.ideas
-const ClosureDate = db.closureDate
-const Department = db.department
 const Like = db.like
 
 exports.checkLike = async (req, res, next) => {

@@ -263,6 +263,12 @@ exports.dislikeIdeas = async (req, res) => {
 }
 
 exports.commentIdeas = async (req, res) => {
+    const schema = Joi.object({ accountEmail: Joi.string().required() });
+    const { error } = schema.validate(req.body);
+    if (error) return res.status(400).send({
+      errorCode: 400,
+      message: error.details[0].message
+    });
     const ideasID = req.params.ideasID //params ?
     //const accountID = req.body.accountID // req.accountID
 
@@ -346,22 +352,35 @@ exports.deleteCommentIdeas = async (req, res) => {
     })
 }
 
-exports.downloadIdeas = (req, res) => {
-    Ideas.find().then((objs) => {
-        let ideas = []
-        objs.forEach((obj) => {
-            const { _id, ideasContent } = obj
-            ideas.push({ _id, ideasContent })
-        })
-        const csvFields = ["Id", "ideasContent"];
-        const csvParser = new CsvParser({ csvFields })
-        const csvData = csvParser.parse(ideas)
-        res.setHeader("Content-Type", "text/csv")
-        res.setHeader("Content-Disposition", "attachment; filename=ideas.csv")
-        //res.pipe(csvData)
-        res.status(200).send(csvData)
+exports.downloadIdeas = async (req, res) => {
+    const d = new Date()
+    const ideas = await Ideas.find()
+    ideas.forEach(e=>{
+        
     })
-        .catch(err => {
-            console.log(err)
+    const closureDate = await ClosureDate.findById(ideas.closureDateID)
+    const finalDate = await closureDate.finalClosureDate.split('/')
+    if (parseInt(finalDate[0]) > parseInt(d.getDate())) {
+        Ideas.find().then((objs) => {
+            let ideas = []
+            objs.forEach((obj) => {
+                const { _id, ideasContent } = obj
+                ideas.push({ _id, ideasContent })
+            })
+            const csvFields = ["Id", "ideasContent"];
+            const csvParser = new CsvParser({ csvFields })
+            const csvData = csvParser.parse(ideas)
+            res.setHeader("Content-Type", "text/csv")
+            res.setHeader("Content-Disposition", "attachment; filename=ideas.csv")
+            //res.pipe(csvData)
+            res.status(200).send(csvData)
         })
+            .catch(err => {
+                console.log(err)
+            })
+    } else {
+        return res.send({
+            message: 'Time expired!'
+        })
+    }
 }
