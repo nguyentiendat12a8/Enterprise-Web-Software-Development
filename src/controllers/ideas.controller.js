@@ -329,16 +329,6 @@ exports.listCommentIdeas = (req, res) => {
     })
 }
 
-exports.editCommentIdeas = (req, res) => {
-    const ideasID = req.body.ideasID //params ?
-    const accountID = req.body.accountID // req.accountID
-
-}
-
-exports.updateCommentIdeas = (req, res) => {
-
-}
-
 exports.deleteCommentIdeas = async (req, res) => {
     const comment = await Comment.findById('622a10e1f965150f29d40efa')
     if (!comment) return res.status(500).send({

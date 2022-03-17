@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.post('/create-category', [verifyToken, isQA], createCategory )
 router.delete('/delete-category/:categoryID', [verifyToken, isQA], deleteCategory )
-router.get('/list-category', [verifyToken, isQA], ListCategory )
+router.get('/list-category', [verifyToken], ListCategory )
 
 module.exports = router
