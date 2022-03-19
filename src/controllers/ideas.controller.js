@@ -47,7 +47,8 @@ exports.createIdeas = async (req, res) => {
     // xử lý ngày để cho đăng ideas lên
     const d = new Date()
     const date = await closureDate.firstClosureDate.split('/')
-    if (parseInt(date[0]) > parseInt(d.getDate())) {
+    if (parseInt(date[2]) > parseInt(d.getFullYear())) {
+        console.log('da di vao so sanh nam lon hon')
         ideas.save(async (err, ideas) => {
             if (err) res.status(500).send({
                 errorCode: 500,
@@ -79,8 +80,88 @@ exports.createIdeas = async (req, res) => {
                 message: 'add ideas successfuly'
             })
         })
-    }
-    else {
+    } else if (parseInt(date[2]) === parseInt(d.getFullYear())) {
+        console.log('da di vao so sanh nam bang nhau')
+        if (parseInt(date[1]) > (parseInt(d.getMonth()) + 1)) {
+            console.log('da di vao so sanh thang lon hon')
+            ideas.save(async (err, ideas) => {
+                if (err) res.status(500).send({
+                    errorCode: 500,
+                    message: err
+                })
+                if (req.body.departmentName === 'IT') {
+                    const role = await Role.findOne({ roleName: 'QA of IT' })
+                    const user = await Account.findOne({ roleID: role._id })
+                    const email = user.accountEmail
+                    const link = `localhost:1000/ideas/${ideas._id}`
+                    await sendEmail(email, 'New ideas uploaded', link)
+                }
+                else if (req.body.departmentName === 'business') {
+                    const role = await Role.findOne({ roleName: 'QA of business' })
+                    const user = await Account.findOne({ roleID: role._id })
+                    const email = user.accountEmail
+                    const link = `localhost:1000/ideas/${ideas._id}`
+                    await sendEmail(email, 'New ideas uploaded', link)
+                }
+                else {
+                    const role = await Role.findOne({ roleName: 'QA of graphic design' })
+                    const user = await Account.findOne({ roleID: role._id })
+                    const email = user.accountEmail
+                    const link = `localhost:1000/ideas/${ideas._id}`
+                    await sendEmail(email, 'New ideas uploaded', link)
+                }
+                res.status(200).send({
+                    errorCode: 0,
+                    message: 'add ideas successfuly'
+                })
+            })
+        } else if (parseInt(date[1]) === (parseInt(d.getMonth()) + 1)) {
+            console.log('da di vao so sanh thang bang nhau')
+            if (parseInt(date[0]) > parseInt(d.getDate())) {
+                ideas.save(async (err, ideas) => {
+                    if (err) res.status(500).send({
+                        errorCode: 500,
+                        message: err
+                    })
+                    if (req.body.departmentName === 'IT') {
+                        const role = await Role.findOne({ roleName: 'QA of IT' })
+                        const user = await Account.findOne({ roleID: role._id })
+                        const email = user.accountEmail
+                        const link = `localhost:1000/ideas/${ideas._id}`
+                        await sendEmail(email, 'New ideas uploaded', link)
+                    }
+                    else if (req.body.departmentName === 'business') {
+                        const role = await Role.findOne({ roleName: 'QA of business' })
+                        const user = await Account.findOne({ roleID: role._id })
+                        const email = user.accountEmail
+                        const link = `localhost:1000/ideas/${ideas._id}`
+                        await sendEmail(email, 'New ideas uploaded', link)
+                    }
+                    else {
+                        const role = await Role.findOne({ roleName: 'QA of graphic design' })
+                        const user = await Account.findOne({ roleID: role._id })
+                        const email = user.accountEmail
+                        const link = `localhost:1000/ideas/${ideas._id}`
+                        await sendEmail(email, 'New ideas uploaded', link)
+                    }
+                    res.status(200).send({
+                        errorCode: 0,
+                        message: 'add ideas successfuly'
+                    })
+                })
+            } else {
+                return res.status(401).send({
+                    errorCode: 401,
+                    message: 'over final closure date!'
+                })
+            }
+        } else {
+            return res.status(401).send({
+                errorCode: 401,
+                message: 'over final closure date!'
+            })
+        }
+    } else {
         return res.status(401).send({
             errorCode: 401,
             message: 'over final closure date!'
@@ -181,20 +262,20 @@ exports.listIdeas = async (req, res) => {
 
 exports.likeIdeas = async (req, res) => {
     try {
-        const ideasID = req.params.ideasID //params ?
-        const accountID = req.accountID // req.accountID
+        const ideasID = req.params.ideasID
+        const accountID = req.accountID
 
         const like = new Like({
             like: true,
-            //dislike: false,
             ideasID: ideasID,
             accountID: accountID
         })
         const d = new Date()
         const ideas = await Ideas.findById({ _id: ideasID })
         const closureDate = await ClosureDate.findById({ _id: ideas.closureDateID })
-        const finalDate = await closureDate.finalClosureDate.split('/')
-        if (parseInt(finalDate[0]) > parseInt(d.getDate())) {
+        const date = await closureDate.finalClosureDate.split('/')
+        if (parseInt(date[2]) > parseInt(d.getFullYear())) {
+            console.log('da di vao so sanh nam lon hon')
             await like.save()
             const number = await Like.find({ ideasID: ideasID })
             let sum = 0
@@ -208,8 +289,52 @@ exports.likeIdeas = async (req, res) => {
                 errorCode: 0,
                 message: 'number of like update successfully'
             })
-        }
-        else {
+        } else if (parseInt(date[2]) === parseInt(d.getFullYear())) {
+            console.log('da di vao so sanh nam bang nhau')
+            if (parseInt(date[1]) > (parseInt(d.getMonth()) + 1)) {
+                console.log('da di vao so sanh thang lon hon')
+                await like.save()
+                const number = await Like.find({ ideasID: ideasID })
+                let sum = 0
+                number.forEach(e => {
+                    if (e.like === true) {
+                        sum = sum + 1
+                    }
+                })
+                await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfLike: sum }, { new: true })
+                return res.status(200).send({
+                    errorCode: 0,
+                    message: 'number of like update successfully'
+                })
+            } else if (parseInt(date[1]) === (parseInt(d.getMonth()) + 1)) {
+                console.log('da di vao so sanh thang bang nhau')
+                if (parseInt(date[0]) > parseInt(d.getDate())) {
+                    await like.save()
+                    const number = await Like.find({ ideasID: ideasID })
+                    let sum = 0
+                    number.forEach(e => {
+                        if (e.like === true) {
+                            sum = sum + 1
+                        }
+                    })
+                    await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfLike: sum }, { new: true })
+                    return res.status(200).send({
+                        errorCode: 0,
+                        message: 'number of like update successfully'
+                    })
+                } else {
+                    return res.status(401).send({
+                        errorCode: 401,
+                        message: 'Time like is expired'
+                    })
+                }
+            } else {
+                return res.status(401).send({
+                    errorCode: 401,
+                    message: 'Time like is expired'
+                })
+            }
+        } else {
             return res.status(401).send({
                 errorCode: 401,
                 message: 'Time like is expired'
@@ -223,8 +348,8 @@ exports.likeIdeas = async (req, res) => {
 
 exports.dislikeIdeas = async (req, res) => {
     try {
-        const ideasID = req.params.ideasID //params ?
-        const accountID = req.accountID // req.accountID
+        const ideasID = req.params.ideasID
+        const accountID = req.accountID
 
         const dislike = new Like({
             dislike: true,
@@ -234,8 +359,9 @@ exports.dislikeIdeas = async (req, res) => {
         const d = new Date()
         const ideas = await Ideas.findById({ _id: ideasID })
         const closureDate = await ClosureDate.findById({ _id: ideas.closureDateID })
-        const finalDate = await closureDate.finalClosureDate.split('/')
-        if (parseInt(finalDate[0]) < parseInt(d.getDate())) {
+        const date = await closureDate.finalClosureDate.split('/')
+        if (parseInt(date[2]) > parseInt(d.getFullYear())) {
+            console.log('da di vao so sanh nam lon hon')
             await dislike.save()
             const number = await Like.find({ ideasID: ideasID })
             let sum = 0
@@ -247,15 +373,59 @@ exports.dislikeIdeas = async (req, res) => {
             await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfDislike: sum }, { new: true })
             return res.status(200).send({
                 errorCode: 0,
-                message: 'number of dislike update successfully'
+                message: 'number of like update successfully'
             })
+        } else if (parseInt(date[2]) === parseInt(d.getFullYear())) {
+            console.log('da di vao so sanh nam bang nhau')
+            if (parseInt(date[1]) > (parseInt(d.getMonth()) + 1)) {
+                console.log('da di vao so sanh thang lon hon')
+                await dislike.save()
+                const number = await Like.find({ ideasID: ideasID })
+                let sum = 0
+                number.forEach(e => {
+                    if (e.dislike === true) {
+                        sum = sum + 1
+                    }
+                })
+                await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfDislike: sum }, { new: true })
+                return res.status(200).send({
+                    errorCode: 0,
+                    message: 'number of like update successfully'
+                })
+            } else if (parseInt(date[1]) === (parseInt(d.getMonth()) + 1)) {
+                console.log('da di vao so sanh thang bang nhau')
+                if (parseInt(date[0]) > parseInt(d.getDate())) {
+                    await dislike.save()
+                    const number = await Like.find({ ideasID: ideasID })
+                    let sum = 0
+                    number.forEach(e => {
+                        if (e.dislike === true) {
+                            sum = sum + 1
+                        }
+                    })
+                    await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfDislike: sum }, { new: true })
+                    return res.status(200).send({
+                        errorCode: 0,
+                        message: 'number of like update successfully'
+                    })
+                } else {
+                    return res.status(401).send({
+                        errorCode: 401,
+                        message: 'Time like is expired'
+                    })
+                }
+            } else {
+                return res.status(401).send({
+                    errorCode: 401,
+                    message: 'Time like is expired'
+                })
+            }
         } else {
             return res.status(401).send({
-                errorCode: 0,
-                message: 'Time dislike is expired!'
+                errorCode: 401,
+                message: 'Time like is expired'
             })
         }
-
     }
     catch (err) {
         console.log(err)
@@ -263,53 +433,120 @@ exports.dislikeIdeas = async (req, res) => {
 }
 
 exports.commentIdeas = async (req, res) => {
-    const schema = Joi.object({ accountEmail: Joi.string().required() });
-    const { error } = schema.validate(req.body);
-    if (error) return res.status(400).send({
-      errorCode: 400,
-      message: error.details[0].message
-    });
-    const ideasID = req.params.ideasID //params ?
-    //const accountID = req.body.accountID // req.accountID
 
-    const comment = new Comment({
-        commentText: req.body.commentText,
-        ideasID,
-        accountID: req.accountID
-    })
-    const d = new Date()
-    const ideas = await Ideas.findById(ideasID)
-    const closureDate = await ClosureDate.findById(ideas.closureDateID)
-    const finalDate = await closureDate.finalClosureDate.split('/')
-    if (parseInt(finalDate[0]) > parseInt(d.getDate())) {
-        await comment.save((err, comment) => {
-            if (err) return res.status(500).send({
-                errorCode: 0,
-                message: 'Comment server is error'
+    try {
+        const ideasID = req.params.ideasID
+
+        const comment = new Comment({
+            commentText: req.body.commentText,
+            ideasID,
+            accountID: req.accountID
+        })
+
+        const d = new Date()
+        const ideas = await Ideas.findById(ideasID)
+        const closureDate = await ClosureDate.findById(ideas.closureDateID)
+        const date = await closureDate.finalClosureDate.split('/')
+
+        if (parseInt(date[2]) > parseInt(d.getFullYear())) {
+            console.log('da di vao so sanh nam lon hon')
+            await comment.save((err, comment) => {
+                if (err) return res.status(500).send({
+                    errorCode: 0,
+                    message: 'Comment server is error'
+                })
             })
-        })
-        const user = await Account.findById(req.accountID)
-        if (!user) return res.status(500).send({
-            errorCode: 500,
-            message: err
-        })
-        link = `localhost:1000/ideas/list-comment-ideas/${ideasID}`
-        await sendEmail(user.accountEmail, 'Someone commented on your idea', link)
-        const number = await Comment.find({ ideasID: ideasID })
-        let sum = 0
-        number.forEach(e => {
-            sum = sum + 1
-        })
-        await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfComment: sum }, { new: true })
-        return res.status(200).send({
-            errorCode: 0,
-            message: 'number of comment update successfully'
-        })
-    } else {
-        return res.status(401).send({
-            errorCode: 0,
-            message: 'Time comment is expired!'
-        })
+            const user = await Account.findById(req.accountID)
+            if (!user) return res.status(500).send({
+                errorCode: 500,
+                message: err
+            })
+            link = `localhost:1000/ideas/list-comment-ideas/${ideasID}`
+            await sendEmail(user.accountEmail, 'Someone commented on your idea', link)
+            const number = await Comment.find({ ideasID: ideasID })
+            let sum = 0
+            number.forEach(e => {
+                sum = sum + 1
+            })
+            await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfComment: sum }, { new: true })
+            return res.status(200).send({
+                errorCode: 0,
+                message: 'number of comment update successfully'
+            })
+        } else if (parseInt(date[2]) === parseInt(d.getFullYear())) {
+            console.log('da di vao so sanh nam bang nhau')
+            if (parseInt(date[1]) > (parseInt(d.getMonth()) + 1)) {
+                console.log('da di vao so sanh thang lon hon')
+                await comment.save((err, comment) => {
+                    if (err) return res.status(500).send({
+                        errorCode: 0,
+                        message: 'Comment server is error'
+                    })
+                })
+                const user = await Account.findById(req.accountID)
+                if (!user) return res.status(500).send({
+                    errorCode: 500,
+                    message: err
+                })
+                link = `localhost:1000/ideas/list-comment-ideas/${ideasID}`
+                await sendEmail(user.accountEmail, 'Someone commented on your idea', link)
+                const number = await Comment.find({ ideasID: ideasID })
+                let sum = 0
+                number.forEach(e => {
+                    sum = sum + 1
+                })
+                await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfComment: sum }, { new: true })
+                return res.status(200).send({
+                    errorCode: 0,
+                    message: 'number of comment update successfully'
+                })
+            } else if (parseInt(date[1]) === (parseInt(d.getMonth()) + 1)) {
+                console.log('da di vao so sanh thang bang nhau')
+                if (parseInt(date[0]) > parseInt(d.getDate())) {
+                    await comment.save((err, comment) => {
+                        if (err) return res.status(500).send({
+                            errorCode: 0,
+                            message: 'Comment server is error'
+                        })
+                    })
+                    const user = await Account.findById(req.accountID)
+                    if (!user) return res.status(500).send({
+                        errorCode: 500,
+                        message: err
+                    })
+                    link = `localhost:1000/ideas/list-comment-ideas/${ideasID}`
+                    await sendEmail(user.accountEmail, 'Someone commented on your idea', link)
+                    const number = await Comment.find({ ideasID: ideasID })
+                    let sum = 0
+                    number.forEach(e => {
+                        sum = sum + 1
+                    })
+                    await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfComment: sum }, { new: true })
+                    return res.status(200).send({
+                        errorCode: 0,
+                        message: 'number of comment update successfully'
+                    })
+                } else {
+                    return res.status(401).send({
+                        errorCode: 0,
+                        message: 'Time comment is expired!'
+                    })
+                }
+            } else {
+                return res.status(401).send({
+                    errorCode: 0,
+                    message: 'Time comment is expired!'
+                })
+            }
+        } else {
+            return res.status(401).send({
+                errorCode: 0,
+                message: 'Time comment is expired!'
+            })
+        }
+    }
+    catch (err) {
+        console.log(err)
     }
 }
 
@@ -343,10 +580,19 @@ exports.deleteCommentIdeas = async (req, res) => {
 }
 
 exports.downloadIdeas = async (req, res) => {
+
+
+// kiểm tra department nào hết hạn mới down
+
+
+
+
+
+    
     const d = new Date()
     const ideas = await Ideas.find()
-    ideas.forEach(e=>{
-        
+    ideas.forEach(e => {
+
     })
     const closureDate = await ClosureDate.findById(ideas.closureDateID)
     const finalDate = await closureDate.finalClosureDate.split('/')
@@ -376,13 +622,13 @@ exports.downloadIdeas = async (req, res) => {
 }
 
 //filter 
-exports.filterMostLike = async (req,res) =>{
-    Ideas.find({}, (err, list) =>{
-        if(err) return res.status(500).send({
+exports.filterMostLike = async (req, res) => {
+    Ideas.find({}, (err, list) => {
+        if (err) return res.status(500).send({
             errorCode: 500,
             message: err
         })
-        list.sort((a,b) =>{
+        list.sort((a, b) => {
             return a.numberOfLike - b.numberOfLike
         })
         return res.status(200).send({
@@ -392,13 +638,13 @@ exports.filterMostLike = async (req,res) =>{
     })
 }
 
-exports.filterLeastLike = async (req,res) =>{
-    Ideas.find({}, (err, list) =>{
-        if(err) return res.status(500).send({
+exports.filterLeastLike = async (req, res) => {
+    Ideas.find({}, (err, list) => {
+        if (err) return res.status(500).send({
             errorCode: 500,
             message: err
         })
-        list.sort((a,b) =>{
+        list.sort((a, b) => {
             return b.numberOfDislike - a.numberOfDislike
         })
         return res.status(200).send({
@@ -408,13 +654,13 @@ exports.filterLeastLike = async (req,res) =>{
     })
 }
 
-exports.filterMostComment = async (req,res) =>{
-    Ideas.find({}, (err, list) =>{
-        if(err) return res.status(500).send({
+exports.filterMostComment = async (req, res) => {
+    Ideas.find({}, (err, list) => {
+        if (err) return res.status(500).send({
             errorCode: 500,
             message: err
         })
-        list.sort((a,b) =>{
+        list.sort((a, b) => {
             return b.numberOfComment - a.numberOfComment
         })
         return res.status(200).send({
@@ -424,13 +670,13 @@ exports.filterMostComment = async (req,res) =>{
     })
 }
 
-exports.filterLeastComment = async (req,res) =>{
-    Ideas.find({}, (err, list) =>{
-        if(err) return res.status(500).send({
+exports.filterLeastComment = async (req, res) => {
+    Ideas.find({}, (err, list) => {
+        if (err) return res.status(500).send({
             errorCode: 500,
             message: err
         })
-        list.sort((a,b) =>{
+        list.sort((a, b) => {
             return a.numberOfComment - b.numberOfComment
         })
         return res.status(200).send({
