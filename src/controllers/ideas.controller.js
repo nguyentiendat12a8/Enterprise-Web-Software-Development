@@ -463,66 +463,46 @@ exports.downloadIdeas = async (req, res) => {
 }
 
 //filter 
-exports.filterMostLike = async (req, res) => {
-    Ideas.find({}, (err, list) => {
-        if (err) return res.status(500).send({
-            errorCode: 500,
-            message: err
-        })
-        list.sort((a, b) => {
-            return a.numberOfLike - b.numberOfLike
-        })
-        return res.status(200).send({
-            errorCode: 0,
-            data: list
-        })
-    })
-}
 
-exports.filterLeastLike = async (req, res) => {
+exports.filter = async (req, res) => {
     Ideas.find({}, (err, list) => {
         if (err) return res.status(500).send({
             errorCode: 500,
             message: err
         })
-        list.sort((a, b) => {
-            return b.numberOfDislike - a.numberOfDislike
-        })
-        return res.status(200).send({
-            errorCode: 0,
-            data: list
-        })
-    })
-}
-
-exports.filterMostComment = async (req, res) => {
-    Ideas.find({}, (err, list) => {
-        if (err) return res.status(500).send({
-            errorCode: 500,
-            message: err
-        })
-        list.sort((a, b) => {
-            return b.numberOfComment - a.numberOfComment
-        })
-        return res.status(200).send({
-            errorCode: 0,
-            data: list
-        })
-    })
-}
-
-exports.filterLeastComment = async (req, res) => {
-    Ideas.find({}, (err, list) => {
-        if (err) return res.status(500).send({
-            errorCode: 500,
-            message: err
-        })
-        list.sort((a, b) => {
-            return a.numberOfComment - b.numberOfComment
-        })
-        return res.status(200).send({
-            errorCode: 0,
-            data: list
-        })
+        const filter = req.query.filter
+        if(filter === 'leastLike'){
+            list.sort((a, b) => {
+                return b.numberOfDislike - a.numberOfDislike
+            })
+            return res.status(200).send({
+                errorCode: 0,
+                data: list
+            })
+        } else if(filter === 'mostLike'){
+            list.sort((a, b) => {
+                return a.numberOfComment - b.numberOfComment
+            })
+            return res.status(200).send({
+                errorCode: 0,
+                data: list
+            })
+        } else if (filter === 'mostComment') {
+            list.sort((a, b) => {
+                return b.numberOfComment - a.numberOfComment
+            })
+            return res.status(200).send({
+                errorCode: 0,
+                data: list
+            })
+        } else if (filter === 'leastComment'){
+            list.sort((a, b) => {
+                return a.numberOfComment - b.numberOfComment
+            })
+            return res.status(200).send({
+                errorCode: 0,
+                data: list
+            })
+        } 
     })
 }

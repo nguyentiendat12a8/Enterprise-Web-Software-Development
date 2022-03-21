@@ -1,7 +1,7 @@
 const express = require('express');
 const { createIdeas, likeIdeas, dislikeIdeas, commentIdeas, listCommentIdeas, listIdeas,
-    viewSubmitIdeas, downloadIdeas, deleteCommentIdeas, filterMostLike, filterLeastLike,
-    filterMostComment, filterLeastComment, myIdeas } = require('../controllers/ideas.controller');
+    viewSubmitIdeas, downloadIdeas, deleteCommentIdeas,  filter,
+     myIdeas } = require('../controllers/ideas.controller');
 const { checkClosureDate } = require('../middlerwares/checkClosureDate.middleware');
 const { checkLike, checkDislike } = require('../middlerwares/checkLike.middleware');
 const { verifyToken, isQA } = require('../middlerwares/jwt.middleware');
@@ -24,9 +24,7 @@ router.get('/view-submit-ideas/:ideasID', [verifyToken], viewSubmitIdeas)
 router.get('/download-ideas', [verifyToken, isQA], downloadIdeas)
 
 //filter
-router.get('/filter-most-like', [verifyToken], filterMostLike)
-router.get('/filter-least-like', [verifyToken], filterLeastLike)
-router.get('/filter-most-comment', [verifyToken], filterMostComment)
-router.get('/filter-least-comment', [verifyToken], filterLeastComment)
+router.get('/filter', [verifyToken], filter)
+
 
 module.exports = router
