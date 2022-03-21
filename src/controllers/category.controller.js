@@ -1,64 +1,62 @@
-const db =require('../models/index')
+const db = require('../models/index')
 const Category = db.category
 const Department = db.department
+const Ideas = db.ideas
 
-exports.createCategory = async (req, res) =>{
+exports.createCategory = async (req, res) => {
     try {
-        const department = await Department.findOne({departmentName: req.query.departmentName})
+        const department = await Department.findOne({ departmentName: req.query.departmentName })
         const category = new Category({
-            categoryName : req.body.categoryName,
+            categoryName: req.body.categoryName,
             departmentID: department._id,
         })
-        category.save(err =>{
-            if(err){
+        category.save(err => {
+            if (err) {
                 return res.status(500).send({
-                    errorCode : 500,
+                    errorCode: 500,
                     message: 'save category fail!'
                 })
             }
             return res.status(200).send({
-                errorCode : 0,
+                errorCode: 0,
                 message: 'save category successfully!'
             })
         })
     }
-    catch (err){
+    catch (err) {
         console.log(err)
     }
 }
 
-exports.deleteCategory = async (req,res) =>{
-    Category.find({},(err,list) =>{
-        if(err) return res.status(500).send({
-            errorCode: 500,
-            message: err
-        })
-        list.forEach(e=>{
-            const categoryDelete = req.params.categoryID
-            if(categoryDelete !== e._id){
-                Category.deleteOne({_id: categoryDelete}, (err) =>{
-                    if(err) return res.status(500).send({
-                        errorCode: 500,
-                        message: err
-                    })
-                    return res.status(200).send({
-                        errorCode: 0,
-                        message: 'Delete category successfully!'
-                    })
-                })
-            }
-            else return res.status(400).send({
-                errorCode: 400,
-                message: 'This category is used'
+exports.deleteCategory = async (req, res) => {
+    const categoryDelete = req.params.categoryID
+    const used = await Ideas.findOne({ categoryID: categoryDelete })
+    if(used === null){
+        await Category.deleteOne({ _id: categoryDelete })
+        .then(()=>{
+            return res.status(200).send({
+                errorCode: 0,
+                message: 'This category is delete successfully!'
             })
         })
-    })
+        .catch(err =>{
+            return res.status(500).send({
+                errorCode: 500,
+                message: err
+            })
+        })
+    } else {
+        return res.status(400).send({
+            errorCode: 400,
+            message: 'This category is used'
+        })
+    }
 }
 
-exports.ListCategory = async (req,res) =>{
-    const department = await Department.findOne({departmentName: req.query.departmentName})
-    Category.find(({departmentID: department._id}), (err,list) => {
-        if(err) return res.status(500).send({
+exports.ListCategory = async (req, res) => {
+    const department = await Department.findOne({ departmentName: req.query.departmentName })
+    Category.find(({ departmentID: department._id }), (err, list) => {
+        if (err) return res.status(500).send({
             errorCode: 500,
             message: err
         })
