@@ -223,49 +223,39 @@ exports.updateAccount = async (req, res, next) => {
 // }
 
 exports.listAccount = async (req, res) => {
-  let perPage = 5
-  let page = req.params.page || 1
-  Account.find({ deleted: { $ne: true } })
-    .skip((perPage * page) - perPage)
-    .limit(perPage)
-    .exec(async (err, list) => {
-      if (err) return res.status(500).send({
-        errorCode: 0,
-        message: err
-      })
-      var listShow = []
-      for (i = 0; i < list.length; i++) {
-        var role = await Role.findById({ _id: list[i].roleID })
-        if (!role)
-          return res.status(500).send({
-            errorCode: 0,
-            message: 'invalid role'
-          })
-        var listInfo = {
-          _id: list[i]._id,
-          accountEmail: list[i].accountEmail,
-          phone: list[i].phone,
-          address: list[i].address,
-          DOB: list[i].DOB,
-          gender: list[i].gender,
-          roleName: role.roleName
-        }
-        listShow.push(listInfo)
-      }
-      Account.countDocuments({ deleted: false }, (err, count) => {
-        if (err) return res.status(500).send({
-          errorCode: 500,
-          message: err
-        })
-        return res.status(200).send({
-          errorCode: 0,
-          data: listShow,
-          current: page,
-          pages: Math.ceil(count / perPage)
-        })
-      })
-
+  Account.find({ deleted: false }, (err, list) => {
+    if (err) return res.status(500).send({
+      errorCode: 0,
+      message: err
     })
+    var listShow = []
+    for (i = 0; i < list.length; i++) {
+      var role = await Role.findById({ _id: list[i].roleID })
+      if (!role)
+        return res.status(500).send({
+          errorCode: 0,
+          message: 'invalid role'
+        })
+      var listInfo = {
+        _id: list[i]._id,
+        accountEmail: list[i].accountEmail,
+        phone: list[i].phone,
+        address: list[i].address,
+        DOB: list[i].DOB,
+        gender: list[i].gender,
+        roleName: role.roleName
+      }
+      listShow.push(listInfo)
+    }
+    if (err) return res.status(500).send({
+      errorCode: 500,
+      message: err
+    })
+    return res.status(200).send({
+      errorCode: 0,
+      data: listShow,
+    })
+  })
 }
 
 exports.deleteUserAccount = async (req, res) => {
@@ -283,49 +273,42 @@ exports.deleteUserAccount = async (req, res) => {
 }
 
 exports.trashUserAccount = (req, res) => {
-  let perPage = 5
-  let page = req.params.page || 1
-  Account.find({ deleted: true })
-    .skip((perPage * page) - perPage)
-    .limit(perPage)
-    .exec(async (err, listDelete) => {
-      if (err) return res.status(500).send({
-        errorCode: 0,
-        message: err
-      })
-      var listDeleteShow = []
-      for (i = 0; i < listDelete.length; i++) {
-        var role = await Role.findById({ _id: listDelete[i].roleID })
-        if (!role)
-          return res.status(500).send({
-            errorCode: 500,
-            message: 'invalid role'
-          })
-        var listInfo = {
-          _id: listDelete[i]._id,
-          accountEmail: listDelete[i].accountEmail,
-          phone: listDelete[i].phone,
-          address: listDelete[i].address,
-          DOB: listDelete[i].DOB,
-          gender: listDelete[i].gender,
-          roleName: role.roleName
-        }
-        listDeleteShow.push(listInfo)
-      }
-      Account.countDocuments({ deleted: true }, (err, count) => {
-        if (err) return res.status(500).send({
-          errorCode: 500,
-          message: err
-        })
-        return res.status(200).send({
-          errorCode: 0,
-          data: listDeleteShow,
-          current: page,
-          pages: Math.ceil(count / perPage)
-        })
-      })
 
+  Account.find({ deleted: true }, (err, listDelete) => {
+    if (err) return res.status(500).send({
+      errorCode: 0,
+      message: err
     })
+    var listDeleteShow = []
+    for (i = 0; i < listDelete.length; i++) {
+      var role = await Role.findById({ _id: listDelete[i].roleID })
+      if (!role)
+        return res.status(500).send({
+          errorCode: 500,
+          message: 'invalid role'
+        })
+      var listInfo = {
+        _id: listDelete[i]._id,
+        accountEmail: listDelete[i].accountEmail,
+        phone: listDelete[i].phone,
+        address: listDelete[i].address,
+        DOB: listDelete[i].DOB,
+        gender: listDelete[i].gender,
+        roleName: role.roleName
+      }
+      listDeleteShow.push(listInfo)
+    }
+    if (err) return res.status(500).send({
+      errorCode: 500,
+      message: err
+    })
+    return res.status(200).send({
+      errorCode: 0,
+      data: listDeleteShow,
+    })
+  })
+
+
 }
 
 exports.restoreUserAccount = (req, res) => {
@@ -417,7 +400,7 @@ exports.confirmLink = async (req, res) => {
   }
 }
 
-exports.searchUser = async (req,res) =>{
+exports.searchUser = async (req, res) => {
   console.log(req.query)
   // var name_search = req.query.email // lấy giá trị của key name trong query parameters gửi lên
   // console.log(name_search)
@@ -430,13 +413,13 @@ exports.searchUser = async (req,res) =>{
 
   //   return res.status(200).send('loi roi')
   // }
-	// var result = users.filter( (user) => {
-	// 	// tìm kiếm chuỗi name_search trong user name. 
-	// 	// Lưu ý: Chuyển tên về cùng in thường hoặc cùng in hoa để không phân biệt hoa, thường khi tìm kiếm
-	// 	return user.name.toLowerCase().indexOf(name_search.toLowerCase()) !== -1
-	// })
+  // var result = users.filter( (user) => {
+  // 	// tìm kiếm chuỗi name_search trong user name. 
+  // 	// Lưu ý: Chuyển tên về cùng in thường hoặc cùng in hoa để không phân biệt hoa, thường khi tìm kiếm
+  // 	return user.name.toLowerCase().indexOf(name_search.toLowerCase()) !== -1
+  // })
 
-	// res.render('users/index', {
-	// 	users: result // render lại trang users/index với biến users bây giờ chỉ bao gồm các kết quả phù hợp
-	// })
+  // res.render('users/index', {
+  // 	users: result // render lại trang users/index với biến users bây giờ chỉ bao gồm các kết quả phù hợp
+  // })
 }

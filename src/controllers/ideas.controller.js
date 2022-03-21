@@ -242,8 +242,6 @@ exports.listIdeas = async (req, res) => {
                 return res.status(200).send({
                     errorCode: 0,
                     data: listShow,
-                    current: page,
-                    pages: Math.ceil(count / perPage)
                 })
             })
         })
