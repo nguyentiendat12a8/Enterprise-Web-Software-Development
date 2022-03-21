@@ -27,16 +27,30 @@ exports.createCategory = async (req, res) =>{
     }
 }
 
-exports.deleteCategory = (req,res) =>{
-    const categoryDelete = req.params.categoryID
-    Category.deleteOne({_id: categoryDelete}, (err) =>{
+exports.deleteCategory = async (req,res) =>{
+    Category.find({},(err,list) =>{
         if(err) return res.status(500).send({
             errorCode: 500,
             message: err
         })
-        return res.status(200).send({
-            errorCode: 0,
-            message: 'Delete category successfully!'
+        list.forEach(e=>{
+            const categoryDelete = req.params.categoryID
+            if(categoryDelete !== e._id){
+                Category.deleteOne({_id: categoryDelete}, (err) =>{
+                    if(err) return res.status(500).send({
+                        errorCode: 500,
+                        message: err
+                    })
+                    return res.status(200).send({
+                        errorCode: 0,
+                        message: 'Delete category successfully!'
+                    })
+                })
+            }
+            else return res.status(400).send({
+                errorCode: 400,
+                message: 'This category is used'
+            })
         })
     })
 }
