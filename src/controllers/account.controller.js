@@ -223,7 +223,7 @@ exports.updateAccount = async (req, res, next) => {
 // }
 
 exports.listAccount = async (req, res) => {
-  Account.find({ deleted: false }, (err, list) => {
+  Account.find({ deleted: false },async (err, list) => {
     if (err) return res.status(500).send({
       errorCode: 0,
       message: err
@@ -274,7 +274,7 @@ exports.deleteUserAccount = async (req, res) => {
 
 exports.trashUserAccount = (req, res) => {
 
-  Account.find({ deleted: true }, (err, listDelete) => {
+  Account.find({ deleted: true },async (err, listDelete) => {
     if (err) return res.status(500).send({
       errorCode: 0,
       message: err
