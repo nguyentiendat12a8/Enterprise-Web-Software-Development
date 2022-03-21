@@ -94,7 +94,7 @@ exports.signin = async (req, res, next) => {
     }
     const user = await Account.findOne({ accountEmail: accountEmail });
     if (!user) {
-      res.status(404).json({
+      return res.status(404).json({
         errorCode: "404",
         message: "User not found ~~~",
       });

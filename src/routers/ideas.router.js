@@ -1,7 +1,7 @@
 const express = require('express');
 const { createIdeas, likeIdeas, dislikeIdeas, commentIdeas, listCommentIdeas, listIdeas,
     viewSubmitIdeas, downloadIdeas, deleteCommentIdeas, filterMostLike, filterLeastLike,
-    filterMostComment, filterLeastComment } = require('../controllers/ideas.controller');
+    filterMostComment, filterLeastComment, myIdeas } = require('../controllers/ideas.controller');
 const { checkClosureDate } = require('../middlerwares/checkClosureDate.middleware');
 const { checkLike, checkDislike } = require('../middlerwares/checkLike.middleware');
 const { verifyToken, isQA } = require('../middlerwares/jwt.middleware');
@@ -16,7 +16,8 @@ router.post('/comment-ideas/:ideasID', [verifyToken, checkClosureDate], commentI
 router.post('/delete-comment/:commnetID', deleteCommentIdeas)
 
 router.get('/list-comment-ideas/:ideasID', [verifyToken], listCommentIdeas)
-router.get('/list-ideas/:page', [verifyToken], listIdeas)
+router.get('/list-ideas', [verifyToken], listIdeas)
+router.get('/list-my-ideas', [verifyToken], myIdeas)
 
 router.get('/view-submit-ideas/:ideasID', [verifyToken], viewSubmitIdeas)
 

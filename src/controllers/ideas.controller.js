@@ -251,6 +251,50 @@ exports.listIdeas = async (req, res) => {
     }
 }
 
+exports.myIdeas = async (req, res) => {
+    try {
+        Ideas.find({ accountID: req.accountID }, async (err, list) => {
+            if (err) return res.status(500).send({
+                errorCode: 0,
+                message: 'Ideas server is error'
+            })
+            var listShow = []
+            for (i = 0; i < list.length; i++) {
+                var department = await Department.findById({ _id: list[i].departmentID })
+                if (!department)
+                    return res.status(500).send({
+                        errorCode: 0,
+                        message: 'department server is error'
+                    })
+                let category = await Category.findById({ _id: list[i].categoryID })
+                if (category == null) return res.status(500).send({
+                    errorCode: 0,
+                    message: 'category server is error'
+                })
+
+                var listInfo = {
+                    _id: list[i]._id,
+                    ideasContent: list[i].ideasContent,
+                    ideasFile: list[i].ideasFile,
+                    numberOfLike: list[i].numberOfLike,
+                    numberOfDislike: list[i].numberOfDislike,
+                    numberOfComment: list[i].numberOfComment,
+                    departmentName: department.departmentName,
+                    categoryName: category.categoryName
+                }
+                listShow.push(listInfo)
+            }
+            return res.status(200).send({
+                errorCode: 0,
+                data: listShow,
+            })
+        })
+    }
+    catch (err) {
+        console.log(err)
+    }
+}
+
 
 exports.likeIdeas = async (req, res) => {
     try {
