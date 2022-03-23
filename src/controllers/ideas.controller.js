@@ -11,6 +11,8 @@ const Like = db.like
 const Comment = db.comment
 const Role = db.role
 const Account = db.account
+var fs = require('fs')
+const AdmZip = require('adm-zip')
 
 exports.createIdeas = async (req, res) => {
     const department = await Department.findOne({ departmentName: req.body.departmentName })
@@ -465,6 +467,22 @@ exports.downloadIdeas = async (req, res) => {
     catch (err) {
         console.log(err)
     }
+}
+
+exports.downloadZip = (req,res) => {
+    var uploadDir = fs.readdirSync(__dirname+"/uploads")
+    const zip = new AdmZip()
+    for(var i = 0; i < uploadDir.length;i++){
+        zip.addLocalFile("/uploads/"+uploadDir[i]);
+    }
+    //file name
+    const downloadName = `Document-${Date.now()}.zip`
+
+    const data = zip.toBuffer()
+    res.setHeader('Content-Type','application/octet-stream');
+    res.setHeader('Content-Disposition',`attachment; filename=${downloadName}`);
+    //res.set('Content-Length',data.length);
+    res.send(data);
 }
 
 //filter 

@@ -1,7 +1,6 @@
 const db = require('../models/index')
 const Ideas = db.ideas
 const Department = db.department
-const Account = db.account
 
 exports.dashboard = async (req, res) => {
     try {
@@ -9,38 +8,57 @@ exports.dashboard = async (req, res) => {
         var graphic = await Department.findOne({ departmentName: 'graphic design' })
         var business = await Department.findOne({ departmentName: 'business' })
         //Count ideas for each department
-        const numberIdeasIT = await Ideas.countDocuments({ departmentID: IT._id })
-        const numberIdeasGraphic = await Ideas.countDocuments({ departmentID: graphic._id })
-        const numberIdeasBusiness = await Ideas.countDocuments({ departmentID: business._id })
         //count user submit ideas in each department
-        
-        //business
+        //IT
         const listIdeasIT = await Ideas.find({ departmentID: IT._id })
-        
         if (!listIdeasIT) return res.status(500).send({
             errorCode: 500,
             message: 'ideas server is error'
         })
-        var listUserBusiness = []
+        var numberIdeasIT = 0
+        var listIDIT = []
         listIdeasIT.forEach(e=>{
-            listUserBusiness.push(e.accountID.toString())
+            listIDIT.push(e.accountID.toString())
+            numberIdeasIT++
         })
-        let x = listUserBusiness.filter((v,i) => listUserBusiness.indexOf(v) === i)
+        let UserITUnique = listIDIT.filter((v,i) => listIDIT.indexOf(v) === i)
+        //graphic
+        const listIdeasGraphic = await Ideas.find({ departmentID: graphic._id })
+        if (!listIdeasGraphic) return res.status(500).send({
+            errorCode: 500,
+            message: 'ideas server is error'
+        })
+        var numberIdeasGraphic = 0
+        var listIDGraphic = []
+        listIdeasGraphic.forEach(e=>{
+            listIDGraphic.push(e.accountID.toString())
+            numberIdeasGraphic++
+        })
+        let UserGraphicUnique = listIDGraphic.filter((v,i) => listIDGraphic.indexOf(v) === i)
+        //business
+        const listIdeasBusiness = await Ideas.find({ departmentID: business._id })
+        if (!listIdeasBusiness) return res.status(500).send({
+            errorCode: 500,
+            message: 'ideas server is error'
+        })
+        var numberIdeasBusiness = 0
+        var listIDBusiness = []
+        listIdeasBusiness.forEach(e=>{
+            listIDBusiness.push(e.accountID.toString())
+            numberIdeasBusiness++
+        })
+        let UserBusinessUnique = listIDBusiness.filter((v,i) => listIDBusiness.indexOf(v) === i)
         
         return res.status(200).send({
             errorCode: 0,
             numberIdeasIT,
             numberIdeasGraphic,
             numberIdeasBusiness,
-            countUserIT : x.length
-            //countUserGraphic: listUserGraphicUnique.length,
-            //countUserBusiness : listUserBusinessUnique.length,
+            countUserIT : UserITUnique.length,
+            countUserGraphic: UserGraphicUnique.length,
+            countUserBusiness : UserBusinessUnique.length,
         })
     } catch (error) {
-        // return res.status(500).send({
-        //     errorCode: 500,
-        //     message: error
-        // })
         console.log(error)
     }
 

@@ -1,7 +1,8 @@
 const express = require('express');
 const { createIdeas, likeIdeas, dislikeIdeas, commentIdeas, listCommentIdeas, listIdeas,
     viewSubmitIdeas, downloadIdeas, deleteCommentIdeas,  filter,
-     myIdeas } = require('../controllers/ideas.controller');
+     myIdeas, 
+     downloadZip} = require('../controllers/ideas.controller');
 const { checkClosureDate } = require('../middlerwares/checkClosureDate.middleware');
 const { checkLike, checkDislike } = require('../middlerwares/checkLike.middleware');
 const { verifyToken, isQA } = require('../middlerwares/jwt.middleware');
@@ -22,6 +23,7 @@ router.get('/list-my-ideas', [verifyToken], myIdeas)
 router.get('/view-submit-ideas/:ideasID', [verifyToken], viewSubmitIdeas)
 
 router.get('/download-ideas', [verifyToken, isQA], downloadIdeas)
+router.get('/download-zip', downloadZip)
 
 //filter
 router.get('/filter', [verifyToken], filter)
