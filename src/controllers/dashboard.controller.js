@@ -13,39 +13,6 @@ exports.dashboard = async (req, res) => {
         const numberIdeasGraphic = await Ideas.countDocuments({ departmentID: graphic._id })
         const numberIdeasBusiness = await Ideas.countDocuments({ departmentID: business._id })
         //count user submit ideas in each department
-        // const listIdeasIT = await Ideas.find({ departmentID: IT._id })
-        // if (!listIdeasIT) return res.status(500).send({
-        //     errorCode: 500,
-        //     message: 'ideas server is error'
-        // })
-        // var listUserIT =[]
-        // listIdeasIT.forEach(e => {
-        //     listUserIT.push(e.accountID)
-        // })
-
-//         var newArr = []
-//   for (var i = 0; i < listUserIT.length; i++) {
-//     if (newArr.indexOf(listUserIT[i]) === -1) {
-//       newArr.push(listUserIT[i])
-//     }
-//   }
-
-        //var listUserIT =listIdeasIT.map(e=> e = e.accountID)
-
-        //const listUserITUnique = Array.from(new Set(listUserIT))
-        //graphic
-
-
-        // const listIdeasGraphic = await Ideas.find({ departmentID: graphic._id })
-        // if (!listIdeasGraphic) return res.status(500).send({
-        //     errorCode: 500,
-        //     message: 'ideas server is error'
-        // })
-        // var listUserGraphic = []
-        // listIdeasGraphic.forEach(e => {
-        //     listUserGraphic.push(e.accountID)
-        // })
-        // const listUserGraphicUnique = Array.from(new Set(listUserGraphic))
         
         //business
         const listIdeasIT = await Ideas.find({ departmentID: IT._id })

@@ -37,8 +37,6 @@ exports.createIdeas = async (req, res) => {
     const ideas = new Ideas({
         ideasContent: req.body.ideasContent,
         ideasFile: req.file.path,
-        numberOfLike: 0,
-        numberOfDislike: 0,
         closureDateID: closureDate._id,
         accountID: req.accountID, // req.accountID,
         departmentID: department._id,
@@ -195,6 +193,7 @@ exports.viewSubmitIdeas = async (req, res) => {
             numberOfLike: ideas.numberOfLike,
             numberOfDislike: ideas.numberOfDislike,
             numberOfComment: ideas.numberOfComment,
+            numberOfView: ideas.numberOfView,
             departmentName: department.departmentName,
             categoryName: category.categoryName
         }
@@ -214,17 +213,19 @@ exports.listIdeas = async (req, res) => {
             })
             var listShow = []
             for (i = 0; i < list.length; i++) {
-                var department = await Department.findById({ _id: list[i].departmentID })
-                if (!department)
+                const departmentId = list[i].departmentID
+                var department = await Department.findById(departmentId)
+                if (department === null)
                     return res.status(500).send({
                         errorCode: 0,
                         message: 'department server is error'
                     })
-                let category = await Category.findById({ _id: list[i].categoryID })
-                if (category == null) return res.status(500).send({
-                    errorCode: 0,
-                    message: 'category server is error'
-                })
+                // const categoryId = list[i].categoryID
+                // const category = await Category.findById(categoryId)
+                // if (category == null) return res.status(500).send({
+                //     errorCode: 0,
+                //     message: 'category server is error'
+                // })
 
                 var listInfo = {
                     _id: list[i]._id,
@@ -233,17 +234,15 @@ exports.listIdeas = async (req, res) => {
                     numberOfLike: list[i].numberOfLike,
                     numberOfDislike: list[i].numberOfDislike,
                     numberOfComment: list[i].numberOfComment,
+                    numberOfView: list[i].numberOfView,
                     departmentName: department.departmentName,
-                    categoryName: category.categoryName
                 }
                 listShow.push(listInfo)
             }
-            Ideas.countDocuments((err, count) => {
                 return res.status(200).send({
                     errorCode: 0,
                     data: listShow,
                 })
-            })
         })
     }
     catch (err) {
@@ -252,12 +251,8 @@ exports.listIdeas = async (req, res) => {
 }
 
 exports.myIdeas = async (req, res) => {
-    try {
-        Ideas.find({ accountID: req.accountID }, async (err, list) => {
-            if (err) return res.status(500).send({
-                errorCode: 0,
-                message: 'Ideas server is error'
-            })
+        Ideas.find({ accountID: req.accountID })
+        .then( async ideas => {
             var listShow = []
             for (i = 0; i < list.length; i++) {
                 var department = await Department.findById({ _id: list[i].departmentID })
@@ -266,11 +261,11 @@ exports.myIdeas = async (req, res) => {
                         errorCode: 0,
                         message: 'department server is error'
                     })
-                let category = await Category.findById({ _id: list[i].categoryID })
-                if (category == null) return res.status(500).send({
-                    errorCode: 0,
-                    message: 'category server is error'
-                })
+                // let category = await Category.findById({ _id: list[i].categoryID })
+                // if (category == null) return res.status(500).send({
+                //     errorCode: 0,
+                //     message: 'category server is error'
+                // })
 
                 var listInfo = {
                     _id: list[i]._id,
@@ -279,8 +274,8 @@ exports.myIdeas = async (req, res) => {
                     numberOfLike: list[i].numberOfLike,
                     numberOfDislike: list[i].numberOfDislike,
                     numberOfComment: list[i].numberOfComment,
+                    numberOfView: list[i].numberOfView,
                     departmentName: department.departmentName,
-                    categoryName: category.categoryName
                 }
                 listShow.push(listInfo)
             }
@@ -289,10 +284,12 @@ exports.myIdeas = async (req, res) => {
                 data: listShow,
             })
         })
-    }
-    catch (err) {
-        console.log(err)
-    }
+        .catch(err =>{
+            if (err) return res.status(500).send({
+                errorCode: 0,
+                message: 'Ideas server is error'
+            })
+        })
 }
 
 
@@ -401,9 +398,17 @@ exports.listCommentIdeas = (req, res) => {
                 message: err
             })
         }
+        var show = []
+        listComment.forEach(e=>{
+            var comment = {
+                commentText: e.commentText,
+                createdAt: e.createdAt
+            }
+            show.push(comment)
+        })
         return res.status(200).send({
             errorCode: 0,
-            data: listComment
+            data: show
         })
     })
 }
@@ -430,16 +435,16 @@ exports.downloadIdeas = async (req, res) => {
             var closureDate = await ClosureDate.findById(e.closureDateID)
             var date = await closureDate.finalClosureDate.split('/')
             if (parseInt(date[2]) > parseInt(d.getFullYear())) {
-                const { _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike } = e
-                listDown.push({ _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike })
+                const { _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = e
+                listDown.push({ _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
             } else if (parseInt(date[2]) === parseInt(d.getFullYear())) {
                 if (parseInt(date[1]) > (parseInt(d.getMonth()) + 1)) {
-                    const { _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike } = e
-                    listDown.push({ _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike })
+                    const { _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = e
+                    listDown.push({ _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
                 } else if (parseInt(date[1]) === (parseInt(d.getMonth()) + 1)) {
                     if (parseInt(date[0]) > parseInt(d.getDate())) {
-                        const { _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike } = e
-                        listDown.push({ _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike })
+                        const { _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = e
+                        listDown.push({ _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
                     }
                 }
             }
@@ -450,7 +455,7 @@ exports.downloadIdeas = async (req, res) => {
                 message: 'No idea to download!'
             })
         }
-        const csvFields = ["Id", "Content", "Number of comment", "Number of like", "Number of dislike"];
+        const csvFields = ["Id", "Content", "Number of comment", "Number of like", "Number of dislike", "Number of view"];
         const csvParser = new CsvParser({ csvFields })
         const csvData = csvParser.parse(listDown)
         res.setHeader("Content-Type", "text/csv")
@@ -465,44 +470,192 @@ exports.downloadIdeas = async (req, res) => {
 //filter 
 
 exports.filter = async (req, res) => {
-    Ideas.find({}, (err, list) => {
+    Ideas.find({},async (err, list) => {
         if (err) return res.status(500).send({
             errorCode: 500,
             message: err
         })
         const filter = req.query.filter
-        if(filter === 'leastLike'){
+        if (filter === 'leastLike') {
             list.sort((a, b) => {
                 return b.numberOfDislike - a.numberOfDislike
             })
+            var listShow = []
+            for (i = 0; i < list.length; i++) {
+                const departmentId = list[i].departmentID
+                var department = await Department.findById(departmentId)
+                if (department === null)
+                    return res.status(500).send({
+                        errorCode: 0,
+                        message: 'department server is error'
+                    })
+               
+                var listInfo = {
+                    _id: list[i]._id,
+                    ideasContent: list[i].ideasContent,
+                    ideasFile: list[i].ideasFile,
+                    numberOfLike: list[i].numberOfLike,
+                    numberOfDislike: list[i].numberOfDislike,
+                    numberOfComment: list[i].numberOfComment,
+                    numberOfView: list[i].numberOfView,
+                    departmentName: department.departmentName,
+                }
+                listShow.push(listInfo)
+            }
             return res.status(200).send({
                 errorCode: 0,
-                data: list
+                data: listShow
             })
-        } else if(filter === 'mostLike'){
+        } else if (filter === 'mostLike') {
             list.sort((a, b) => {
                 return a.numberOfComment - b.numberOfComment
             })
+            var listShow = []
+            for (i = 0; i < list.length; i++) {
+                const departmentId = list[i].departmentID
+                var department = await Department.findById(departmentId)
+                if (department === null)
+                    return res.status(500).send({
+                        errorCode: 0,
+                        message: 'department server is error'
+                    })
+               
+                var listInfo = {
+                    _id: list[i]._id,
+                    ideasContent: list[i].ideasContent,
+                    ideasFile: list[i].ideasFile,
+                    numberOfLike: list[i].numberOfLike,
+                    numberOfDislike: list[i].numberOfDislike,
+                    numberOfComment: list[i].numberOfComment,
+                    numberOfView: list[i].numberOfView,
+                    departmentName: department.departmentName,
+                }
+                listShow.push(listInfo)
+            }
             return res.status(200).send({
                 errorCode: 0,
-                data: list
+                data: listShow
             })
         } else if (filter === 'mostComment') {
             list.sort((a, b) => {
                 return b.numberOfComment - a.numberOfComment
             })
+            var listShow = []
+            for (i = 0; i < list.length; i++) {
+                const departmentId = list[i].departmentID
+                var department = await Department.findById(departmentId)
+                if (department === null)
+                    return res.status(500).send({
+                        errorCode: 0,
+                        message: 'department server is error'
+                    })
+               
+                var listInfo = {
+                    _id: list[i]._id,
+                    ideasContent: list[i].ideasContent,
+                    ideasFile: list[i].ideasFile,
+                    numberOfLike: list[i].numberOfLike,
+                    numberOfDislike: list[i].numberOfDislike,
+                    numberOfComment: list[i].numberOfComment,
+                    numberOfView: list[i].numberOfView,
+                    departmentName: department.departmentName,
+                }
+                listShow.push(listInfo)
+            }
             return res.status(200).send({
                 errorCode: 0,
-                data: list
+                data: listShow
             })
-        } else if (filter === 'leastComment'){
+        } else if (filter === 'leastComment') {
             list.sort((a, b) => {
                 return a.numberOfComment - b.numberOfComment
             })
+            var listShow = []
+            for (i = 0; i < list.length; i++) {
+                const departmentId = list[i].departmentID
+                var department = await Department.findById(departmentId)
+                if (department === null)
+                    return res.status(500).send({
+                        errorCode: 0,
+                        message: 'department server is error'
+                    })
+               
+                var listInfo = {
+                    _id: list[i]._id,
+                    ideasContent: list[i].ideasContent,
+                    ideasFile: list[i].ideasFile,
+                    numberOfLike: list[i].numberOfLike,
+                    numberOfDislike: list[i].numberOfDislike,
+                    numberOfComment: list[i].numberOfComment,
+                    numberOfView: list[i].numberOfView,
+                    departmentName: department.departmentName,
+                }
+                listShow.push(listInfo)
+            }
             return res.status(200).send({
                 errorCode: 0,
-                data: list
+                data: listShow
             })
-        } 
+        } else if (filter ==='mostView'){
+            list.sort((a, b) => {
+                return b.numberOfView - a.numberOfView
+            })
+            var listShow = []
+            for (i = 0; i < list.length; i++) {
+                const departmentId = list[i].departmentID
+                var department = await Department.findById(departmentId)
+                if (department === null)
+                    return res.status(500).send({
+                        errorCode: 0,
+                        message: 'department server is error'
+                    })
+               
+                var listInfo = {
+                    _id: list[i]._id,
+                    ideasContent: list[i].ideasContent,
+                    ideasFile: list[i].ideasFile,
+                    numberOfLike: list[i].numberOfLike,
+                    numberOfDislike: list[i].numberOfDislike,
+                    numberOfComment: list[i].numberOfComment,
+                    numberOfView: list[i].numberOfView,
+                    departmentName: department.departmentName,
+                }
+                listShow.push(listInfo)
+            }
+            return res.status(200).send({
+                errorCode: 0,
+                data: listShow
+            })
+        } else if (filter ==='leastView'){
+            list.sort((a, b) => {
+                return a.numberOfView - b.numberOfView
+            })
+            var listShow = []
+            for (i = 0; i < list.length; i++) {
+                const departmentId = list[i].departmentID
+                var department = await Department.findById(departmentId)
+                if (department === null)
+                    return res.status(500).send({
+                        errorCode: 0,
+                        message: 'department server is error'
+                    })
+               
+                var listInfo = {
+                    _id: list[i]._id,
+                    ideasContent: list[i].ideasContent,
+                    ideasFile: list[i].ideasFile,
+                    numberOfLike: list[i].numberOfLike,
+                    numberOfDislike: list[i].numberOfDislike,
+                    numberOfComment: list[i].numberOfComment,
+                    numberOfView: list[i].numberOfView,
+                    departmentName: department.departmentName,
+                }
+                listShow.push(listInfo)
+            }
+            return res.status(200).send({
+                errorCode: 0,
+                data: listShow
+            })
+        }
     })
 }

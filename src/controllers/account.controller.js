@@ -273,7 +273,6 @@ exports.deleteUserAccount = async (req, res) => {
 }
 
 exports.trashUserAccount = (req, res) => {
-
   Account.find({ deleted: true },async (err, listDelete) => {
     if (err) return res.status(500).send({
       errorCode: 0,
