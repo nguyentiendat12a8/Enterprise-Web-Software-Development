@@ -178,7 +178,7 @@ exports.viewDetailIdeas = async (req, res) => {
             })
             var department = await Department.findById(ideas.departmentID)
             var category = await Category.findById(ideas.categoryID)
-            var listComment = await Comment.findById(ideas.ideasID)
+            var listComment = await Comment.find({ideasID: ideas._id})
             var showComment = []
             if(listComment){
                 listComment.forEach(e=>{
@@ -199,7 +199,7 @@ exports.viewDetailIdeas = async (req, res) => {
                 numberOfView: ideas.numberOfView,
                 departmentName: department.departmentName,
                 categoryName: category.categoryName,
-                showComment
+                showComment: showComment
             }
             return res.status(200).send({
                 errorCode: 0,
