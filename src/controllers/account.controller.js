@@ -11,75 +11,47 @@ const crypto = require("crypto");
 const Joi = require("joi");
 
 exports.signup = async (req, res) => {
+  try {
+    const roleName = req.query.roleName
+    if (!roleName) {
+      return res.status(400).send({
+        errorCode: 400,
+        message: 'Choose the right role!'
+      })
+    }
+    const role = await Role.findOne({ roleName: roleName })
+    const user = new Account({
+      accountEmail: req.body.accountEmail,
+      accountPassword: bcrypt.hashSync(req.body.accountPassword, 8),
+      phone: req.body.phone,
+      address: req.body.address,
+      gender: req.body.gender,
+      DOB: req.body.DOB,
+      roleID: role._id
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
 
-  const user = new Account({
-    accountEmail: req.body.accountEmail,
-    accountPassword: bcrypt.hashSync(req.body.accountPassword, 8),
-    phone: req.body.phone,
-    address: req.body.address,
-    gender: req.body.gender,
-    DOB: req.body.DOB,
-    //roleID: req.body.roleID
+exports.listRole = async (req, res) => {
+  Role.find({}, (err, list) => {
+    if (err) return res.status(500).send({
+      errorCode: 500,
+      message: err
+    })
+    var show = []
+    list.forEach(e => {
+      var role = {
+        roleName: e.roleName
+      }
+      show.push(role)
+    })
+    return res.status(200).send({
+      errorCode:0,
+      data: show
+    })
   })
-
-  user.save((err, user) => {
-    if (err) {
-      return res.status(500).send({
-        errorCode: 500,
-        message: err
-      })
-    }
-
-    if (req.body.roleName) {
-      Role.findOne({
-        roleName: req.body.roleName
-      }, (err, roles) => {
-        if (err) {
-          return res.status(500).send({
-            errorCode: 500,
-            message: err
-          })
-        }
-        user.roleID = roles._id
-        user.save(err => {
-          if (err) {
-            return res.status(500).send({
-              errorCode: 500,
-              message: err
-            })
-          }
-          res.send({
-            errorCode: 0,
-            message: `${roles.roleName} was registered successfully`
-          })
-        })
-      })
-    }
-    else {
-      Role.findOne({ roleName: 'staff' }, (err, role) => {
-        if (err) {
-          return res.status(500).send({
-            errorCode: 500,
-            message: err
-          })
-        }
-        user.roleID = [role._id];
-        user.save(err => {
-          if (err) {
-            res.status(500).send({
-              errorCode: 500,
-              message: err
-            })
-            return
-          }
-          res.send({
-            errorCode: 0,
-            message: "Staff was registered successfully!"
-          });
-        });
-      });
-    }
-  });
 }
 
 
@@ -223,7 +195,7 @@ exports.updateAccount = async (req, res, next) => {
 // }
 
 exports.listAccount = async (req, res) => {
-  Account.find({ deleted: false },async (err, list) => {
+  Account.find({ deleted: false }, async (err, list) => {
     if (err) return res.status(500).send({
       errorCode: 0,
       message: err
@@ -273,7 +245,7 @@ exports.deleteUserAccount = async (req, res) => {
 }
 
 exports.trashUserAccount = (req, res) => {
-  Account.find({ deleted: true },async (err, listDelete) => {
+  Account.find({ deleted: true }, async (err, listDelete) => {
     if (err) return res.status(500).send({
       errorCode: 0,
       message: err
@@ -397,28 +369,4 @@ exports.confirmLink = async (req, res) => {
     res.send("An error occured");
     console.log(error);
   }
-}
-
-exports.searchUser = async (req, res) => {
-  console.log(req.query)
-  // var name_search = req.query.email // lấy giá trị của key name trong query parameters gửi lên
-  // console.log(name_search)
-  // if(name_search){
-  //   await Account.find({accountEmail : name_search}, (err,user)=>{
-  //     if(err) return res.status(400).send({message: err})
-  //     return res.status(200).send({data: user})
-  //   })
-  // }
-
-  //   return res.status(200).send('loi roi')
-  // }
-  // var result = users.filter( (user) => {
-  // 	// tìm kiếm chuỗi name_search trong user name. 
-  // 	// Lưu ý: Chuyển tên về cùng in thường hoặc cùng in hoa để không phân biệt hoa, thường khi tìm kiếm
-  // 	return user.name.toLowerCase().indexOf(name_search.toLowerCase()) !== -1
-  // })
-
-  // res.render('users/index', {
-  // 	users: result // render lại trang users/index với biến users bây giờ chỉ bao gồm các kết quả phù hợp
-  // })
 }

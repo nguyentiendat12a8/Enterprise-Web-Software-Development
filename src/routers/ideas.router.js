@@ -5,6 +5,7 @@ const { createIdeas, likeIdeas, dislikeIdeas, commentIdeas, listCommentIdeas, li
      downloadZip} = require('../controllers/ideas.controller');
 const { checkClosureDate } = require('../middlerwares/checkClosureDate.middleware');
 const { checkLike, checkDislike } = require('../middlerwares/checkLike.middleware');
+const { checkView } = require('../middlerwares/checkView.middleware');
 const { verifyToken, isQA } = require('../middlerwares/jwt.middleware');
 const { upload } = require('../utils/uploadFile')
 
@@ -20,7 +21,7 @@ router.post('/comment-ideas/:ideasID', [verifyToken, checkClosureDate], commentI
 router.get('/list-ideas', [verifyToken], listIdeas)
 router.get('/list-my-ideas', [verifyToken], myIdeas)
 
-router.get('/view-detail-ideas/:ideasID', [verifyToken], viewDetailIdeas)
+router.get('/view-detail-ideas/:ideasID', [verifyToken, checkView], viewDetailIdeas)
 
 router.get('/download-ideas', [verifyToken, isQA], downloadIdeas)
 router.get('/download-zip', downloadZip)

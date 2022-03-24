@@ -9,6 +9,7 @@ const {Comment} = require('./comment.schema')
 const {Department} = require('./department.schema')
 const {Ideas} = require('./ideas.schema')
 const {Like} = require('./like.schema')
+const {View} = require('./view.schema')
 const db = {}
 
 // const softDelete = require('mongoose-delete')
@@ -28,6 +29,7 @@ db.comment = Comment
 db.department = Department 
 db.ideas = Ideas 
 db.like = Like 
+db.view = View
 
 // db.ROLES = ['staff', 'admin','QA', 'QA of IT','QA of business','QA of graphic design']
 
