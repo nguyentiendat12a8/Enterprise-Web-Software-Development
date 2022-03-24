@@ -180,14 +180,16 @@ exports.viewDetailIdeas = async (req, res) => {
             var category = await Category.findById(ideas.categoryID)
             var listComment = await Comment.findById(ideas.ideasID)
             var showComment = []
-            listComment.forEach(e=>{
-                var comment = {
-                    commentText: e.commentText,
-                    createdAt: e.createdAt
-                }
-                showComment.push(comment)
-            })
-    
+            if(listComment){
+                listComment.forEach(e=>{
+                    var comment = {
+                        commentText: e.commentText,
+                        createdAt: e.createdAt
+                    }
+                    showComment.push(comment)
+                })
+            }
+            
             var ideasShow = {
                 ideasContent: ideas.ideasContent,
                 ideasFile: ideas.ideasFile,
@@ -218,13 +220,13 @@ exports.listIdeas = async (req, res) => {
             })
             var listShow = []
             for (i = 0; i < list.length; i++) {
-                const departmentId = list[i].departmentID
-                var department = await Department.findById(departmentId)
-                if (department === null)
-                    return res.status(500).send({
-                        errorCode: 0,
-                        message: 'department server is error'
-                    })
+                // const departmentId = list[i].departmentID
+                // var department = await Department.findById(departmentId)
+                // if (department === null)
+                //     return res.status(500).send({
+                //         errorCode: 0,
+                //         message: 'department server is error'
+                //     })
                 // const categoryId = list[i].categoryID
                 // const category = await Category.findById(categoryId)
                 // if (category == null) return res.status(500).send({
@@ -235,12 +237,12 @@ exports.listIdeas = async (req, res) => {
                 var listInfo = {
                     _id: list[i]._id,
                     ideasContent: list[i].ideasContent,
-                    ideasFile: list[i].ideasFile,
+                    //ideasFile: list[i].ideasFile,
                     numberOfLike: list[i].numberOfLike,
                     numberOfDislike: list[i].numberOfDislike,
                     numberOfComment: list[i].numberOfComment,
                     numberOfView: list[i].numberOfView,
-                    departmentName: department.departmentName,
+                    //departmentName: department.departmentName,
                 }
                 listShow.push(listInfo)
             }
@@ -266,21 +268,17 @@ exports.myIdeas = async (req, res) => {
                         errorCode: 0,
                         message: 'department server is error'
                     })
-                // let category = await Category.findById({ _id: list[i].categoryID })
-                // if (category == null) return res.status(500).send({
-                //     errorCode: 0,
-                //     message: 'category server is error'
-                // })
+                let category = await Category.findById({ _id: list[i].categoryID })
+                if (category == null) return res.status(500).send({
+                    errorCode: 0,
+                    message: 'category server is error'
+                })
 
                 var listInfo = {
                     _id: list[i]._id,
                     ideasContent: list[i].ideasContent,
-                    ideasFile: list[i].ideasFile,
-                    numberOfLike: list[i].numberOfLike,
-                    numberOfDislike: list[i].numberOfDislike,
-                    numberOfComment: list[i].numberOfComment,
-                    numberOfView: list[i].numberOfView,
                     departmentName: department.departmentName,
+                    categoryName: category.categoryName
                 }
                 listShow.push(listInfo)
             }
