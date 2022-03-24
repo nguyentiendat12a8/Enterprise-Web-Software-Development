@@ -169,41 +169,44 @@ exports.createIdeas = async (req, res) => {
     }
 }
 
-exports.viewSubmitIdeas = async (req, res) => {
-    Ideas.findById(req.params.ideasID, async (err, ideas) => {
-        if (err) return res.status(500).send({
-            errorCode: 0,
-            message: err
-        })
-        var department = await Department.findById(ideas.departmentID)
-        if (!department) {
-            return res.status(500).send({
-                errorCode: 500,
-                message: 'Department server is error'
+exports.viewDetailIdeas = async (req, res) => {
+    try {
+        Ideas.findById(req.params.ideasID, async (err, ideas) => {
+            if (err) return res.status(500).send({
+                errorCode: 0,
+                message: err
             })
-        }
-        var category = await Category.findById(ideas.categoryID)
-        if (!category) {
-            return res.status(500).send({
-                errorCode: 500,
-                message: 'Category server is error'
+            var department = await Department.findById(ideas.departmentID)
+            var category = await Category.findById(ideas.categoryID)
+            var listComment = await Comment.findById(ideas.ideasID)
+            var showComment = []
+            listComment.forEach(e=>{
+                var comment = {
+                    commentText: e.commentText,
+                    createdAt: e.createdAt
+                }
+                showComment.push(comment)
             })
-        }
-        var ideasShow = {
-            ideasContent: ideas.ideasContent,
-            ideasFile: ideas.ideasFile,
-            numberOfLike: ideas.numberOfLike,
-            numberOfDislike: ideas.numberOfDislike,
-            numberOfComment: ideas.numberOfComment,
-            numberOfView: ideas.numberOfView,
-            departmentName: department.departmentName,
-            categoryName: category.categoryName
-        }
-        return res.status(200).send({
-            errorCode: 0,
-            data: ideasShow
+    
+            var ideasShow = {
+                ideasContent: ideas.ideasContent,
+                ideasFile: ideas.ideasFile,
+                numberOfLike: ideas.numberOfLike,
+                numberOfDislike: ideas.numberOfDislike,
+                numberOfComment: ideas.numberOfComment,
+                numberOfView: ideas.numberOfView,
+                departmentName: department.departmentName,
+                categoryName: category.categoryName,
+                showComment
+            }
+            return res.status(200).send({
+                errorCode: 0,
+                data: ideasShow
+            })
         })
-    })
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 exports.listIdeas = async (req, res) => {
@@ -391,42 +394,19 @@ exports.commentIdeas = async (req, res) => {
     }
 }
 
-exports.listCommentIdeas = (req, res) => {
-    const ideasID = req.params.ideasID
-    Comment.find({ ideasID }, (err, listComment) => {
-        if (err) {
-            return res.status(500).send({
-                errorCode: 500,
-                message: err
-            })
-        }
-        var show = []
-        listComment.forEach(e=>{
-            var comment = {
-                commentText: e.commentText,
-                createdAt: e.createdAt
-            }
-            show.push(comment)
-        })
-        return res.status(200).send({
-            errorCode: 0,
-            data: show
-        })
-    })
-}
 
-exports.deleteCommentIdeas = async (req, res) => {
-    const comment = await Comment.findById('622a10e1f965150f29d40efa')
-    if (!comment) return res.status(500).send({
-        errorCode: 500,
-        message: 'Comment server is error'
-    })
-    await comment.delete()
-    return res.status(200).send({
-        errorCode: 0,
-        message: 'Comment delete successfully'
-    })
-}
+// exports.deleteCommentIdeas = async (req, res) => {
+//     const comment = await Comment.findById('622a10e1f965150f29d40efa')
+//     if (!comment) return res.status(500).send({
+//         errorCode: 500,
+//         message: 'Comment server is error'
+//     })
+//     await comment.delete()
+//     return res.status(200).send({
+//         errorCode: 0,
+//         message: 'Comment delete successfully'
+//     })
+// }
 
 exports.downloadIdeas = async (req, res) => {
     try {

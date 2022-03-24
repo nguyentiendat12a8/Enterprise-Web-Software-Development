@@ -16,11 +16,11 @@ router.post('/dislike-ideas/:ideasID', [verifyToken, checkClosureDate, checkDisl
 router.post('/comment-ideas/:ideasID', [verifyToken, checkClosureDate], commentIdeas)
 router.post('/delete-comment/:commnetID', deleteCommentIdeas)
 
-router.get('/list-comment-ideas/:ideasID', [verifyToken], listCommentIdeas)
+//router.get('/list-comment-ideas/:ideasID', [verifyToken], listCommentIdeas)
 router.get('/list-ideas', [verifyToken], listIdeas)
 router.get('/list-my-ideas', [verifyToken], myIdeas)
 
-router.get('/view-submit-ideas/:ideasID', [verifyToken], viewSubmitIdeas)
+router.get('/view-detail-ideas/:ideasID', [verifyToken], viewSubmitIdeas)
 
 router.get('/download-ideas', [verifyToken, isQA], downloadIdeas)
 router.get('/download-zip', downloadZip)
