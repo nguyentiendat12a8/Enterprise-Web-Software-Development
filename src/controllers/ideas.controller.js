@@ -448,10 +448,10 @@ exports.downloadIdeas = async (req, res) => {
 }
 
 exports.downloadZip = (req,res) => {
-    var uploadDir = fs.readdirSync(__dirname+"/uploads")
+    var uploadDir = fs.readdirSync(__dirname+"/../uploads")
     const zip = new AdmZip()
     for(var i = 0; i < uploadDir.length;i++){
-        zip.addLocalFile("/uploads/"+uploadDir[i]);
+        zip.addLocalFile(__dirname+"/../uploads/"+uploadDir[i]);
     }
     //file name
     const downloadName = `Document-${Date.now()}.zip`
