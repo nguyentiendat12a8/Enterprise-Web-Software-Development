@@ -164,7 +164,6 @@ exports.updateAccount = async (req, res, next) => {
   try {
     //const { id } = req.params
     const id = req.accountID
-    console.log(id)
     const phone = req.body.phone
     const address = req.body.address
     const gender = req.body.gender
