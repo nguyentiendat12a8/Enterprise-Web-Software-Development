@@ -263,7 +263,7 @@ exports.myIdeas = async (req, res) => {
             var listShow = []
             for (i = 0; i < list.length; i++) {
                 var department = await Department.findById({ _id: list[i].departmentID })
-                if (!department)
+                if (department === null)
                     return res.status(500).send({
                         errorCode: 0,
                         message: 'department server is error'

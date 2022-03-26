@@ -12,7 +12,7 @@ const Joi = require("joi");
 
 exports.signup = async (req, res) => {
   try {
-    const roleName = req.query.roleName
+    const roleName = req.body.roleName
     if (!roleName) {
       return res.status(400).send({
         errorCode: 400,
@@ -28,6 +28,16 @@ exports.signup = async (req, res) => {
       gender: req.body.gender,
       DOB: req.body.DOB,
       roleID: role._id
+    })
+    user.save((err) =>{
+      if (err) return res.status(500).send({
+        errorCode: 500,
+        message: err
+      })
+      return res.status(200).send({
+        errorCode: 0,
+        message: 'add account successfully!'
+      })
     })
   } catch (error) {
     console.log(error)
@@ -48,7 +58,7 @@ exports.listRole = async (req, res) => {
       show.push(role)
     })
     return res.status(200).send({
-      errorCode:0,
+      errorCode: 0,
       data: show
     })
   })
@@ -193,40 +203,69 @@ exports.updateAccount = async (req, res, next) => {
 //   }
 // }
 
-exports.listAccount = async (req, res) => {
-  Account.find({ deleted: false }, async (err, list) => {
-    if (err) return res.status(500).send({
-      errorCode: 0,
-      message: err
-    })
-    var listShow = []
-    for (i = 0; i < list.length; i++) {
-      var role = await Role.findById({ _id: list[i].roleID })
-      if (!role)
-        return res.status(500).send({
-          errorCode: 0,
-          message: 'invalid role'
-        })
-      var listInfo = {
-        _id: list[i]._id,
-        accountEmail: list[i].accountEmail,
-        phone: list[i].phone,
-        address: list[i].address,
-        DOB: list[i].DOB,
-        gender: list[i].gender,
-        roleName: role.roleName
+exports.listAccount = (req, res) => {
+  try {
+    Account.find({},async (err, list) => {
+      if (err) return res.status(500).send({
+        errorCode: 500,
+        message: err
+      })
+      var listShow = []
+      for(i = 0; i<list.length; i++){
+        var role = await Role.findById(list[i].roleID)
+        if(role === null) res.status(500).send({
+              errorCode: 500,
+              message: 'sai o day'
+            })
+        var show = {
+          _id: list[i]._id,
+          accountEmail: list[i].accountEmail,
+          phone: list[i].phone,
+          address: list[i].address,
+          DOB: list[i].DOB,
+          gender: list[i].gender,
+          roleName: role.roleName
+        }
+        listShow.push(show)
       }
-      listShow.push(listInfo)
-    }
-    if (err) return res.status(500).send({
-      errorCode: 500,
-      message: err
+       
+      return res.status(200).send({
+        errorCode: 0,
+        data: listShow
+      })
     })
-    return res.status(200).send({
-      errorCode: 0,
-      data: listShow,
-    })
-  })
+  } catch (error) {
+    console.log(error)
+  }
+  // Account.find({ deleted: false }, (err, list) => {
+  //   if (err) return res.status(500).send({
+  //     errorCode: 500,
+  //     message: err
+  //   })
+  //   var listShow = []
+  //   list.forEach(async e=>{
+  //     const role = await Role.findById(e.roleID)
+  //     if(!role) return res.status(500).send({
+  //         errorCode: 500,
+  //         message: 'Bill tour is error'
+  //     })
+
+  //     var listInfo = {
+  //       _id: e._id,
+  //       accountEmail: e.accountEmail,
+  //       phone: e.phone,
+  //       address: e.address,
+  //       DOB: e.DOB,
+  //       gender: e.gender,
+  //       roleName: role.roleName
+  //     }
+  //     listShow.push(listInfo)
+  //   })
+  //   return res.status(200).send({
+  //     errorCode: 0,
+  //     data: list,
+  //   })
+  // })
 }
 
 exports.deleteUserAccount = async (req, res) => {

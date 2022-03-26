@@ -14,7 +14,7 @@ router.patch('/update-password',[verifyToken], updatePassword)
 router.get('/edit-account', [verifyToken],editAccount)
 router.patch('/update-account', [verifyToken], updateAccount)
 
-router.get('/list-account/:page',[verifyToken, isAdmin], listAccount)
+router.get('/list-account',[verifyToken, isAdmin], listAccount)
 router.patch('/delete-user-account/:accountID', [verifyToken, isAdmin], deleteUserAccount)
 router.get('/trash-user-account', [verifyToken, isAdmin], trashUserAccount)
 router.post('/restore-user-account/:accountID', [verifyToken, isAdmin], restoreUserAccount)
