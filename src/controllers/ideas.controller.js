@@ -491,7 +491,7 @@ exports.filter = async (req, res) => {
         const filter = req.query.filter
         if (filter === 'leastLike') {
             list.sort((a, b) => {
-                return b.numberOfDislike - a.numberOfDislike
+                return b.numberOfLike - a.numberOfLike
             })
             var listShow = []
             for (i = 0; i < list.length; i++) {
@@ -521,7 +521,7 @@ exports.filter = async (req, res) => {
             })
         } else if (filter === 'mostLike') {
             list.sort((a, b) => {
-                return a.numberOfComment - b.numberOfComment
+                return a.numberOfLike - b.numberOfLike
             })
             var listShow = []
             for (i = 0; i < list.length; i++) {
