@@ -9,6 +9,7 @@ exports.Ideas = mongoose.model(
         numberOfDislike: {type: Number, default : 0},
         numberOfComment: {type: Number, default : 0},
         numberOfView: {type: Number, default : 0},
+        anonymous: {type: Boolean, default: false}, 
         closureDateID: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'ClosureDate'

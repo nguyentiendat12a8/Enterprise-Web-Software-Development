@@ -42,7 +42,8 @@ exports.createIdeas = async (req, res) => {
         closureDateID: closureDate._id,
         accountID: req.accountID, // req.accountID,
         departmentID: department._id,
-        categoryID: category._id
+        categoryID: category._id,
+        anonymous: req.body.anonymous
     })
     // xử lý ngày để cho đăng ideas lên
     const d = new Date()
@@ -189,17 +190,33 @@ exports.viewDetailIdeas = async (req, res) => {
                     showComment.push(comment)
                 })
             }
-            
-            var ideasShow = {
-                ideasContent: ideas.ideasContent,
-                ideasFile: ideas.ideasFile,
-                numberOfLike: ideas.numberOfLike,
-                numberOfDislike: ideas.numberOfDislike,
-                numberOfComment: ideas.numberOfComment,
-                numberOfView: ideas.numberOfView,
-                departmentName: department.departmentName,
-                categoryName: category.categoryName,
-                showComment: showComment
+            if(ideas.anonymous === false){
+                var user = Account.findById(ideas.accountID) 
+                var ideasShow = {
+                    name : user.accountEmail,
+                    ideasContent: ideas.ideasContent,
+                    ideasFile: ideas.ideasFile,
+                    numberOfLike: ideas.numberOfLike,
+                    numberOfDislike: ideas.numberOfDislike,
+                    numberOfComment: ideas.numberOfComment,
+                    numberOfView: ideas.numberOfView,
+                    departmentName: department.departmentName,
+                    categoryName: category.categoryName,
+                    showComment: showComment
+                }
+            } else {
+                var ideasShow = {
+                    name : 'anonymous',
+                    ideasContent: ideas.ideasContent,
+                    ideasFile: ideas.ideasFile,
+                    numberOfLike: ideas.numberOfLike,
+                    numberOfDislike: ideas.numberOfDislike,
+                    numberOfComment: ideas.numberOfComment,
+                    numberOfView: ideas.numberOfView,
+                    departmentName: department.departmentName,
+                    categoryName: category.categoryName,
+                    showComment: showComment
+                }
             }
             return res.status(200).send({
                 errorCode: 0,
