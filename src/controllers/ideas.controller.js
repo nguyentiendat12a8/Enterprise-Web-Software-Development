@@ -669,6 +669,66 @@ exports.filter = async (req, res) => {
                 errorCode: 0,
                 data: listShow
             })
+        }else if (filter ==='leastDislike'){
+            list.sort((a, b) => {
+                return a.numberOfDislike - b.numberOfDislike
+            })
+            var listShow = []
+            for (i = 0; i < list.length; i++) {
+                const departmentId = list[i].departmentID
+                var department = await Department.findById(departmentId)
+                if (department === null)
+                    return res.status(500).send({
+                        errorCode: 0,
+                        message: 'department server is error'
+                    })
+               
+                var listInfo = {
+                    _id: list[i]._id,
+                    ideasContent: list[i].ideasContent,
+                    ideasFile: list[i].ideasFile,
+                    numberOfLike: list[i].numberOfLike,
+                    numberOfDislike: list[i].numberOfDislike,
+                    numberOfComment: list[i].numberOfComment,
+                    numberOfView: list[i].numberOfView,
+                    departmentName: department.departmentName,
+                }
+                listShow.push(listInfo)
+            }
+            return res.status(200).send({
+                errorCode: 0,
+                data: listShow
+            })
+        }else if (filter ==='mostDislike'){
+            list.sort((a, b) => {
+                return b.numberOfDislike - a.numberOfDislike
+            })
+            var listShow = []
+            for (i = 0; i < list.length; i++) {
+                const departmentId = list[i].departmentID
+                var department = await Department.findById(departmentId)
+                if (department === null)
+                    return res.status(500).send({
+                        errorCode: 0,
+                        message: 'department server is error'
+                    })
+               
+                var listInfo = {
+                    _id: list[i]._id,
+                    ideasContent: list[i].ideasContent,
+                    ideasFile: list[i].ideasFile,
+                    numberOfLike: list[i].numberOfLike,
+                    numberOfDislike: list[i].numberOfDislike,
+                    numberOfComment: list[i].numberOfComment,
+                    numberOfView: list[i].numberOfView,
+                    departmentName: department.departmentName,
+                }
+                listShow.push(listInfo)
+            }
+            return res.status(200).send({
+                errorCode: 0,
+                data: listShow
+            })
         }
     })
 }
