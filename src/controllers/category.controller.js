@@ -2,6 +2,7 @@ const db = require('../models/index')
 const Category = db.category
 const Department = db.department
 const Ideas = db.ideas
+const Joi = require("joi");
 
 exports.createCategory = async (req, res) => {
     try {
