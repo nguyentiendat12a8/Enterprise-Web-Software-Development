@@ -500,7 +500,7 @@ exports.downloadZip = (req,res) => {
 }
 
 exports.downloadFiles = (req,res) =>{
-    var filename = __dirname + '/../../uploads/1646647591775.pdf'
+    var filename = __dirname + `/../../uploads/${req.params.ideasFile}`
     res.download(filename)
 }
 
