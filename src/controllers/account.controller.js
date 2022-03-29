@@ -12,20 +12,7 @@ const Joi = require("joi");
 
 exports.signup = async (req, res) => {
   try {
-    const schema = Joi.object({ 
-      accountEmail : Joi.string().trim().min(5).email(),
-      accountPassword : Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$')),
-      phone : Joi.string().pattern(new RegExp('(09|03|07|08|05)+([0-9]{8})')),
-      address : Joi.string().min(10).trim(),
-      gender  : Joi.array().items(Joi.string().valid('male', 'female')),
-      DOB : Joi.string().pattern(new RegExp('^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$')),
-      roleName : Joi.required()
-    });
-    const { error } = schema.validate(req.body);
-    if (error) return res.status(400).send({
-      errorCode: 400,
-      message: error.details[0].message
-    });
+ 
     //////////////////////////////////////
     const roleName = req.body.roleName
     if (!roleName) {
