@@ -12,6 +12,21 @@ const Joi = require("joi");
 
 exports.signup = async (req, res) => {
   try {
+    const schema = Joi.object({ 
+      accountEmail : Joi.string().trim().min(5).email(),
+      accountPassword : Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$')),
+      phone : Joi.string().pattern(new RegExp('(09|03|07|08|05)+([0-9]{8})')),
+      address : Joi.string().min(10).trim(),
+      gender  : Joi.array().items(Joi.string().valid('male', 'female')),
+      DOB : Joi.string().pattern(new RegExp('^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$')),
+      roleName : Joi.required()
+    });
+    const { error } = schema.validate(req.body);
+    if (error) return res.status(400).send({
+      errorCode: 400,
+      message: error.details[0].message
+    });
+    //////////////////////////////////////
     const roleName = req.body.roleName
     if (!roleName) {
       return res.status(400).send({
@@ -67,6 +82,16 @@ exports.listRole = async (req, res) => {
 
 exports.signin = async (req, res, next) => {
   try {
+    const schema = Joi.object({ 
+      accountEmail : Joi.string().trim().min(5).email(),
+      accountPassword : Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$'))
+    });
+    const { error } = schema.validate(req.body);
+    if (error) return res.status(400).send({
+      errorCode: 400,
+      message: error.details[0].message
+    });
+    ////////////////
     const { accountEmail, accountPassword } = req.body;
     if (!(accountEmail && accountPassword)) {
       res.status(500).json({
@@ -116,6 +141,17 @@ exports.signin = async (req, res, next) => {
 
 exports.updatePassword = async (req, res, next) => {
   try {
+    const schema = Joi.object({ 
+      accountPassword : Joi.string().trim().required(),
+      newAccountPassword : Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$')),
+      newAccountPasswordAgain : Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$')),
+    });
+    const { error } = schema.validate(req.body);
+    if (error) return res.status(400).send({
+      errorCode: 400,
+      message: error.details[0].message
+    });
+    /////////////////
     //const { id } = req.params
     const id = req.accountID
     const user = await Account.findOne({ _id: id })
@@ -172,6 +208,18 @@ exports.editAccount = async (req, res, next) => {
 
 exports.updateAccount = async (req, res, next) => {
   try {
+    const schema = Joi.object({ 
+      phone : Joi.string().pattern(new RegExp('(09|03|07|08|05)+([0-9]{8})')),
+      address : Joi.string().min(10).trim(),
+      gender  : Joi.array().items(Joi.string().valid('male', 'female')),
+      DOB : Joi.string().pattern(new RegExp('^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$'))
+    });
+    const { error } = schema.validate(req.body);
+    if (error) return res.status(400).send({
+      errorCode: 400,
+      message: error.details[0].message
+    });
+  //////////////
     //const { id } = req.params
     const id = req.accountID
     const phone = req.body.phone
@@ -391,13 +439,13 @@ exports.confirmLink = async (req, res) => {
     })
 
     const user = await Account.findById(req.params.accountID);
-    if (!user) return res.status(400).send("invalid link or expired");
+    if (!user) return res.status(400).send("invalid link or expired 1 ");
 
     const token = await ResetPassword.findOne({
       accountID: user._id,
       token: req.params.token,
     });
-    if (!token) return res.status(400).send("Invalid link or expired");
+    if (!token) return res.status(400).send("Invalid link or expired 2 ");
 
     user.accountPassword = bcrypt.hashSync(req.body.accountPassword, 8)
     await user.save();
