@@ -9,7 +9,7 @@ exports.createCategory = async (req, res) => {
         const department = await Department.findOne({ departmentName: req.query.departmentName })
         if(department === null) return res.status(500).send({
             errorCode: 500,
-            message: err
+            message: 'Department server is err'
         })
         const category = new Category({
             categoryName: req.body.categoryName,

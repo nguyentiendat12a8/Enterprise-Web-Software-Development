@@ -4,7 +4,7 @@ const { createIdeas, likeIdeas, dislikeIdeas, commentIdeas, listCommentIdeas, li
      myIdeas, 
      downloadZip,
      downloadFiles} = require('../controllers/ideas.controller');
-const { checkClosureDate } = require('../middlerwares/checkClosureDate.middleware');
+const { checkFinalClosureDate, checkFirstClosureDate } = require('../middlerwares/checkClosureDate.middleware');
 const { checkLike, checkDislike } = require('../middlerwares/checkLike.middleware');
 const { checkView } = require('../middlerwares/checkView.middleware');
 const { verifyToken, isQA } = require('../middlerwares/jwt.middleware');
@@ -12,10 +12,10 @@ const { upload } = require('../utils/uploadFile')
 
 const router = express.Router();
 
-router.post('/upload-ideas', [verifyToken, upload.single('ideasFile')], createIdeas)
+router.post('/upload-ideas', [verifyToken, checkFirstClosureDate, upload.single('ideasFile')], createIdeas)
 router.post('/like-ideas/:ideasID', [verifyToken, checkLike], likeIdeas)
 router.post('/dislike-ideas/:ideasID', [verifyToken, checkDislike], dislikeIdeas)
-router.post('/comment-ideas/:ideasID', [verifyToken, checkClosureDate], commentIdeas)
+router.post('/comment-ideas/:ideasID', [verifyToken, checkFinalClosureDate], commentIdeas)
 //router.post('/delete-comment/:commnetID', deleteCommentIdeas)
 
 //router.get('/list-comment-ideas/:ideasID', [verifyToken], listCommentIdeas)

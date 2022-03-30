@@ -1,6 +1,7 @@
 const db = require('../models/index')
 const Ideas = db.ideas
 const Department = db.department
+const ClosureDate = db.closureDate
 
 exports.dashboard = async (req, res) => {
     try {
@@ -10,14 +11,17 @@ exports.dashboard = async (req, res) => {
         //Count ideas for each department
         //count user submit ideas in each department
         //IT
-        const listIdeasIT = await Ideas.find({ departmentID: IT._id })
+        const listIdeasIT = await Ideas.find({ departmentID: IT._id})
         if (!listIdeasIT) return res.status(500).send({
             errorCode: 500,
             message: 'ideas server is error'
         })
         var numberIdeasIT = 0
         var listIDIT = []
-        listIdeasIT.forEach(e=>{
+        listIdeasIT.forEach(async e=>{
+
+            // var date = await ClosureDate.findById(e.closureDateID)
+            // var dateYear = date.
             listIDIT.push(e.accountID.toString())
             numberIdeasIT++
         })

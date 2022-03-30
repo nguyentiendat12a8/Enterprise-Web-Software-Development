@@ -19,6 +19,7 @@ exports.verifyToken = async (req, res, next) => {
             return res.status(401).send({message: err.message})
         }
         req.accountID = decoded.id
+        req.email = decoded.email
         //return res.send({token : token})
         next()
     })

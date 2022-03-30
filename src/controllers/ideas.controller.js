@@ -16,50 +16,38 @@ const AdmZip = require('adm-zip')
 const Joi = require("joi");
 
 exports.createIdeas = async (req, res) => {
-    const schema = Joi.object({ 
-        ideasContent : Joi.string.trim().require(),
-      });
-      const { error } = schema.validate(req.body);
-        if (error) return res.status(400).send({
-          errorCode: 400,
-          message: error.details[0].message
-      });
-    //////////////
-    const department = await Department.findOne({ departmentName: req.body.departmentName })
-    if (!department) {
-        return res.status(500).send({
-            errorCode: 500,
-            message: 'Department server is error'
+    try {
+        const department = await Department.findOne({ departmentName: req.body.departmentName })
+        if (!department) {
+            return res.status(500).send({
+                errorCode: 500,
+                message: 'Department server is error'
+            })
+        }
+        const category = await Category.findOne({ categoryName: req.body.categoryName })
+        if (!category) {
+            return res.status(500).send({
+                errorCode: 500,
+                message: 'Category server is error'
+            })
+        }
+        const closureDate = await ClosureDate.findOne({ departmentID: department._id })
+        if (!closureDate) {
+            return res.status(500).send({
+                errorCode: 500,
+                message: 'Closure date server is error'
+            })
+        }
+        const ideas = new Ideas({
+            ideasContent: req.body.ideasContent,
+            ideasFile: req.file.path,
+            closureDateID: closureDate._id,
+            accountID: req.accountID, // req.accountID,
+            departmentID: department._id,
+            categoryID: category._id,
+            anonymous: req.body.anonymous
         })
-    }
-    const category = await Category.findOne({ categoryName: req.body.categoryName })
-    if (!category) {
-        return res.status(500).send({
-            errorCode: 500,
-            message: 'Category server is error'
-        })
-    }
-    const closureDate = await ClosureDate.findOne({ departmentID: department._id })
-    if (!closureDate) {
-        return res.status(500).send({
-            errorCode: 500,
-            message: 'Closure date server is error'
-        })
-    }
-    const ideas = new Ideas({
-        ideasContent: req.body.ideasContent,
-        ideasFile: req.file.path,
-        closureDateID: closureDate._id,
-        accountID: req.accountID, // req.accountID,
-        departmentID: department._id,
-        categoryID: category._id,
-        anonymous: req.body.anonymous
-    })
-    // xử lý ngày để cho đăng ideas lên
-    const d = new Date()
-    const date = await closureDate.firstClosureDate.split('/')
-    if (parseInt(date[2]) > parseInt(d.getFullYear())) {
-        console.log('da di vao so sanh nam lon hon')
+
         ideas.save(async (err, ideas) => {
             if (err) res.status(500).send({
                 errorCode: 500,
@@ -91,92 +79,8 @@ exports.createIdeas = async (req, res) => {
                 message: 'add ideas successfuly'
             })
         })
-    } else if (parseInt(date[2]) === parseInt(d.getFullYear())) {
-        console.log('da di vao so sanh nam bang nhau')
-        if (parseInt(date[1]) > (parseInt(d.getMonth()) + 1)) {
-            console.log('da di vao so sanh thang lon hon')
-            ideas.save(async (err, ideas) => {
-                if (err) res.status(500).send({
-                    errorCode: 500,
-                    message: err
-                })
-                if (req.body.departmentName === 'IT') {
-                    const role = await Role.findOne({ roleName: 'QA of IT' })
-                    const user = await Account.findOne({ roleID: role._id })
-                    const email = user.accountEmail
-                    const link = `localhost:1000/ideas/${ideas._id}`
-                    await sendEmail(email, 'New ideas uploaded', link)
-                }
-                else if (req.body.departmentName === 'business') {
-                    const role = await Role.findOne({ roleName: 'QA of business' })
-                    const user = await Account.findOne({ roleID: role._id })
-                    const email = user.accountEmail
-                    const link = `localhost:1000/ideas/${ideas._id}`
-                    await sendEmail(email, 'New ideas uploaded', link)
-                }
-                else {
-                    const role = await Role.findOne({ roleName: 'QA of graphic design' })
-                    const user = await Account.findOne({ roleID: role._id })
-                    const email = user.accountEmail
-                    const link = `localhost:1000/ideas/${ideas._id}`
-                    await sendEmail(email, 'New ideas uploaded', link)
-                }
-                res.status(200).send({
-                    errorCode: 0,
-                    message: 'add ideas successfuly'
-                })
-            })
-        } else if (parseInt(date[1]) === (parseInt(d.getMonth()) + 1)) {
-            console.log('da di vao so sanh thang bang nhau')
-            if (parseInt(date[0]) > parseInt(d.getDate())) {
-                ideas.save(async (err, ideas) => {
-                    if (err) res.status(500).send({
-                        errorCode: 500,
-                        message: err
-                    })
-                    if (req.body.departmentName === 'IT') {
-                        const role = await Role.findOne({ roleName: 'QA of IT' })
-                        const user = await Account.findOne({ roleID: role._id })
-                        const email = user.accountEmail
-                        const link = `localhost:1000/ideas/${ideas._id}`
-                        await sendEmail(email, 'New ideas uploaded', link)
-                    }
-                    else if (req.body.departmentName === 'business') {
-                        const role = await Role.findOne({ roleName: 'QA of business' })
-                        const user = await Account.findOne({ roleID: role._id })
-                        const email = user.accountEmail
-                        const link = `localhost:1000/ideas/${ideas._id}`
-                        await sendEmail(email, 'New ideas uploaded', link)
-                    }
-                    else {
-                        const role = await Role.findOne({ roleName: 'QA of graphic design' })
-                        const user = await Account.findOne({ roleID: role._id })
-                        const email = user.accountEmail
-                        const link = `localhost:1000/ideas/${ideas._id}`
-                        await sendEmail(email, 'New ideas uploaded', link)
-                    }
-                    res.status(200).send({
-                        errorCode: 0,
-                        message: 'add ideas successfuly'
-                    })
-                })
-            } else {
-                return res.status(401).send({
-                    errorCode: 401,
-                    message: 'over final closure date!'
-                })
-            }
-        } else {
-            return res.status(401).send({
-                errorCode: 401,
-                message: 'over final closure date!'
-            })
-        }
-    } else {
-        return res.status(401).send({
-            errorCode: 401,
-            message: 'over final closure date!'
-        })
+    } catch (error) {
+        console.log(error)
     }
 }
 
@@ -189,21 +93,37 @@ exports.viewDetailIdeas = async (req, res) => {
             })
             var department = await Department.findById(ideas.departmentID)
             var category = await Category.findById(ideas.categoryID)
-            var listComment = await Comment.find({ideasID: ideas._id})
+            var listComment = await Comment.find({ ideasID: ideas._id })
             var showComment = []
-            if(listComment){
-                listComment.forEach(e=>{
-                    var comment = {
-                        commentText: e.commentText,
-                        createdAt: e.createdAt
+            if (listComment) {
+                for(i = 0; i < listComment.length; i++){
+                    if (listComment[i].anonymous === false) {
+                        console.log(listComment[i])
+                        var user = await Account.findById(listComment[i].accountID)
+                        var comment = {
+                            author: user.accountEmail,
+                            commentText: listComment[i].commentText,
+                            createdAt: listComment[i].createdAt
+                        }
+                        showComment.push(comment)
+                    } else {
+                        var comment = {
+                            author: 'anonymous',
+                            commentText: listComment[i].commentText,
+                            createdAt: listComment[i].createdAt
+                        }
+                        showComment.push(comment)
                     }
-                    showComment.push(comment)
-                })
+                }
             }
-            if(ideas.anonymous === false){
-                var user = Account.findById(ideas.accountID) 
+            if (ideas.anonymous === false) {
+                var user = await Account.findById(ideas.accountID)
+                if(user === null) return res.status(500).send({
+                    errorCode: 500,
+                    message: 'User upload ideas have been deleted or the user server is down'
+                })
                 var ideasShow = {
-                    name : user.accountEmail,
+                    name: user.accountEmail,
                     ideasContent: ideas.ideasContent,
                     ideasFile: ideas.ideasFile,
                     numberOfLike: ideas.numberOfLike,
@@ -216,7 +136,7 @@ exports.viewDetailIdeas = async (req, res) => {
                 }
             } else {
                 var ideasShow = {
-                    name : 'anonymous',
+                    name: 'anonymous',
                     ideasContent: ideas.ideasContent,
                     ideasFile: ideas.ideasFile,
                     numberOfLike: ideas.numberOfLike,
@@ -273,10 +193,10 @@ exports.listIdeas = async (req, res) => {
                 }
                 listShow.push(listInfo)
             }
-                return res.status(200).send({
-                    errorCode: 0,
-                    data: listShow,
-                })
+            return res.status(200).send({
+                errorCode: 0,
+                data: listShow,
+            })
         })
     }
     catch (err) {
@@ -285,8 +205,8 @@ exports.listIdeas = async (req, res) => {
 }
 
 exports.myIdeas = async (req, res) => {
-        Ideas.find({ accountID: req.accountID })
-        .then( async ideas => {
+    Ideas.find({ accountID: req.accountID })
+        .then(async ideas => {
             var listShow = []
             for (i = 0; i < list.length; i++) {
                 var department = await Department.findById({ _id: list[i].departmentID })
@@ -314,7 +234,7 @@ exports.myIdeas = async (req, res) => {
                 data: listShow,
             })
         })
-        .catch(err =>{
+        .catch(err => {
             if (err) return res.status(500).send({
                 errorCode: 0,
                 message: 'Ideas server is error'
@@ -382,17 +302,7 @@ exports.dislikeIdeas = async (req, res) => {
 }
 
 exports.commentIdeas = async (req, res) => {
-
     try {
-        const schema = Joi.object({ 
-            commentText : Joi.string.trim().require(),
-        });
-        const { error } = schema.validate(req.body);
-        if (error) return res.status(400).send({
-          errorCode: 400,
-          message: error.details[0].message
-        });
-        ////////////
         const ideasID = req.params.ideasID
         const comment = new Comment({
             commentText: req.body.commentText,
@@ -405,7 +315,8 @@ exports.commentIdeas = async (req, res) => {
                 message: 'Comment server is error'
             })
         })
-        const user = await Account.findById(req.accountID)
+        const ideas = await Ideas.findById(ideasID)
+        const user = await Account.findById(ideas.accountID)
         if (!user) return res.status(500).send({
             errorCode: 500,
             message: err
@@ -483,23 +394,23 @@ exports.downloadIdeas = async (req, res) => {
     }
 }
 
-exports.downloadZip = (req,res) => {
-    var uploadDir = fs.readdirSync(__dirname+"/../../uploads")
+exports.downloadZip = (req, res) => {
+    var uploadDir = fs.readdirSync(__dirname + "/../../uploads")
     const zip = new AdmZip()
-    for(var i = 0; i < uploadDir.length;i++){
-        zip.addLocalFile(__dirname+"/../../uploads/"+uploadDir[i]);
+    for (var i = 0; i < uploadDir.length; i++) {
+        zip.addLocalFile(__dirname + "/../../uploads/" + uploadDir[i]);
     }
     //file name
     const downloadName = `Document-${Date.now()}.zip`
 
     const data = zip.toBuffer()
-    res.setHeader('Content-Type','application/octet-stream');
-    res.setHeader('Content-Disposition',`attachment; filename=${downloadName}`);
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename=${downloadName}`);
     //res.set('Content-Length',data.length);
     res.send(data);
 }
 
-exports.downloadFiles = (req,res) =>{
+exports.downloadFiles = (req, res) => {
     var filename = __dirname + `/../../uploads/${req.params.ideasFile}`
     res.download(filename)
 }
@@ -507,7 +418,7 @@ exports.downloadFiles = (req,res) =>{
 //filter 
 
 exports.filter = async (req, res) => {
-    Ideas.find({},async (err, list) => {
+    Ideas.find({}, async (err, list) => {
         if (err) return res.status(500).send({
             errorCode: 500,
             message: err
@@ -526,7 +437,7 @@ exports.filter = async (req, res) => {
                         errorCode: 0,
                         message: 'department server is error'
                     })
-                    var id = list[i]._id
+                var id = list[i]._id
                 var listInfo = {
                     _id: id,
                     ideasContent: list[i].ideasContent,
@@ -556,7 +467,7 @@ exports.filter = async (req, res) => {
                         errorCode: 0,
                         message: 'department server is error'
                     })
-               
+
                 var listInfo = {
                     _id: list[i]._id,
                     ideasContent: list[i].ideasContent,
@@ -586,7 +497,7 @@ exports.filter = async (req, res) => {
                         errorCode: 0,
                         message: 'department server is error'
                     })
-               
+
                 var listInfo = {
                     _id: list[i]._id,
                     ideasContent: list[i].ideasContent,
@@ -616,7 +527,7 @@ exports.filter = async (req, res) => {
                         errorCode: 0,
                         message: 'department server is error'
                     })
-               
+
                 var listInfo = {
                     _id: list[i]._id,
                     ideasContent: list[i].ideasContent,
@@ -633,7 +544,7 @@ exports.filter = async (req, res) => {
                 errorCode: 0,
                 data: listShow
             })
-        } else if (filter ==='mostView'){
+        } else if (filter === 'mostView') {
             list.sort((a, b) => {
                 return b.numberOfView - a.numberOfView
             })
@@ -646,7 +557,7 @@ exports.filter = async (req, res) => {
                         errorCode: 0,
                         message: 'department server is error'
                     })
-               
+
                 var listInfo = {
                     _id: list[i]._id,
                     ideasContent: list[i].ideasContent,
@@ -663,7 +574,7 @@ exports.filter = async (req, res) => {
                 errorCode: 0,
                 data: listShow
             })
-        } else if (filter ==='leastView'){
+        } else if (filter === 'leastView') {
             list.sort((a, b) => {
                 return a.numberOfView - b.numberOfView
             })
@@ -676,7 +587,7 @@ exports.filter = async (req, res) => {
                         errorCode: 0,
                         message: 'department server is error'
                     })
-               
+
                 var listInfo = {
                     _id: list[i]._id,
                     ideasContent: list[i].ideasContent,
@@ -693,7 +604,7 @@ exports.filter = async (req, res) => {
                 errorCode: 0,
                 data: listShow
             })
-        }else if (filter ==='leastDislike'){
+        } else if (filter === 'leastDislike') {
             list.sort((a, b) => {
                 return a.numberOfDislike - b.numberOfDislike
             })
@@ -706,7 +617,7 @@ exports.filter = async (req, res) => {
                         errorCode: 0,
                         message: 'department server is error'
                     })
-               
+
                 var listInfo = {
                     _id: list[i]._id,
                     ideasContent: list[i].ideasContent,
@@ -723,7 +634,7 @@ exports.filter = async (req, res) => {
                 errorCode: 0,
                 data: listShow
             })
-        }else if (filter ==='mostDislike'){
+        } else if (filter === 'mostDislike') {
             list.sort((a, b) => {
                 return b.numberOfDislike - a.numberOfDislike
             })
@@ -736,7 +647,7 @@ exports.filter = async (req, res) => {
                         errorCode: 0,
                         message: 'department server is error'
                     })
-               
+
                 var listInfo = {
                     _id: list[i]._id,
                     ideasContent: list[i].ideasContent,

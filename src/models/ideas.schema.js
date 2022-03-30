@@ -25,6 +25,10 @@ exports.Ideas = mongoose.model(
         categoryID: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Category'
-        }]
+        }],
+        
+    },
+    {
+        timestamps: true
     })
 )

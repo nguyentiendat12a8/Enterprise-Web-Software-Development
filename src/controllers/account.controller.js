@@ -95,16 +95,10 @@ exports.signin = async (req, res, next) => {
     }
 
     if (bcrypt.compareSync(accountPassword, user.accountPassword)) {
-      const token = jwt.sign({ id: user._id }, process.env.TOKEN_KEY, {
+      const token = jwt.sign({ id: user._id, email: user.accountEmail }, process.env.TOKEN_KEY, {
         expiresIn: process.env.tokenLife,
       });
-      const refreshToken = jwt.sign(
-        { id: user._id },
-        process.env.REFRESH_TOKEN_KEY,
-        {
-          expiresIn: process.env.refreshTokenLife,
-        }
-      );
+      
       const role = await Role.findById(user.roleID).then((response) => {
         console.log("response", response);
         return response.roleName;
@@ -113,7 +107,7 @@ exports.signin = async (req, res, next) => {
         errorCode: 0,
         token: token,
         role: role,
-        refreshToken: refreshToken
+        email: user.accountEmail
       });
     } else {
       return res.status(400).json({
