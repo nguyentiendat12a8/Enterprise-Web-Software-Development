@@ -417,7 +417,7 @@ exports.downloadZip = (req, res) => {
 }
 
 exports.downloadFiles = (req, res) => {
-    var filename = __dirname + `/../../uploads/${req.params.ideasFile}`
+    var filename = __dirname + `/../../${req.params.ideasFile}`
     res.download(filename)
 }
 

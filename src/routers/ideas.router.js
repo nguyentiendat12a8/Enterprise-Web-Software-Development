@@ -25,7 +25,7 @@ router.get('/list-my-ideas', [verifyToken], myIdeas)
 router.get('/view-detail-ideas/:ideasID', [verifyToken, checkView], viewDetailIdeas)
 
 router.get('/download-ideas', [verifyToken, isQA], downloadIdeas)
-router.get('/download-zip', downloadZip)
+router.get('/download-zip',  [verifyToken, isQA], downloadZip)
 router.get('/download-files/:ideasFile', downloadFiles)
 
 //filter
