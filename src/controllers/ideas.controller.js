@@ -526,9 +526,9 @@ exports.filter = async (req, res) => {
                         errorCode: 0,
                         message: 'department server is error'
                     })
-               
+                    var id = list[i]._id
                 var listInfo = {
-                    _id: list[i]._id,
+                    _id: id,
                     ideasContent: list[i].ideasContent,
                     ideasFile: list[i].ideasFile,
                     numberOfLike: list[i].numberOfLike,

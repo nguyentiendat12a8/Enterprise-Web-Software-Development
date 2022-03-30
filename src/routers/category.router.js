@@ -3,7 +3,7 @@ const { createCategory, deleteCategory, ListCategory } = require('../controllers
 const { verifyToken, isQA } = require('../middlerwares/jwt.middleware');
 const router = express.Router();
 
-router.post('/create-category', [verifyToken, isQA], createCategory )
+router.post('/create-category', createCategory )
 router.delete('/delete-category/:categoryID', [verifyToken, isQA], deleteCategory )
 router.get('/list-category', [verifyToken], ListCategory )
 

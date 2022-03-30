@@ -44,7 +44,6 @@ exports.listClosureDate = (req, res) => {
                     finalClosureDate: listClosureDate[i].finalClosureDate,
                     departmentName: department.departmentName
                 }
-                console.log(show)
                 listShow.push(show)
             }
                 
