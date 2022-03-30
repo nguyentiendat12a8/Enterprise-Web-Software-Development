@@ -66,7 +66,6 @@ exports.listRole = async (req, res) => {
   })
 }
 
-
 exports.signin = async (req, res, next) => {
   try {
     const schema = Joi.object({ 
@@ -118,7 +117,7 @@ exports.signin = async (req, res, next) => {
   } catch (err) {
     return console.log(err);
   }
-};
+}
 
 exports.updatePassword = async (req, res, next) => {
   try {

@@ -5,13 +5,13 @@ const ClosureDate = db.closureDate
 
 exports.dashboard = async (req, res) => {
     try {
-        var IT = await Department.findOne({ departmentName: 'IT' })
-        var graphic = await Department.findOne({ departmentName: 'graphic design' })
-        var business = await Department.findOne({ departmentName: 'business' })
+        // var IT = await Department.findOne({ departmentName: 'IT' })
+        // var graphic = await Department.findOne({ departmentName: 'graphic design' })
+        // var business = await Department.findOne({ departmentName: 'business' })
         //Count ideas for each department
         //count user submit ideas in each department
         //IT
-        const listIdeasIT = await Ideas.find({ departmentID: IT._id})
+        const listIdeasIT = await Ideas.find({ departmentID: '621dadf98ddbf30945ce2208'})
         if (!listIdeasIT) return res.status(500).send({
             errorCode: 500,
             message: 'ideas server is error'
@@ -26,8 +26,9 @@ exports.dashboard = async (req, res) => {
             numberIdeasIT++
         })
         let UserITUnique = listIDIT.filter((v,i) => listIDIT.indexOf(v) === i)
+        
         //graphic
-        const listIdeasGraphic = await Ideas.find({ departmentID: graphic._id })
+        const listIdeasGraphic = await Ideas.find({ departmentID: '621dadf98ddbf30945ce220a' })
         if (!listIdeasGraphic) return res.status(500).send({
             errorCode: 500,
             message: 'ideas server is error'
@@ -40,7 +41,7 @@ exports.dashboard = async (req, res) => {
         })
         let UserGraphicUnique = listIDGraphic.filter((v,i) => listIDGraphic.indexOf(v) === i)
         //business
-        const listIdeasBusiness = await Ideas.find({ departmentID: business._id })
+        const listIdeasBusiness = await Ideas.find({ departmentID: '621dadf98ddbf30945ce2209' })
         if (!listIdeasBusiness) return res.status(500).send({
             errorCode: 500,
             message: 'ideas server is error'

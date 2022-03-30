@@ -32,6 +32,7 @@ exports.createIdeas = async (req, res) => {
             })
         }
         const closureDate = await ClosureDate.findOne({ departmentID: department._id })
+        console.log(closureDate)
         if (!closureDate) {
             return res.status(500).send({
                 errorCode: 500,
@@ -84,72 +85,77 @@ exports.createIdeas = async (req, res) => {
     }
 }
 
-exports.viewDetailIdeas = async (req, res) => {
+exports.viewDetailIdeas = (req, res) => {
     try {
         Ideas.findById(req.params.ideasID, async (err, ideas) => {
             if (err) return res.status(500).send({
                 errorCode: 0,
                 message: err
             })
-            var department = await Department.findById(ideas.departmentID)
-            var category = await Category.findById(ideas.categoryID)
-            var listComment = await Comment.find({ ideasID: ideas._id })
-            var showComment = []
-            if (listComment) {
-                for(i = 0; i < listComment.length; i++){
-                    if (listComment[i].anonymous === false) {
-                        var user = await Account.findById(listComment[i].accountID)
-                        var comment = {
-                            author: user.accountEmail,
-                            commentText: listComment[i].commentText,
-                            createdAt: listComment[i].createdAt
+            // var department = await Department.findById(ideas.departmentID)
+            // var category = await Category.findById(ideas.categoryID)
+            Comment.find({ ideasID: ideas._id },async (err, listComment) => {
+                if (err) return res.status(500).send({
+                    errorCode: 0,
+                    message: err
+                })
+                var showComment = []
+                if (listComment) {
+                    for(i = 0; i < listComment.length; i++){
+                        if (listComment[i].anonymous === false) {
+                            var user = await Account.findById(listComment[i].accountID)
+                            var comment = {
+                                author: user.accountEmail,
+                                commentText: listComment[i].commentText,
+                                createdAt: listComment[i].createdAt
+                            }
+                            showComment.push(comment)
+                        } else {
+                            var comment = {
+                                author: 'anonymous',
+                                commentText: listComment[i].commentText,
+                                createdAt: listComment[i].createdAt
+                            }
+                            showComment.push(comment)
                         }
-                        showComment.push(comment)
-                    } else {
-                        var comment = {
-                            author: 'anonymous',
-                            commentText: listComment[i].commentText,
-                            createdAt: listComment[i].createdAt
-                        }
-                        showComment.push(comment)
                     }
                 }
-            }
-            if (ideas.anonymous === false) {
-                var user = await Account.findById(ideas.accountID)
-                if(user === null) return res.status(500).send({
-                    errorCode: 500,
-                    message: 'User upload ideas have been deleted or the user server is down'
+                if (ideas.anonymous === false) {
+                    var user = await Account.findById(ideas.accountID)
+                    if(user === null) return res.status(500).send({
+                        errorCode: 500,
+                        message: 'User upload ideas have been deleted or the user server is down'
+                    })
+                    var ideasShow = {
+                        name: user.accountEmail,
+                        ideasContent: ideas.ideasContent,
+                        ideasFile: ideas.ideasFile,
+                        numberOfLike: ideas.numberOfLike,
+                        numberOfDislike: ideas.numberOfDislike,
+                        numberOfComment: ideas.numberOfComment,
+                        numberOfView: ideas.numberOfView,
+                        // departmentName: department.departmentName,
+                        // categoryName: category.categoryName,
+                        showComment: showComment
+                    }
+                } else {
+                    var ideasShow = {
+                        name: 'anonymous',
+                        ideasContent: ideas.ideasContent,
+                        ideasFile: ideas.ideasFile,
+                        numberOfLike: ideas.numberOfLike,
+                        numberOfDislike: ideas.numberOfDislike,
+                        numberOfComment: ideas.numberOfComment,
+                        numberOfView: ideas.numberOfView,
+                        // departmentName: department.departmentName,
+                        // categoryName: category.categoryName,
+                        showComment: showComment
+                    }
+                }
+                return res.status(200).send({
+                    errorCode: 0,
+                    data: ideasShow
                 })
-                var ideasShow = {
-                    name: user.accountEmail,
-                    ideasContent: ideas.ideasContent,
-                    ideasFile: ideas.ideasFile,
-                    numberOfLike: ideas.numberOfLike,
-                    numberOfDislike: ideas.numberOfDislike,
-                    numberOfComment: ideas.numberOfComment,
-                    numberOfView: ideas.numberOfView,
-                    departmentName: department.departmentName,
-                    categoryName: category.categoryName,
-                    showComment: showComment
-                }
-            } else {
-                var ideasShow = {
-                    name: 'anonymous',
-                    ideasContent: ideas.ideasContent,
-                    ideasFile: ideas.ideasFile,
-                    numberOfLike: ideas.numberOfLike,
-                    numberOfDislike: ideas.numberOfDislike,
-                    numberOfComment: ideas.numberOfComment,
-                    numberOfView: ideas.numberOfView,
-                    departmentName: department.departmentName,
-                    categoryName: category.categoryName,
-                    showComment: showComment
-                }
-            }
-            return res.status(200).send({
-                errorCode: 0,
-                data: ideasShow
             })
         })
     } catch (error) {
@@ -308,29 +314,25 @@ exports.commentIdeas = async (req, res) => {
             ideasID,
             accountID: req.accountID
         })
-        await comment.save((err, comment) => {
+        await comment.save( async (err, comment) => {
             if (err) return res.status(500).send({
                 errorCode: 0,
                 message: 'Comment server is error'
             })
-        })
-        const ideas = await Ideas.findById(ideasID)
-        const user = await Account.findById(ideas.accountID)
-        if (!user) return res.status(500).send({
-            errorCode: 500,
-            message: err
-        })
-        link = `localhost:1000/ideas/list-comment-ideas/${ideasID}`
-        await sendEmail(user.accountEmail, 'Someone commented on your idea', link)
-        const number = await Comment.find({ ideasID: ideasID })
-        let sum = 0
-        number.forEach(e => {
-            sum = sum + 1
-        })
-        await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfComment: sum }, { new: true })
-        return res.status(200).send({
-            errorCode: 0,
-            message: 'number of comment update successfully'
+            const ideas = await Ideas.findById(ideasID)
+            const user = await Account.findById(ideas.accountID)
+            if (!user) return res.status(500).send({
+                errorCode: 500,
+                message: err
+            })
+            link = `localhost:1000/ideas/list-comment-ideas/${ideasID}`
+            await sendEmail(user.accountEmail, 'Someone commented on your idea', link)
+            const number = await Comment.find({ ideasID: ideasID })
+            await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfComment: number.length }, { new: true })
+            return res.status(200).send({
+                errorCode: 0,
+                message: 'number of comment update successfully'
+            })
         })
     }
     catch (err) {
