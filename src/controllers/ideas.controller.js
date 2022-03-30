@@ -213,24 +213,29 @@ exports.myIdeas = async (req, res) => {
     Ideas.find({ accountID: req.accountID })
         .then(async ideas => {
             var listShow = []
-            for (i = 0; i < list.length; i++) {
-                var department = await Department.findById({ _id: list[i].departmentID })
-                if (department === null)
-                    return res.status(500).send({
-                        errorCode: 0,
-                        message: 'department server is error'
-                    })
-                let category = await Category.findById({ _id: list[i].categoryID })
-                if (category == null) return res.status(500).send({
-                    errorCode: 0,
-                    message: 'category server is error'
-                })
+            for (i = 0; i < ideas.length; i++) {
+                // var department = await Department.findById({ _id: ideas[i].departmentID })
+                // if (department === null)
+                //     return res.status(500).send({
+                //         errorCode: 0,
+                //         message: 'department server is error'
+                //     })
+                // let category = await Category.findById({ _id: ideas[i].categoryID })
+                // if (category == null) return res.status(500).send({
+                //     errorCode: 0,
+                //     message: 'category server is error'
+                // })
 
                 var listInfo = {
-                    _id: list[i]._id,
-                    ideasContent: list[i].ideasContent,
-                    departmentName: department.departmentName,
-                    categoryName: category.categoryName
+                    _id: ideas[i]._id,
+                    ideasContent: ideas[i].ideasContent,
+                    //ideasFile: list[i].ideasFile,
+                    numberOfLike: ideas[i].numberOfLike,
+                    numberOfDislike: ideas[i].numberOfDislike,
+                    numberOfComment: ideas[i].numberOfComment,
+                    numberOfView: ideas[i].numberOfView,
+                    // departmentName: department.departmentName,
+                    // categoryName: category.categoryName
                 }
                 listShow.push(listInfo)
             }
