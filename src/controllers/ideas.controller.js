@@ -98,7 +98,6 @@ exports.viewDetailIdeas = async (req, res) => {
             if (listComment) {
                 for(i = 0; i < listComment.length; i++){
                     if (listComment[i].anonymous === false) {
-                        console.log(listComment[i])
                         var user = await Account.findById(listComment[i].accountID)
                         var comment = {
                             author: user.accountEmail,

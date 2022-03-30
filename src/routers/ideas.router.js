@@ -12,7 +12,7 @@ const { upload } = require('../utils/uploadFile')
 
 const router = express.Router();
 
-router.post('/upload-ideas', [verifyToken, checkFirstClosureDate, upload.single('ideasFile')], createIdeas)
+router.post('/upload-ideas', [verifyToken, upload.single('ideasFile')], createIdeas)
 router.post('/like-ideas/:ideasID', [verifyToken, checkLike], likeIdeas)
 router.post('/dislike-ideas/:ideasID', [verifyToken, checkDislike], dislikeIdeas)
 router.post('/comment-ideas/:ideasID', [verifyToken, checkFinalClosureDate], commentIdeas)

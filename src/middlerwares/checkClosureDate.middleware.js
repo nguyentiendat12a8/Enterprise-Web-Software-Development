@@ -1,6 +1,7 @@
 const db = require('../models/index')
 const Ideas = db.ideas
 const ClosureDate = db.closureDate
+const Department = db.department
 
 exports.checkFinalClosureDate = async (req,res,next) => {
     try {
@@ -45,8 +46,13 @@ exports.checkFinalClosureDate = async (req,res,next) => {
 exports.checkFirstClosureDate = async (req,res,next) => {
     try {
         const d = new Date()
-        const ideas = await Ideas.findById(req.params.ideasID)
-        const closureDate = await ClosureDate.findById(ideas.closureDateID)
+        const department = await Department.findOne({departmentName: req.body.departmentName})
+        console.log(req.body.departmentName)
+        if(department === null) return res.status(500).send({
+            errorCode: 500,
+            message: 'department error'
+        })
+        const closureDate = await ClosureDate.findOne({departmentID: department._id})
         const date = closureDate.firstClosureDate.split('/') //await closureDate.finalClosureDate.split('/')
 
         if (parseInt(date[2]) > parseInt(d.getFullYear())) {
