@@ -14,14 +14,12 @@ exports.checkView = async (req, res, next) => {
             accountID,
             ideasID
         })
-        await view.save()
-        const number = await View.find({ ideasID })
-        let sumView = 0
-        number.forEach(() => {
-            sumView++
-        })
-        await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfView: sumView }, { new: true })
+        await Promise.all([view.save(), View.find({ ideasID })])
+        .then(async ([number]) => {
+            await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfView: number.length }, { new: true })
         next()
+        })
+        .catch(err => next())
     } else {
         next()
     }

@@ -85,82 +85,76 @@ exports.createIdeas = async (req, res) => {
     }
 }
 
-exports.viewDetailIdeas = (req, res) => {
-    try {
-        Ideas.findById(req.params.ideasID, async (err, ideas) => {
-            if (err) return res.status(500).send({
-                errorCode: 0,
-                message: err
-            })
-            // var department = await Department.findById(ideas.departmentID)
-            // var category = await Category.findById(ideas.categoryID)
-            Comment.find({ ideasID: ideas._id },async (err, listComment) => {
-                if (err) return res.status(500).send({
-                    errorCode: 0,
-                    message: err
-                })
-                var showComment = []
-                if (listComment) {
-                    for(i = 0; i < listComment.length; i++){
-                        if (listComment[i].anonymous === false) {
-                            var user = await Account.findById(listComment[i].accountID)
-                            var comment = {
-                                author: user.accountEmail,
-                                commentText: listComment[i].commentText,
-                                createdAt: listComment[i].createdAt
-                            }
-                            showComment.push(comment)
-                        } else {
-                            var comment = {
-                                author: 'anonymous',
-                                commentText: listComment[i].commentText,
-                                createdAt: listComment[i].createdAt
-                            }
-                            showComment.push(comment)
+exports.viewDetailIdeas =async (req, res) => {
+        Promise.all([Comment.find({ ideasID:req.params.ideasID }),Ideas.findById(req.params.ideasID)])
+        .then(async ([listComment, ideas]) =>{
+            var showComment = []
+            if (listComment) {
+                for(i = 0; i < listComment.length; i++){
+                    if (listComment[i].anonymous === false) {
+                        var user = await Account.findById(listComment[i].accountID)
+                        var comment = {
+                            author: user.accountEmail,
+                            commentText: listComment[i].commentText,
+                            createdAt: listComment[i].createdAt
                         }
+                        showComment.push(comment)
+                    } else {
+                        var comment = {
+                            author: 'anonymous',
+                            commentText: listComment[i].commentText,
+                            createdAt: listComment[i].createdAt
+                        }
+                        showComment.push(comment)
                     }
                 }
-                if (ideas.anonymous === false) {
-                    var user = await Account.findById(ideas.accountID)
-                    if(user === null) return res.status(500).send({
-                        errorCode: 500,
-                        message: 'User upload ideas have been deleted or the user server is down'
-                    })
-                    var ideasShow = {
-                        name: user.accountEmail,
-                        ideasContent: ideas.ideasContent,
-                        ideasFile: ideas.ideasFile,
-                        numberOfLike: ideas.numberOfLike,
-                        numberOfDislike: ideas.numberOfDislike,
-                        numberOfComment: ideas.numberOfComment,
-                        numberOfView: ideas.numberOfView,
-                        // departmentName: department.departmentName,
-                        // categoryName: category.categoryName,
-                        showComment: showComment
-                    }
-                } else {
-                    var ideasShow = {
-                        name: 'anonymous',
-                        ideasContent: ideas.ideasContent,
-                        ideasFile: ideas.ideasFile,
-                        numberOfLike: ideas.numberOfLike,
-                        numberOfDislike: ideas.numberOfDislike,
-                        numberOfComment: ideas.numberOfComment,
-                        numberOfView: ideas.numberOfView,
-                        // departmentName: department.departmentName,
-                        // categoryName: category.categoryName,
-                        showComment: showComment
-                    }
-                }
-                return res.status(200).send({
-                    errorCode: 0,
-                    data: ideasShow
+            }
+            if (ideas.anonymous === false) {
+                var user = await Account.findById(ideas.accountID)
+                if(user === null) return res.status(500).send({
+                    errorCode: 500,
+                    message: 'User upload ideas have been deleted or the user server is down'
                 })
+                var ideasShow = {
+                    name: user.accountEmail,
+                    ideasContent: ideas.ideasContent,
+                    ideasFile: ideas.ideasFile,
+                    numberOfLike: ideas.numberOfLike,
+                    numberOfDislike: ideas.numberOfDislike,
+                    numberOfComment: ideas.numberOfComment,
+                    numberOfView: ideas.numberOfView,
+                    // departmentName: department.departmentName,
+                    // categoryName: category.categoryName,
+                    //showComment: showComment
+                }
+            } else {
+                var ideasShow = {
+                    name: 'anonymous',
+                    ideasContent: ideas.ideasContent,
+                    ideasFile: ideas.ideasFile,
+                    numberOfLike: ideas.numberOfLike,
+                    numberOfDislike: ideas.numberOfDislike,
+                    numberOfComment: ideas.numberOfComment,
+                    numberOfView: ideas.numberOfView,
+                    // departmentName: department.departmentName,
+                    // categoryName: category.categoryName,
+                    //showComment: showComment
+                }
+            }
+            return res.status(200).send({
+                errorCode: 0,
+                data: {
+                    ideasShow,
+                    showComment
+                }
             })
         })
-    } catch (error) {
-        console.log(error)
-    }
+        .catch((err) =>{
+            return res.status(500).send({
+                errorCode: 500,
+                data: err
+            })
+        })
 }
 
 exports.listIdeas = async (req, res) => {
@@ -287,11 +281,13 @@ exports.dislikeIdeas = async (req, res) => {
         const ideasID = req.params.ideasID
         const accountID = req.accountID
 
+        
         const dislike = new Like({
             dislike: true,
             ideasID: ideasID,
             accountID: accountID
         })
+
         await dislike.save()
         const number = await Like.find({ ideasID: ideasID })
         let sum = 0
