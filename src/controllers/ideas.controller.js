@@ -17,67 +17,49 @@ const Joi = require("joi");
 
 exports.createIdeas = async (req, res) => {
     try {
-        const department = await Department.findOne({ departmentName: req.body.departmentName })
-        if (!department) {
-            return res.status(500).send({
-                errorCode: 500,
-                message: 'Department server is error'
+        Promise.all([Department.findOne({ departmentName: req.body.departmentName }), Category.findOne({ categoryName: req.body.categoryName })])
+        .then(async ([department,category]) =>{
+            const closureDate = await ClosureDate.findOne({ departmentID: department._id })
+            const ideas = new Ideas({
+                ideasContent: req.body.ideasContent,
+                ideasFile: req.file.path,
+                closureDateID: closureDate._id,
+                accountID: req.accountID, // req.accountID,
+                departmentID: department._id,
+                categoryID: category._id,
+                anonymous: req.body.anonymous
             })
-        }
-        const category = await Category.findOne({ categoryName: req.body.categoryName })
-        if (!category) {
-            return res.status(500).send({
-                errorCode: 500,
-                message: 'Category server is error'
-            })
-        }
-        const closureDate = await ClosureDate.findOne({ departmentID: department._id })
-        console.log(closureDate)
-        if (!closureDate) {
-            return res.status(500).send({
-                errorCode: 500,
-                message: 'Closure date server is error'
-            })
-        }
-        const ideas = new Ideas({
-            ideasContent: req.body.ideasContent,
-            ideasFile: req.file.path,
-            closureDateID: closureDate._id,
-            accountID: req.accountID, // req.accountID,
-            departmentID: department._id,
-            categoryID: category._id,
-            anonymous: req.body.anonymous
-        })
-
-        ideas.save(async (err, ideas) => {
-            if (err) res.status(500).send({
-                errorCode: 500,
-                message: err
-            })
-            if (req.body.departmentName === 'IT') {
-                const role = await Role.findOne({ roleName: 'QA of IT' })
-                const user = await Account.findOne({ roleID: role._id })
-                const email = user.accountEmail
-                const link = `localhost:1000/ideas/${ideas._id}`
-                await sendEmail(email, 'New ideas uploaded', link)
-            }
-            else if (req.body.departmentName === 'business') {
-                const role = await Role.findOne({ roleName: 'QA of business' })
-                const user = await Account.findOne({ roleID: role._id })
-                const email = user.accountEmail
-                const link = `localhost:1000/ideas/${ideas._id}`
-                await sendEmail(email, 'New ideas uploaded', link)
-            }
-            else {
-                const role = await Role.findOne({ roleName: 'QA of graphic design' })
-                const user = await Account.findOne({ roleID: role._id })
-                const email = user.accountEmail
-                const link = `localhost:1000/ideas/${ideas._id}`
-                await sendEmail(email, 'New ideas uploaded', link)
-            }
-            res.status(200).send({
-                errorCode: 0,
-                message: 'add ideas successfuly'
+    
+            await ideas.save(async (err, ideas) => {
+                if (err) res.status(500).send({
+                    errorCode: 500,
+                    message: err
+                })
+                if (req.body.departmentName === 'IT') {
+                    //const role = await Role.findOne({ roleName: 'QA of IT' })
+                    const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21fe' })
+                    const email = user.accountEmail
+                    const link = `localhost:1000/ideas/${ideas._id}`
+                    await sendEmail(email, 'New ideas uploaded', link)
+                }
+                else if (req.body.departmentName === 'business') {
+                    //const role = await Role.findOne({ roleName: 'QA of business' })
+                    const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21ff' })
+                    const email = user.accountEmail
+                    const link = `localhost:1000/ideas/${ideas._id}`
+                    await sendEmail(email, 'New ideas uploaded', link)
+                }
+                else {
+                    //const role = await Role.findOne({ roleName: 'QA of graphic design' })
+                    const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce2200' })
+                    const email = user.accountEmail
+                    const link = `localhost:1000/ideas/${ideas._id}`
+                    await sendEmail(email, 'New ideas uploaded', link)
+                }
+                res.status(200).send({
+                    errorCode: 0,
+                    message: 'add ideas successfuly'
+                })
             })
         })
     } catch (error) {
@@ -85,12 +67,12 @@ exports.createIdeas = async (req, res) => {
     }
 }
 
-exports.viewDetailIdeas =async (req, res) => {
-        Promise.all([Comment.find({ ideasID:req.params.ideasID }),Ideas.findById(req.params.ideasID)])
-        .then(async ([listComment, ideas]) =>{
+exports.viewDetailIdeas = async (req, res) => {
+    Promise.all([Comment.find({ ideasID: req.params.ideasID }), Ideas.findById(req.params.ideasID)])
+        .then(async ([listComment, ideas]) => {
             var showComment = []
             if (listComment) {
-                for(i = 0; i < listComment.length; i++){
+                for (i = 0; i < listComment.length; i++) {
                     if (listComment[i].anonymous === false) {
                         var user = await Account.findById(listComment[i].accountID)
                         var comment = {
@@ -111,7 +93,7 @@ exports.viewDetailIdeas =async (req, res) => {
             }
             if (ideas.anonymous === false) {
                 var user = await Account.findById(ideas.accountID)
-                if(user === null) return res.status(500).send({
+                if (user === null) return res.status(500).send({
                     errorCode: 500,
                     message: 'User upload ideas have been deleted or the user server is down'
                 })
@@ -149,7 +131,7 @@ exports.viewDetailIdeas =async (req, res) => {
                 }
             })
         })
-        .catch((err) =>{
+        .catch((err) => {
             return res.status(500).send({
                 errorCode: 500,
                 data: err
@@ -281,7 +263,7 @@ exports.dislikeIdeas = async (req, res) => {
         const ideasID = req.params.ideasID
         const accountID = req.accountID
 
-        
+
         const dislike = new Like({
             dislike: true,
             ideasID: ideasID,
@@ -308,19 +290,14 @@ exports.dislikeIdeas = async (req, res) => {
 }
 
 exports.commentIdeas = async (req, res) => {
-    try {
-        const ideasID = req.params.ideasID
-        const comment = new Comment({
-            commentText: req.body.commentText,
-            ideasID,
-            accountID: req.accountID
-        })
-        await comment.save( async (err, comment) => {
-            if (err) return res.status(500).send({
-                errorCode: 0,
-                message: 'Comment server is error'
-            })
-            const ideas = await Ideas.findById(ideasID)
+    const ideasID = req.params.ideasID
+    const comment = new Comment({
+        commentText: req.body.commentText,
+        ideasID,
+        accountID: req.accountID
+    })
+    await Promise.all([comment.save(), Ideas.findById(ideasID), Comment.countDocuments({ ideasID: ideasID })])
+        .then(async ([comment, ideas, number]) => {
             const user = await Account.findById(ideas.accountID)
             if (!user) return res.status(500).send({
                 errorCode: 500,
@@ -328,17 +305,18 @@ exports.commentIdeas = async (req, res) => {
             })
             link = `localhost:1000/ideas/list-comment-ideas/${ideasID}`
             await sendEmail(user.accountEmail, 'Someone commented on your idea', link)
-            const number = await Comment.find({ ideasID: ideasID })
-            await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfComment: number.length }, { new: true })
+            await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfComment: number }, { new: true })
             return res.status(200).send({
                 errorCode: 0,
                 message: 'number of comment update successfully'
             })
         })
-    }
-    catch (err) {
-        console.log(err)
-    }
+        .catch(err => {
+            return res.status(500).send({
+                errorCode: 500,
+                message: err
+            })
+        })
 }
 
 

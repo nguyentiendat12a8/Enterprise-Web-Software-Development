@@ -47,7 +47,6 @@ exports.checkFirstClosureDate = async (req,res,next) => {
     try {
         const d = new Date()
         const department = await Department.findOne({departmentName: req.body.departmentName})
-        console.log(req.body.departmentName)
         if(department === null) return res.status(500).send({
             errorCode: 500,
             message: 'department error'
