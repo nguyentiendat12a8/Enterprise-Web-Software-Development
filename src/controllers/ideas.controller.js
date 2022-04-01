@@ -18,50 +18,50 @@ const Joi = require("joi");
 exports.createIdeas = async (req, res) => {
     try {
         Promise.all([Department.findOne({ departmentName: req.body.departmentName }), Category.findOne({ categoryName: req.body.categoryName })])
-        .then(async ([department,category]) =>{
-            const closureDate = await ClosureDate.findOne({ departmentID: department._id })
-            const ideas = new Ideas({
-                ideasContent: req.body.ideasContent,
-                ideasFile: req.file.path,
-                closureDateID: closureDate._id,
-                accountID: req.accountID, // req.accountID,
-                departmentID: department._id,
-                categoryID: category._id,
-                anonymous: req.body.anonymous
-            })
-    
-            await ideas.save(async (err, ideas) => {
-                if (err) res.status(500).send({
-                    errorCode: 500,
-                    message: err
+            .then(async ([department, category]) => {
+                const closureDate = await ClosureDate.findOne({ departmentID: department._id })
+                const ideas = new Ideas({
+                    ideasContent: req.body.ideasContent,
+                    ideasFile: req.file.path,
+                    closureDateID: closureDate._id,
+                    accountID: req.accountID, // req.accountID,
+                    departmentID: department._id,
+                    categoryID: category._id,
+                    anonymous: req.body.anonymous
                 })
-                if (req.body.departmentName === 'IT') {
-                    //const role = await Role.findOne({ roleName: 'QA of IT' })
-                    const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21fe' })
-                    const email = user.accountEmail
-                    const link = `localhost:1000/ideas/${ideas._id}`
-                    await sendEmail(email, 'New ideas uploaded', link)
-                }
-                else if (req.body.departmentName === 'business') {
-                    //const role = await Role.findOne({ roleName: 'QA of business' })
-                    const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21ff' })
-                    const email = user.accountEmail
-                    const link = `localhost:1000/ideas/${ideas._id}`
-                    await sendEmail(email, 'New ideas uploaded', link)
-                }
-                else {
-                    //const role = await Role.findOne({ roleName: 'QA of graphic design' })
-                    const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce2200' })
-                    const email = user.accountEmail
-                    const link = `localhost:1000/ideas/${ideas._id}`
-                    await sendEmail(email, 'New ideas uploaded', link)
-                }
-                res.status(200).send({
-                    errorCode: 0,
-                    message: 'add ideas successfuly'
+
+                await ideas.save(async (err, ideas) => {
+                    if (err) res.status(500).send({
+                        errorCode: 500,
+                        message: err
+                    })
+                    if (req.body.departmentName === 'IT') {
+                        //const role = await Role.findOne({ roleName: 'QA of IT' })
+                        const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21fe' })
+                        const email = user.accountEmail
+                        const link = `localhost:1000/ideas/${ideas._id}`
+                        await sendEmail(email, 'New ideas uploaded', link)
+                    }
+                    else if (req.body.departmentName === 'business') {
+                        //const role = await Role.findOne({ roleName: 'QA of business' })
+                        const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21ff' })
+                        const email = user.accountEmail
+                        const link = `localhost:1000/ideas/${ideas._id}`
+                        await sendEmail(email, 'New ideas uploaded', link)
+                    }
+                    else {
+                        //const role = await Role.findOne({ roleName: 'QA of graphic design' })
+                        const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce2200' })
+                        const email = user.accountEmail
+                        const link = `localhost:1000/ideas/${ideas._id}`
+                        await sendEmail(email, 'New ideas uploaded', link)
+                    }
+                    res.status(200).send({
+                        errorCode: 0,
+                        message: 'add ideas successfuly'
+                    })
                 })
             })
-        })
     } catch (error) {
         console.log(error)
     }
@@ -338,31 +338,31 @@ exports.downloadIdeas = async (req, res) => {
         const d = new Date()
         const ideas = await Ideas.find()
         var listDown = []
-        ideas.forEach(async e => {
-            var closureDate = await ClosureDate.findById(e.closureDateID)
+        for(i =0 ; i < ideas.length ; i ++) {
+            var closureDate = await ClosureDate.findById(ideas[i].closureDateID)
             var date = await closureDate.finalClosureDate.split('/')
-            if (parseInt(date[2]) > parseInt(d.getFullYear())) {
-                const { _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = e
-                listDown.push({ _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
+            if (1 > 0) {
+                const {  ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = ideas[i]
+                listDown.push({  ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
             } else if (parseInt(date[2]) === parseInt(d.getFullYear())) {
                 if (parseInt(date[1]) > (parseInt(d.getMonth()) + 1)) {
-                    const { _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = e
-                    listDown.push({ _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
+                    const {  ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = ideas[i]
+                    listDown.push({  ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
                 } else if (parseInt(date[1]) === (parseInt(d.getMonth()) + 1)) {
                     if (parseInt(date[0]) > parseInt(d.getDate())) {
-                        const { _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = e
-                        listDown.push({ _id, ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
-                    }
-                }
+                        const {  ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = ideas[i]
+                        listDown.push({  ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
+                    } 
+                } 
             }
-        })
-        if (listDown === null) {
-            return res.send({
+        }
+        if (listDown.length === 0) {
+            return res.status(400).send({
                 errorCode: 400,
                 message: 'No idea to download!'
             })
         }
-        const csvFields = ["Id", "Content", "Number of comment", "Number of like", "Number of dislike", "Number of view"];
+        const csvFields = [ "Content", "Number of comment", "Number of like", "Number of dislike", "Number of view"];
         const csvParser = new CsvParser({ csvFields })
         const csvData = csvParser.parse(listDown)
         res.setHeader("Content-Type", "text/csv")
