@@ -293,6 +293,7 @@ exports.commentIdeas = async (req, res) => {
     const ideasID = req.params.ideasID
     const comment = new Comment({
         commentText: req.body.commentText,
+        anonymous: req.body.anonymous,
         ideasID,
         accountID: req.accountID
     })
