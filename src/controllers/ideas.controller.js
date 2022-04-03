@@ -358,7 +358,7 @@ exports.downloadIdeas = async (req, res) => {
         // res.status(200).send(csvData)
         return res.status(200).send({
             errorCode: 0,
-            message: listDown
+            date: listDown
         })
     }
     catch (err) {
