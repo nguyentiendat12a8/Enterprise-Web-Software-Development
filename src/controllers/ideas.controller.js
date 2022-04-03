@@ -91,6 +91,9 @@ exports.viewDetailIdeas = async (req, res) => {
             }
             var showComment = []
             await Promise.all(listComment.map(c => getComment(c)))
+            showComment.sort((a,b) =>{
+                return a.createdAt - b.createdAt
+            })
             if (ideas.anonymous === false) {
                 var user = await Account.findById(ideas.accountID)
                 if (user === null) return res.status(500).send({
