@@ -87,17 +87,17 @@ exports.checkFirstClosureDate = async (req,res,next) => {
 }
 
 
-exports.checkDownload = async (req,res,next) => {
-    try {
-        const d = new Date()
-        var closureDate = await ClosureDate.findById(e.closureDateID)
-            var date = closureDate.finalClosureDate.split('/')
+// exports.checkDownload = async (req,res,next) => {
+//     try {
+//         const d = new Date()
+//         var closureDate = await ClosureDate.findById(e.closureDateID)
+//             var date = closureDate.finalClosureDate.split('/')
 
         
-    }
-    catch (err) {
-        console.log(err)
-    }
-}
+//     }
+//     catch (err) {
+//         console.log(err)
+//     }
+// }
 
 
