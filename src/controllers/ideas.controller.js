@@ -329,18 +329,15 @@ exports.downloadIdeas = async (req, res) => {
         for (i = 0; i < ideas.length; i++) {
             var closureDate = await ClosureDate.findById(ideas[i].closureDateID)
             var date = await closureDate.finalClosureDate.split('/')
-            if (parseInt(date[2]) < parseInt(d.getFullYear())) {
-                console.log('1')
+            if (0 < 1) { //parseInt(date[2]) < parseInt(d.getFullYear())
                 const { ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = ideas[i]
                 listDown.push({ ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
             } else if (parseInt(date[2]) === parseInt(d.getFullYear())) {
                 if (parseInt(date[1]) < (parseInt(d.getMonth()) + 1)) {
-                    console.log('2')
                     const { ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = ideas[i]
                     listDown.push({ ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
                 } else if (parseInt(date[1]) === (parseInt(d.getMonth()) + 1)) {
                     if (parseInt(date[0]) < parseInt(d.getDate())) {
-                        console.log('3')
                         const { ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = ideas[i]
                         listDown.push({ ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
                     }
@@ -353,12 +350,16 @@ exports.downloadIdeas = async (req, res) => {
                 message: 'No idea to download!'
             })
         }
-        const csvFields = ["Content", "Number of comment", "Number of like", "Number of dislike", "Number of view"];
-        const csvParser = new CsvParser({ csvFields })
-        const csvData = csvParser.parse(listDown)
-        res.setHeader("Content-Type", "text/csv")
-        res.setHeader("Content-Disposition", "attachment; filename=ideas.csv")
-        res.status(200).send(csvData)
+        //const csvFields = ["Content", "Number of comment", "Number of like", "Number of dislike", "Number of view"];
+        //const csvParser = new CsvParser({ csvFields })
+        //const csvData = csvParser.parse(listDown)
+        // res.setHeader("Content-Type", "text/csv")
+        // res.setHeader("Content-Disposition", "attachment; filename=ideas.csv")
+        // res.status(200).send(csvData)
+        return res.status(200).send({
+            errorCode: 0,
+            message: listDown
+        })
     }
     catch (err) {
         console.log(err)
