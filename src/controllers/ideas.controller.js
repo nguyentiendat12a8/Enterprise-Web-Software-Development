@@ -70,27 +70,27 @@ exports.createIdeas = async (req, res) => {
 exports.viewDetailIdeas = async (req, res) => {
     Promise.all([Comment.find({ ideasID: req.params.ideasID }), Ideas.findById(req.params.ideasID)])
         .then(async ([listComment, ideas]) => {
-            var showComment = []
-            if (listComment) {
-                for (i = 0; i < listComment.length; i++) {
-                    if (listComment[i].anonymous === false) {
-                        var user = await Account.findById(listComment[i].accountID)
-                        var comment = {
-                            author: user.accountEmail,
-                            commentText: listComment[i].commentText,
-                            createdAt: listComment[i].createdAt
-                        }
-                        showComment.push(comment)
-                    } else {
-                        var comment = {
-                            author: 'anonymous',
-                            commentText: listComment[i].commentText,
-                            createdAt: listComment[i].createdAt
-                        }
-                        showComment.push(comment)
+            async function getComment(c) {
+                if (c.anonymous === false) {
+                    var user = await Account.findById(c.accountID)
+                    var comment = {
+                        author: user.accountEmail,
+                        commentText: c.commentText,
+                        createdAt: c.createdAt
                     }
+                    showComment.push(comment)
+                } else {
+                    var comment = {
+                        author: 'anonymous',
+                        commentText: c.commentText,
+                        createdAt: c.createdAt
+                    }
+                    showComment.push(comment)
                 }
+                return showComment
             }
+            var showComment = []
+            await Promise.all(listComment.map(c => getComment(c)))
             if (ideas.anonymous === false) {
                 var user = await Account.findById(ideas.accountID)
                 if (user === null) return res.status(500).send({
@@ -107,7 +107,6 @@ exports.viewDetailIdeas = async (req, res) => {
                     numberOfView: ideas.numberOfView,
                     // departmentName: department.departmentName,
                     // categoryName: category.categoryName,
-                    //showComment: showComment
                 }
             } else {
                 var ideasShow = {
@@ -120,7 +119,6 @@ exports.viewDetailIdeas = async (req, res) => {
                     numberOfView: ideas.numberOfView,
                     // departmentName: department.departmentName,
                     // categoryName: category.categoryName,
-                    //showComment: showComment
                 }
             }
             return res.status(200).send({
@@ -320,41 +318,27 @@ exports.commentIdeas = async (req, res) => {
         })
 }
 
-
-// exports.deleteCommentIdeas = async (req, res) => {
-//     const comment = await Comment.findById('622a10e1f965150f29d40efa')
-//     if (!comment) return res.status(500).send({
-//         errorCode: 500,
-//         message: 'Comment server is error'
-//     })
-//     await comment.delete()
-//     return res.status(200).send({
-//         errorCode: 0,
-//         message: 'Comment delete successfully'
-//     })
-// }
-
 exports.downloadIdeas = async (req, res) => {
     try {
         const d = new Date()
         const ideas = await Ideas.find()
         var listDown = []
-        for(i =0 ; i < ideas.length ; i ++) {
+        for (i = 0; i < ideas.length; i++) {
             var closureDate = await ClosureDate.findById(ideas[i].closureDateID)
             var date = await closureDate.finalClosureDate.split('/')
             if (1 > 0) {
-                const {  ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = ideas[i]
-                listDown.push({  ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
+                const { ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = ideas[i]
+                listDown.push({ ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
             } else if (parseInt(date[2]) === parseInt(d.getFullYear())) {
                 if (parseInt(date[1]) > (parseInt(d.getMonth()) + 1)) {
-                    const {  ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = ideas[i]
-                    listDown.push({  ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
+                    const { ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = ideas[i]
+                    listDown.push({ ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
                 } else if (parseInt(date[1]) === (parseInt(d.getMonth()) + 1)) {
                     if (parseInt(date[0]) > parseInt(d.getDate())) {
-                        const {  ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = ideas[i]
-                        listDown.push({  ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
-                    } 
-                } 
+                        const { ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = ideas[i]
+                        listDown.push({ ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
+                    }
+                }
             }
         }
         if (listDown.length === 0) {
@@ -363,7 +347,7 @@ exports.downloadIdeas = async (req, res) => {
                 message: 'No idea to download!'
             })
         }
-        const csvFields = [ "Content", "Number of comment", "Number of like", "Number of dislike", "Number of view"];
+        const csvFields = ["Content", "Number of comment", "Number of like", "Number of dislike", "Number of view"];
         const csvParser = new CsvParser({ csvFields })
         const csvData = csvParser.parse(listDown)
         res.setHeader("Content-Type", "text/csv")
@@ -382,12 +366,12 @@ exports.downloadZip = (req, res) => {
         zip.addLocalFile(__dirname + "/../../uploads/" + uploadDir[i]);
     }
     //file name
-    const downloadName = `Document-${Date.now()}.zip`
+    const downloadName = `Document.zip`
 
     const data = zip.toBuffer()
     res.setHeader('Content-Type', 'application/octet-stream');
     res.setHeader('Content-Disposition', `attachment; filename=${downloadName}`);
-    //res.set('Content-Length',data.length);
+    res.set('Content-Length', data.length);
     res.send(data);
 }
 

@@ -9,7 +9,10 @@ exports.verifyToken = async (req, res, next) => {
     //const token = req.cookies.access_token
     //const token = req.body.access_token
     if(!token){
-       return res.status(401).send("token is required!")
+       return res.status(401).send({
+           errorCode: 401,
+           message:'token is required!'
+       })
     }
     jwt.verify(token, config.TOKEN_KEY, (err,decoded)=>{
         if(err){
