@@ -12,7 +12,20 @@ const Joi = require("joi");
 
 exports.signup = async (req, res) => {
   try {
- 
+    const schema = Joi.object({ 
+      accountEmail : Joi.string().trim().min(5).email().message("Email must be in the format @gmail.com, Ex: thang1@gmail.com"),
+      accountPassword : Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$')).message("Password must have at least 6 characters and maximum 30 characters"),
+      phone : Joi.string().pattern(new RegExp('(09|03|07|08|05)+([0-9]{8})')).message("Incorrect phone format, Ex: 0906246555"),
+      address : Joi.string().min(10).trim().message("Incorrect address format"),
+      gender  : Joi.array().items(Joi.string().valid('male', 'female')).message("Incorrect gennder format, only : 'male' or 'female'"),
+      DOB : Joi.string().pattern(new RegExp('^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$')).message("Incorrect date format, Ex : 10-10-2000"),
+      roleName : Joi.required().message("Incorrect rolename")
+    });
+      const { error } = schema.validate(req.body);
+      if (error) return res.status(400).send({
+        errorCode: 400,
+        message: error.message
+      });
     //////////////////////////////////////
     const roleName = req.body.roleName
     if (!roleName) {
@@ -69,13 +82,13 @@ exports.listRole = async (req, res) => {
 exports.signin = async (req, res, next) => {
   try {
     const schema = Joi.object({ 
-      accountEmail : Joi.string().trim().min(5).email(),
-      accountPassword : Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$'))
+      accountEmail : Joi.string().trim().min(5).email().message("Email must be in the format @gmail.com, Ex: thang1@gmail.com"),
+      accountPassword : Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$')).message("Password must have at least 6 characters and maximum 30 characters")
     });
     const { error } = schema.validate(req.body);
     if (error) return res.status(400).send({
       errorCode: 400,
-      message: error.details[0].message
+      message: error.message
     });
     ////////////////
     const { accountEmail, accountPassword } = req.body;
@@ -99,7 +112,6 @@ exports.signin = async (req, res, next) => {
       });
       
       const role = await Role.findById(user.roleID).then((response) => {
-        console.log("response", response);
         return response.roleName;
       });
       return res.status(200).json({
@@ -122,14 +134,13 @@ exports.signin = async (req, res, next) => {
 exports.updatePassword = async (req, res, next) => {
   try {
     const schema = Joi.object({ 
-      accountPassword : Joi.string().trim().required(),
-      newAccountPassword : Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$')),
-      newAccountPasswordAgain : Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$')),
+      newAccountPassword : Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$')).message("NewPassword must have at least 6 characters and maximum 30 characters"),
+      newAccountPasswordAgain : Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$')).message("NewPasswordAgain must have at least 6 characters and maximum 30 characters"),
     });
     const { error } = schema.validate(req.body);
     if (error) return res.status(400).send({
       errorCode: 400,
-      message: error.details[0].message
+      message: error.message
     });
     /////////////////
     //const { id } = req.params
@@ -214,22 +225,6 @@ exports.updateAccount = async (req, res, next) => {
     console.log(error)
   }
 }
-
-// exports.deleteAccount = async (req, res, next) => {
-//   try {
-//     const id = req.params.id
-//     Account.deleteOne({_id: id})
-//     .then(()=>{
-//       return res.status(200).send({
-//         errorCode: 0,
-//         message: 'Delete account successfully!'
-//       })
-//     })
-//   }
-//   catch(err){
-
-//   }
-// }
 
 exports.listAccount = (req, res) => {
   try {
@@ -375,6 +370,8 @@ exports.forceDeleteUserAccount = async (req, res) => {
 }
 
 
+
+
 exports.sendEmailResetPass = async (req, res) => {
   try {
 
@@ -407,7 +404,6 @@ exports.sendEmailResetPass = async (req, res) => {
     console.log(error);
   }
 }
-
 
 exports.confirmLink = async (req, res) => {
   try {

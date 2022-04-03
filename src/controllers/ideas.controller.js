@@ -17,6 +17,15 @@ const Joi = require("joi");
 
 exports.createIdeas = async (req, res) => {
     try {
+        const schema = Joi.object({ 
+            ideasContent : Joi.string.trim().require().message("IdeasContent must exist"),
+          });
+            const { error } = schema.validate(req.body);
+            if (error) return res.status(400).send({
+              errorCode: 400,
+              message: error.message
+            });
+        /////
         Promise.all([Department.findOne({ departmentName: req.body.departmentName }), Category.findOne({ categoryName: req.body.categoryName })])
             .then(async ([department, category]) => {
                 const closureDate = await ClosureDate.findOne({ departmentID: department._id })
@@ -291,6 +300,15 @@ exports.dislikeIdeas = async (req, res) => {
 }
 
 exports.commentIdeas = async (req, res) => {
+    const schema = Joi.object({ 
+        commentText : Joi.string.trim().require(),
+    });
+    const { error } = schema.validate(req.body);
+    if (error) return res.status(400).send({
+      errorCode: 400,
+      message: error.details[0].message
+    });
+    /////////////////
     const ideasID = req.params.ideasID
     const comment = new Comment({
         commentText: req.body.commentText,

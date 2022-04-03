@@ -5,6 +5,16 @@ const Joi = require("joi");
 
 exports.createClousureDate = async (req, res) => {
     try {
+        const schema = Joi.object({ 
+            firstClosureDate: Joi.date().min(Joi.ref('$todayDate')).iso().required().message("First Closure Date must be after today"),
+            finalClosureDate : Joi.date().iso().greater(Joi.ref('firstClosureDate')).required().message("Final Closure Date must be after First Closure Date")
+          });
+            const { error } = schema.validate(req.body);
+            if (error) return res.status(400).send({
+              errorCode: 400,
+              message: error.message
+            });
+            /////
         //10-2-2020
         const department = await Department.findOne({ departmentName: req.body.departmentName })
         const closureDate = new ClosureDate({
