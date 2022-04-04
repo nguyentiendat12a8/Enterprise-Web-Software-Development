@@ -27,7 +27,7 @@ exports.signup = async (req, res) => {
     if (error) return res.status(400).send({
       errorCode: 400,
       message: error.message
-    });
+    })
     //////////////////////////////////////
     const roleName = req.body.roleName
     if (!roleName) {
@@ -91,7 +91,7 @@ exports.signin = async (req, res, next) => {
     if (error) return res.status(400).send({
       errorCode: 400,
       message: error.message
-    });
+    })
     ////////////////
     const { accountEmail, accountPassword } = req.body;
     if (!(accountEmail && accountPassword)) {

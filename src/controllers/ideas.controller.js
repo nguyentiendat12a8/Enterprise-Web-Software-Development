@@ -17,14 +17,14 @@ const Joi = require("joi");
 
 exports.createIdeas = async (req, res) => {
     try {
-        const schema = Joi.object({ 
-            ideasContent : Joi.string().trim().require().message("IdeasContent must exist"),
-          });
-            const { error } = schema.validate(req.body);
-            if (error) return res.status(400).send({
-              errorCode: 400,
-              message: error.message
-            });
+        const schema = Joi.object({
+            ideasContent: Joi.string().trim().message("IdeasContent must exist"),
+        });
+        const { error } = schema.validate(req.body);
+        if (error) return res.status(400).send({
+            errorCode: 400,
+            message: error.message
+        });
         /////
         Promise.all([Department.findOne({ departmentName: req.body.departmentName }), Category.findOne({ categoryName: req.body.categoryName })])
             .then(async ([department, category]) => {
@@ -100,7 +100,7 @@ exports.viewDetailIdeas = async (req, res) => {
             }
             var showComment = []
             await Promise.all(listComment.map(c => getComment(c)))
-            showComment.sort((a,b) =>{
+            showComment.sort((a, b) => {
                 return a.createdAt - b.createdAt
             })
             if (ideas.anonymous === false) {
@@ -300,14 +300,14 @@ exports.dislikeIdeas = async (req, res) => {
 }
 
 exports.commentIdeas = async (req, res) => {
-    const schema = Joi.object({ 
-        commentText : Joi.string().trim().error(new Error('comment text must exist')),
-      });
-      const { error } = schema.validate(req.body);
-      if (error) return res.status(400).send({
+    const schema = Joi.object({
+        commentText: Joi.string().trim().error(new Error('comment text must exist')),
+    });
+    const { error } = schema.validate(req.body);
+    if (error) return res.status(400).send({
         errorCode: 400,
         message: error.message
-      });
+    });
     /////////////////
     const ideasID = req.params.ideasID
     const comment = new Comment({
@@ -318,11 +318,8 @@ exports.commentIdeas = async (req, res) => {
     })
     await Promise.all([comment.save(), Ideas.findById(ideasID), Comment.countDocuments({ ideasID: ideasID })])
         .then(async ([comment, ideas, number]) => {
-            const user = await Account.findById(ideas.accountID)
-            if (!user) return res.status(500).send({
-                errorCode: 500,
-                message: err
-            })
+
+            var user = await Account.findById(ideas.accountID)
             link = `localhost:1000/ideas/list-comment-ideas/${ideasID}`
             await sendEmail(user.accountEmail, 'Someone commented on your idea', link)
             await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfComment: number }, { new: true })
