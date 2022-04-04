@@ -6,8 +6,8 @@ const Joi = require("joi");
 exports.createClousureDate = async (req, res) => {
     try {
         const schema = Joi.object({ 
-            firstClosureDate: Joi.string().pattern(new RegExp("([0-9]{4}[-](0[1-9]|1[0-2])[-]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-](0[1-9]|1[0-2])[-][0-9]{4})")).message("Incorrect date format, Ex : 30-3-2022"),
-            finalClosureDate : Joi.string().pattern(new RegExp("([0-9]{4}[-](0[1-9]|1[0-2])[-]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-](0[1-9]|1[0-2])[-][0-9]{4})")).message("Incorrect date format, Ex : 30-3-2022"),
+            firstClosureDate: Joi.string().pattern(new RegExp("([0-9]{4}[-||/](0[1-9]|1[0-2])[-||/]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-||/](0[1-9]|1[0-2])[-||/][0-9]{4})")).message("Incorrect date format, Ex : 30/03/2022"),
+            finalClosureDate : Joi.string().pattern(new RegExp("([0-9]{4}[-||/](0[1-9]|1[0-2])[-||/]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-||/](0[1-9]|1[0-2])[-||/][0-9]{4})")).message("Incorrect date format, Ex : 30/03/2022"),
           });
             const { error } = schema.validate(req.body);
             if (error) return res.status(400).send({
@@ -50,6 +50,7 @@ exports.listClosureDate = (req, res) => {
                 var departmentID = listClosureDate[i].departmentID
                 var department = await Department.findOne({ _id: departmentID })
                 var show = {
+                    _id: listClosureDate[i]._id,
                     firstClosureDate: listClosureDate[i].firstClosureDate,
                     finalClosureDate: listClosureDate[i].finalClosureDate,
                     departmentName: department.departmentName
@@ -67,3 +68,50 @@ exports.listClosureDate = (req, res) => {
     }
 }
 
+exports.editClosureDate = (req,res) =>{
+    ClosureDate.findById(req.params.closureDateID, (err, date) => {
+        if (err) return res.status(500).send({
+            errorCode: 500,
+            message: err
+        })
+        const show = {
+            _id: req.params.closureDateID,
+            firstClosureDate: date.firstClosureDate,
+            finalClosureDate: date.finalClosureDate
+        }
+        return res.status(200).send({
+            errorCode: 0,
+            data: show
+        })
+    })
+}
+
+exports.updateClosureDate = (req,res) =>{
+    try {
+        const schema = Joi.object({ 
+            firstClosureDate: Joi.string().pattern(new RegExp("([0-9]{4}[-||/](0[1-9]|1[0-2])[-||/]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-||/](0[1-9]|1[0-2])[-||/][0-9]{4})")).message("Incorrect date format, Ex : 30/03/2022"),
+            finalClosureDate : Joi.string().pattern(new RegExp("([0-9]{4}[-||/](0[1-9]|1[0-2])[-||/]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-||/](0[1-9]|1[0-2])[-||/][0-9]{4})")).message("Incorrect date format, Ex : 30/03/2022"),
+          });
+            const { error } = schema.validate(req.body);
+            if (error) return res.status(400).send({
+              errorCode: 400,
+              message: error.message
+            });
+
+        ClosureDate.findByIdAndUpdate(req.params.closureDateID, {
+            firstClosureDate: req.body.firstClosureDate,
+            finalClosureDate: req.body.finalClosureDate
+        }, {new: true}, (err) => {
+            if (err) return res.status(500).send({
+                errorCode: 500,
+                message: err
+            })
+            return res.status(200).send({
+                errorCode: 0,
+                message: 'Update closure date successfully!'
+            })
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
