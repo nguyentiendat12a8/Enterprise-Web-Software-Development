@@ -18,7 +18,7 @@ const Joi = require("joi");
 exports.createIdeas = async (req, res) => {
     try {
         const schema = Joi.object({ 
-            ideasContent : Joi.string.trim().require().message("IdeasContent must exist"),
+            ideasContent : Joi.string().trim().require().message("IdeasContent must exist"),
           });
             const { error } = schema.validate(req.body);
             if (error) return res.status(400).send({
@@ -301,13 +301,13 @@ exports.dislikeIdeas = async (req, res) => {
 
 exports.commentIdeas = async (req, res) => {
     const schema = Joi.object({ 
-        commentText : Joi.string.trim().require(),
-    });
-    const { error } = schema.validate(req.body);
-    if (error) return res.status(400).send({
-      errorCode: 400,
-      message: error.details[0].message
-    });
+        commentText : Joi.string().trim().error(new Error('comment text must exist')),
+      });
+      const { error } = schema.validate(req.body);
+      if (error) return res.status(400).send({
+        errorCode: 400,
+        message: error.message
+      });
     /////////////////
     const ideasID = req.params.ideasID
     const comment = new Comment({

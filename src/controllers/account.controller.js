@@ -16,16 +16,18 @@ exports.signup = async (req, res) => {
       accountEmail : Joi.string().trim().min(5).email().message("Email must be in the format @gmail.com, Ex: thang1@gmail.com"),
       accountPassword : Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$')).message("Password must have at least 6 characters and maximum 30 characters"),
       phone : Joi.string().pattern(new RegExp('(09|03|07|08|05)+([0-9]{8})')).message("Incorrect phone format, Ex: 0906246555"),
-      address : Joi.string().min(10).trim().message("Incorrect address format"),
-      gender  : Joi.array().items(Joi.string().valid('male', 'female')).message("Incorrect gennder format, only : 'male' or 'female'"),
-      DOB : Joi.string().pattern(new RegExp('^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$')).message("Incorrect date format, Ex : 10-10-2000"),
-      roleName : Joi.required().message("Incorrect rolename")
+      // address : Joi.string().min(10).trim().message("Incorrect address format"),
+      address : Joi.string().min(10).trim().error(new Error('Incorrect address format')),
+      gender  : Joi.array().items(Joi.string().valid('male', 'female')).error(new Error('Incorrect gender')),
+      DOB : Joi.string().pattern(new RegExp("([0-9]{4}[-](0[1-9]|1[0-2])[-]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-](0[1-9]|1[0-2])[-][0-9]{4})")).message("Incorrect date format, Ex : 10-10-2000"),
+      roleName : Joi.array().items(Joi.string().valid('admin', 'staff', 'QAM', "QAC")).error(new Error('Incorrect rolename')),
+  
     });
-      const { error } = schema.validate(req.body);
-      if (error) return res.status(400).send({
-        errorCode: 400,
-        message: error.message
-      });
+    const { error } = schema.validate(req.body);
+    if (error) return res.status(400).send({
+      errorCode: 400,
+      message: error.message
+    });
     //////////////////////////////////////
     const roleName = req.body.roleName
     if (!roleName) {
@@ -200,16 +202,16 @@ exports.editAccount = async (req, res, next) => {
 exports.updateAccount = async (req, res, next) => {
   try {
     const schema = Joi.object({ 
-      phone : Joi.string().pattern(new RegExp('(09|03|07|08|05)+([0-9]{8})')),
-      address : Joi.string().min(10).trim(),
-      gender  : Joi.array().items(Joi.string().valid('male', 'female')),
-      DOB : Joi.string().pattern(new RegExp('^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$'))
+      phone : Joi.string().pattern(new RegExp('(09|03|07|08|05)+([0-9]{8})')).message("Incorrect phone format, Ex: 0906246555"),
+      address : Joi.string().min(10).trim().message("Incorrect address format"),
+      gender  : Joi.array().items(Joi.string().valid('male', 'female')).message("Incorrect gennder format, only : 'male' or 'female'"),
+      DOB : Joi.string().pattern(new RegExp('^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$')).message("Incorrect date format, Ex : 10-10-2000"),
     });
-    const { error } = schema.validate(req.body);
-    if (error) return res.status(400).send({
-      errorCode: 400,
-      message: error.details[0].message
-    });
+      const { error } = schema.validate(req.body);
+      if (error) return res.status(400).send({
+        errorCode: 400,
+        message: error.message
+      });
   //////////////
     //const { id } = req.params
     const id = req.accountID
@@ -374,14 +376,23 @@ exports.forceDeleteUserAccount = async (req, res) => {
 
 exports.sendEmailResetPass = async (req, res) => {
   try {
-
-    //code validate
-    const schema = Joi.object({ accountEmail: Joi.string().email().required() });
+    const schema = Joi.object({ 
+      accountEmail : Joi.string().trim().min(5).email().message("Email must be in the format @gmail.com, Ex: thang1@gmail.com"),
+    });
     const { error } = schema.validate(req.body);
     if (error) return res.status(400).send({
       errorCode: 400,
-      message: error.details[0].message
+      message: error.message
     });
+    /////////////////////////
+
+    //code validate
+    // const schema = Joi.object({ accountEmail: Joi.string().email().required() });
+    // const { error } = schema.validate(req.body);
+    // if (error) return res.status(400).send({
+    //   errorCode: 400,
+    //   message: error.details[0].message
+    // });
 
     const user = await Account.findOne({ accountEmail: req.body.accountEmail });
     if (!user)
