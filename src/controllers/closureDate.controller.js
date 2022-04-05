@@ -6,8 +6,8 @@ const Joi = require("joi");
 exports.createClousureDate = async (req, res) => {
     try {
         const schema = Joi.object({ 
-            firstClosureDate: Joi.string().pattern(new RegExp("([0-9]{4}[-||/](0[1-9]|1[0-2])[-||/]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-||/](0[1-9]|1[0-2])[-||/][0-9]{4})")).message("Incorrect date format, Ex : 30/03/2022"),
-            finalClosureDate : Joi.string().pattern(new RegExp("([0-9]{4}[-||/](0[1-9]|1[0-2])[-||/]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-||/](0[1-9]|1[0-2])[-||/][0-9]{4})")).message("Incorrect date format, Ex : 30/03/2022"),
+            firstClosureDate: Joi.string().pattern(new RegExp("([0-9]{4}[/](0[1-9]|1[0-2])[/]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[/](0[1-9]|1[0-2])[/][0-9]{4})")).message("Incorrect date format, Ex : 30/03/2022"),
+            finalClosureDate : Joi.string().pattern(new RegExp("([0-9]{4}[/](0[1-9]|1[0-2])[/]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[/](0[1-9]|1[0-2])[/][0-9]{4})")).message("Incorrect date format, Ex : 30/03/2022"),
           });
             const { error } = schema.validate(req.body);
             if (error) return res.status(400).send({

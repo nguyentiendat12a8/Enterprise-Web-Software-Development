@@ -266,7 +266,8 @@ exports.listAccount = (req, res) => {
 }
 
 exports.deleteUserAccount = async (req, res) => {
-  const account = await Account.findByIdAndUpdate(req.params.accountID, { deleted: true }, { new: true })
+  try {
+    const account = await Account.findByIdAndUpdate(req.params.accountID, { deleted: true }, { new: true })
   if (!account) {
     return res.status(500).send({
       errorCode: '500',
@@ -277,6 +278,12 @@ exports.deleteUserAccount = async (req, res) => {
     errorCode: 0,
     message: 'Delete account successfully!'
   })
+  } catch (error) {
+    return res.status(500).send({
+      errorCode: '500',
+      message: error
+    })
+  }
 }
 
 exports.trashUserAccount = (req, res) => {
