@@ -19,7 +19,7 @@ exports.signup = async (req, res) => {
       // address : Joi.string().min(10).trim().message("Incorrect address format"),
       address : Joi.string().min(10).trim().error(new Error('Incorrect address format')),
       gender  : Joi.array().items(Joi.string().valid('male', 'female')).error(new Error('Incorrect gender')),
-      DOB : Joi.string().pattern(new RegExp("([0-9]{4}[-](0[1-9]|1[0-2])[-]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-](0[1-9]|1[0-2])[-][0-9]{4})")).message("Incorrect date format, Ex : 10-10-2000"),
+      DOB : Joi.string().pattern(new RegExp("([0-9]{4}[/](0[1-9]|1[0-2])[/]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[/](0[1-9]|1[0-2])[/][0-9]{4})")).message("Incorrect date format, Ex : 10-10-2000"),
       roleName : Joi.array().items(Joi.string().valid('admin', 'staff', 'QAM', "QAC")).error(new Error('Incorrect rolename')),
   
     });
@@ -230,30 +230,31 @@ exports.updateAccount = async (req, res, next) => {
 
 exports.listAccount = (req, res) => {
   try {
-    Account.find({},async (err, list) => {
+    Account.find({deleted: false},async (err, list) => {
       if (err) return res.status(500).send({
         errorCode: 500,
         message: err
       })
       var listShow = []
-      for(i = 0; i<list.length; i++){
-        var role = await Role.findById(list[i].roleID)
-        if(role === null) res.status(500).send({
+      async function getRole(e) {
+        var role = await Role.findById(e.roleID)
+        if(!role) res.status(500).send({
               errorCode: 500,
-              message: 'sai o day'
+              message: 'Role server is error!'
             })
         var show = {
-          _id: list[i]._id,
-          accountEmail: list[i].accountEmail,
-          phone: list[i].phone,
-          address: list[i].address,
-          DOB: list[i].DOB,
-          gender: list[i].gender,
+          _id: e._id,
+          accountEmail: e.accountEmail,
+          phone: e.phone,
+          //address: e.address,
+          //DOB: e.DOB,
+          //gender: e.gender,
           roleName: role.roleName
         }
-        listShow.push(show)
+        return listShow.push(show)
       }
-       
+      await Promise.all(list.map(e => getRole(e))) 
+
       return res.status(200).send({
         errorCode: 0,
         data: listShow
@@ -262,35 +263,6 @@ exports.listAccount = (req, res) => {
   } catch (error) {
     console.log(error)
   }
-  // Account.find({ deleted: false }, (err, list) => {
-  //   if (err) return res.status(500).send({
-  //     errorCode: 500,
-  //     message: err
-  //   })
-  //   var listShow = []
-  //   list.forEach(async e=>{
-  //     const role = await Role.findById(e.roleID)
-  //     if(!role) return res.status(500).send({
-  //         errorCode: 500,
-  //         message: 'Bill tour is error'
-  //     })
-
-  //     var listInfo = {
-  //       _id: e._id,
-  //       accountEmail: e.accountEmail,
-  //       phone: e.phone,
-  //       address: e.address,
-  //       DOB: e.DOB,
-  //       gender: e.gender,
-  //       roleName: role.roleName
-  //     }
-  //     listShow.push(listInfo)
-  //   })
-  //   return res.status(200).send({
-  //     errorCode: 0,
-  //     data: list,
-  //   })
-  // })
 }
 
 exports.deleteUserAccount = async (req, res) => {
