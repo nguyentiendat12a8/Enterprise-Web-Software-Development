@@ -1,7 +1,7 @@
 const express = require('express');
 const { signup, signin, sendEmailResetPass,
      confirmLink, listAccount, updatePassword,
-    editAccount, updateAccount, deleteUserAccount, trashUserAccount, restoreUserAccount, forceDeleteUserAccount, listRole } = require('../controllers/account.controller');
+    editAccount, updateAccount, deleteUserAccount, trashUserAccount, restoreUserAccount, forceDeleteUserAccount, listRole, viewDetailAccount } = require('../controllers/account.controller');
 const verifySignUp = require('../middlerwares/verifySignUp.middleware');
 const { verifyToken, isAdmin } = require('../middlerwares/jwt.middleware');
 
@@ -15,6 +15,7 @@ router.get('/edit-account', [verifyToken],editAccount)
 router.patch('/update-account', [verifyToken], updateAccount)
 
 router.get('/list-account',[verifyToken, isAdmin], listAccount)
+router.get('/view-detail-account/:accountID', [verifyToken], viewDetailAccount)
 router.patch('/delete-user-account/:accountID', [verifyToken, isAdmin], deleteUserAccount)
 router.get('/trash-user-account', [verifyToken, isAdmin], trashUserAccount)
 router.post('/restore-user-account/:accountID', [verifyToken, isAdmin], restoreUserAccount)

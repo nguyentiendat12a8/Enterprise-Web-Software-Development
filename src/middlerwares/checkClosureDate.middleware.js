@@ -8,7 +8,7 @@ exports.checkFinalClosureDate = async (req,res,next) => {
         const d = new Date()
         const ideas = await Ideas.findById(req.params.ideasID)
         const closureDate = await ClosureDate.findById(ideas.closureDateID)
-        const date = closureDate.finalClosureDate.split('/') //await closureDate.finalClosureDate.split('/')
+        const date = closureDate.finalClosureDate.split('-') //await closureDate.finalClosureDate.split('/')
 
         if (parseInt(date[2]) > parseInt(d.getFullYear())) {
             next()
@@ -52,7 +52,7 @@ exports.checkFirstClosureDate = async (req,res,next) => {
             message: 'department error'
         })
         const closureDate = await ClosureDate.findOne({departmentID: department._id})
-        const date = closureDate.firstClosureDate.split('/') //await closureDate.finalClosureDate.split('/')
+        const date = closureDate.firstClosureDate.split('-') //await closureDate.finalClosureDate.split('/')
 
         if (parseInt(date[2]) > parseInt(d.getFullYear())) {
             next()

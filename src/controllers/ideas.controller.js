@@ -18,6 +18,9 @@ const Joi = require("joi");
 exports.createIdeas = async (req, res) => {
     try {
         const schema = Joi.object({
+            departmentName: Joi.string(),
+            categoryName: Joi.string(),
+            anonymous: Joi.boolean(),
             ideasContent: Joi.string().trim().message("IdeasContent must exist"),
         });
         const { error } = schema.validate(req.body);
@@ -144,7 +147,7 @@ exports.viewDetailIdeas = async (req, res) => {
         .catch((err) => {
             return res.status(500).send({
                 errorCode: 500,
-                data: err
+                data: 'sdfdsf'
             })
         })
 }
@@ -302,6 +305,7 @@ exports.dislikeIdeas = async (req, res) => {
 exports.commentIdeas = async (req, res) => {
     const schema = Joi.object({
         commentText: Joi.string().trim().error(new Error('comment text must exist')),
+        anonymous: Joi.boolean().error(new Error('error anonymous')),
     });
     const { error } = schema.validate(req.body);
     if (error) return res.status(400).send({
@@ -316,12 +320,13 @@ exports.commentIdeas = async (req, res) => {
         ideasID,
         accountID: req.accountID
     })
-    await Promise.all([comment.save(), Ideas.findById(ideasID), Comment.countDocuments({ ideasID: ideasID })])
-        .then(async ([comment, ideas, number]) => {
+    await Promise.all([comment.save(), Ideas.findById(ideasID)])
+        .then(async ([comment, ideas]) => {
 
             var user = await Account.findById(ideas.accountID)
             link = `localhost:1000/ideas/list-comment-ideas/${ideasID}`
             await sendEmail(user.accountEmail, 'Someone commented on your idea', link)
+            const number = await Comment.countDocuments({ ideasID: ideasID })
             await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfComment: number }, { new: true })
             return res.status(200).send({
                 errorCode: 0,
