@@ -9,7 +9,7 @@ exports.createClousureDate = async (req, res) => {
             departmentName: Joi.string(),
             firstClosureDate: Joi.string().pattern(new RegExp("([0-9]{4}[-](0[1-9]|1[0-2])[-]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-](0[1-9]|1[0-2])[-][0-9]{4})")).message("Incorrect date format, Ex : 30/03/2022"),
             finalClosureDate : Joi.string().pattern(new RegExp("([0-9]{4}[-](0[1-9]|1[0-2])[-]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-](0[1-9]|1[0-2])[-][0-9]{4})")).message("Incorrect date format, Ex : 30/03/2022"),
-          });
+          })
             const { error } = schema.validate(req.body);
             if (error) return res.status(400).send({
               errorCode: 400,
@@ -17,11 +17,24 @@ exports.createClousureDate = async (req, res) => {
             });
             /////
         //10-2-2020
+        if(new Date(req.body.firstClosureDate) > new Date(req.body.finalClosureDate)){
+            return res.status(400).send({
+                errorCode: 400,
+                message: 'Final date must more than first date!'
+            })
+        }
         const department = await Department.findOne({ departmentName: req.body.departmentName })
+        if(!department) {
+            return res.status(500).send({
+                errorCode: '500',
+                message: 'department not found!'
+            })
+        }
+        const id = department._id
         const closureDate = new ClosureDate({
             firstClosureDate: req.body.firstClosureDate,
             finalClosureDate: req.body.finalClosureDate,
-            departmentID: department._id
+            departmentID: id
         })
         closureDate.save(err => {
             if (err) return res.status(500).send({
