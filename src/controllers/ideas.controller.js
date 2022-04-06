@@ -82,6 +82,18 @@ exports.createIdeas = async (req, res) => {
 exports.viewDetailIdeas = async (req, res) => {
     Promise.all([Comment.find({ ideasID: req.params.ideasID }), Ideas.findById(req.params.ideasID)])
         .then(async ([listComment, ideas]) => {
+            var checkLike = false
+            var checkDislike = false
+            var check = await Like.findOne({ideasID: req.params.ideasID, accountID: req.accountID})
+            console.log(check)
+            if(check) {
+                console.log('ádas')
+                if(check.like === true) {
+                    checkLike = true
+                } else {
+                    checkDislike =true
+                }
+            }
             async function getComment(c) {
                 if (c.anonymous === false) {
                     var user = await Account.findById(c.accountID)
@@ -140,7 +152,9 @@ exports.viewDetailIdeas = async (req, res) => {
                 errorCode: 0,
                 data: {
                     ideasShow,
-                    showComment
+                    showComment,
+                    checkLike,
+                    checkDislike
                 }
             })
         })
