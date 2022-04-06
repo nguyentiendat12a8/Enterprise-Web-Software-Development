@@ -84,13 +84,13 @@ exports.viewDetailIdeas = async (req, res) => {
         .then(async ([listComment, ideas]) => {
             var checkLike = false
             var checkDislike = false
-            var check = await Like.findOne({ideasID: req.params.ideasID, accountID: req.accountID})
+            var check = await Like.findOne({ ideasID: req.params.ideasID, accountID: req.accountID })
             console.log(check)
-            if(check) {
-                if(check.like === true) {
+            if (check) {
+                if (check.like === true) {
                     checkLike = true
                 } else {
-                    checkDislike =true
+                    checkDislike = true
                 }
             }
             async function getComment(c) {
@@ -335,7 +335,6 @@ exports.commentIdeas = async (req, res) => {
     })
     await Promise.all([comment.save(), Ideas.findById(ideasID)])
         .then(async ([comment, ideas]) => {
-
             var user = await Account.findById(ideas.accountID)
             link = `localhost:1000/ideas/list-comment-ideas/${ideasID}`
             await sendEmail(user.accountEmail, 'Someone commented on your idea', link)
