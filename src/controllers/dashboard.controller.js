@@ -2,11 +2,12 @@ const db = require('../models/index')
 const Ideas = db.ideas
 const Department = db.department
 const ClosureDate = db.closureDate
+const Category = db.category
 
 exports.dashboard = async (req, res) => {
     Promise.all([Ideas.find({ departmentID: '621dadf98ddbf30945ce2208' }), Ideas.find({ departmentID: '621dadf98ddbf30945ce220a' }),
-    Ideas.find({ departmentID: '621dadf98ddbf30945ce2209' })])
-        .then(([listIdeasIT, listIdeasGraphic, listIdeasBusiness]) => {
+    Ideas.find({ departmentID: '621dadf98ddbf30945ce2209' }), Ideas.countDocuments(), Department.countDocuments(), Category.countDocuments()])
+        .then(([listIdeasIT, listIdeasGraphic, listIdeasBusiness, countIdeas, countDepartments, countCategories]) => {
             //IT
             var numberIdeasIT = 0
             var listIDIT = []
@@ -46,6 +47,9 @@ exports.dashboard = async (req, res) => {
                 countUserIT: UserITUnique.length,
                 countUserGraphic: UserGraphicUnique.length,
                 countUserBusiness: UserBusinessUnique.length,
+                countIdeas,
+                countDepartments,
+                countCategories
             })
         })
         .catch(error => {
