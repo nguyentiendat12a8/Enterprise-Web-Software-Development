@@ -16,7 +16,6 @@ exports.createClousureDate = async (req, res) => {
               message: error.message
             });
             /////
-        //10-2-2020
         if(new Date(req.body.firstClosureDate) > new Date(req.body.finalClosureDate)){
             return res.status(400).send({
                 errorCode: 400,

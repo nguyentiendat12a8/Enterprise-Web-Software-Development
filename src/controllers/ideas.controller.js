@@ -360,15 +360,15 @@ exports.downloadIdeas = async (req, res) => {
         for (i = 0; i < ideas.length; i++) {
             var closureDate = await ClosureDate.findById(ideas[i].closureDateID)
             var date = await closureDate.finalClosureDate.split('/')
-            if (parseInt(date[2]) < parseInt(d.getFullYear())) { 
+            if (parseInt(date[0]) < parseInt(d.getFullYear())) { 
                 const { ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = ideas[i]
                 listDown.push({ ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
-            } else if (parseInt(date[2]) === parseInt(d.getFullYear())) {
+            } else if (parseInt(date[0]) === parseInt(d.getFullYear())) {
                 if (parseInt(date[1]) < (parseInt(d.getMonth()) + 1)) {
                     const { ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = ideas[i]
                     listDown.push({ ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
                 } else if (parseInt(date[1]) === (parseInt(d.getMonth()) + 1)) {
-                    if (parseInt(date[0]) < parseInt(d.getDate())) {
+                    if (parseInt(date[2]) < parseInt(d.getDate())) {
                         const { ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = ideas[i]
                         listDown.push({ ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
                     }

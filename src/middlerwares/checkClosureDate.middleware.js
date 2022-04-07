@@ -9,13 +9,13 @@ exports.checkFinalClosureDate = async (req,res,next) => {
         const ideas = await Ideas.findById(req.params.ideasID)
         const closureDate = await ClosureDate.findById(ideas.closureDateID)
         const date = closureDate.finalClosureDate.split('-') 
-        if (parseInt(date[2]) > parseInt(d.getFullYear())) {
+        if (parseInt(date[0]) > parseInt(d.getFullYear())) {
             next()
-        } else if (parseInt(date[2]) === parseInt(d.getFullYear())) {
+        } else if (parseInt(date[0]) === parseInt(d.getFullYear())) {
             if (parseInt(date[1]) > (parseInt(d.getMonth()) + 1)) {
                 next()
             } else if (parseInt(date[1]) === (parseInt(d.getMonth()) + 1)) {
-                if (parseInt(date[0]) > parseInt(d.getDate())) {
+                if (parseInt(date[2]) > parseInt(d.getDate())) {
                     next()
                 } else {
                     return res.status(401).send({
@@ -53,13 +53,13 @@ exports.checkFirstClosureDate = async (req,res,next) => {
         const closureDate = await ClosureDate.findOne({departmentID: department._id})
         const date = closureDate.firstClosureDate.split('-') 
 
-        if (parseInt(date[2]) > parseInt(d.getFullYear())) {
+        if (parseInt(date[0]) > parseInt(d.getFullYear())) {
             next()
-        } else if (parseInt(date[2]) === parseInt(d.getFullYear())) {
+        } else if (parseInt(date[0]) === parseInt(d.getFullYear())) {
             if (parseInt(date[1]) > (parseInt(d.getMonth()) + 1)) {
                 next()
             } else if (parseInt(date[1]) === (parseInt(d.getMonth()) + 1)) {
-                if (parseInt(date[0]) > parseInt(d.getDate())) {
+                if (parseInt(date[2]) > parseInt(d.getDate())) {
                     next()
                 } else {
                     return res.status(401).send({
@@ -86,17 +86,18 @@ exports.checkFirstClosureDate = async (req,res,next) => {
 }
 
 
-// exports.checkDownload = async (req,res,next) => {
-//     try {
-//         const d = new Date()
-//         var closureDate = await ClosureDate.findById(e.closureDateID)
-//             var date = closureDate.finalClosureDate.split('/')
-
-        
-//     }
-//     catch (err) {
-//         console.log(err)
-//     }
-// }
+exports.checkAddClosureDate = async (req,res,next) => {
+    const department = await Department.findOne({departmentName: req.body.departmentName})
+    if (!department) return res.status(400).send({
+        errorCode: 400,
+        message: 'You must be select department name!'
+    })
+    const check =  ClosureDate.findOne({departmentID: check._id})
+    if (check) return res.status(400).send({
+        errorCode: 400,
+        message: 'Each department has only 1 timeline!'
+    })
+    next()
+}
 
 
