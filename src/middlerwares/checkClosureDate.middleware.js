@@ -92,7 +92,7 @@ exports.checkAddClosureDate = async (req,res,next) => {
         errorCode: 400,
         message: 'You must be select department name!'
     })
-    const check =  ClosureDate.findOne({departmentID: check._id})
+    const check = await ClosureDate.findOne({departmentID: department._id})
     if (check) return res.status(400).send({
         errorCode: 400,
         message: 'Each department has only 1 timeline!'

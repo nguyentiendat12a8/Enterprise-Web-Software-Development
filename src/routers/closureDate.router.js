@@ -7,6 +7,6 @@ const router = express.Router();
 router.post('/create-closure-date',[verifyToken, isAdmin, checkAddClosureDate], createClousureDate)
 router.get('/list-closure-date', [verifyToken, isAdmin],listClosureDate)
 router.get('/edit-closure-date/:closureDateID', [verifyToken, isAdmin], editClosureDate)
-router.post('/update-closure-date/:closureDateID', [verifyToken, isAdmin], updateClosureDate)
+router.put('/update-closure-date/:closureDateID', [verifyToken, isAdmin], updateClosureDate)
 
 module.exports = router
