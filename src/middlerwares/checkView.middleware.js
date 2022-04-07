@@ -14,9 +14,9 @@ exports.checkView = async (req, res, next) => {
             accountID,
             ideasID
         })
-        await Promise.all([view.save(), View.find({ ideasID })])
+        await Promise.all([view.save(), View.countDocuments({ ideasID })])
         .then(async ([view,number]) => {
-            await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfView: number.length }, { new: true })
+            await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfView: number }, { new: true })
         next()
         })
         .catch(err => next())
