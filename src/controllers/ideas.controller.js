@@ -85,7 +85,6 @@ exports.viewDetailIdeas = async (req, res) => {
             var checkLike = false
             var checkDislike = false
             var check = await Like.findOne({ ideasID: req.params.ideasID, accountID: req.accountID })
-            console.log(check)
             if (check) {
                 if (check.like === true) {
                     checkLike = true
