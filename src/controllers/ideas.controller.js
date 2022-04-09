@@ -17,6 +17,7 @@ const Joi = require("joi");
 
 exports.createIdeas = async (req, res) => {
     try {
+        // validate input
         const schema = Joi.object({
             departmentName: Joi.string(),
             categoryName: Joi.string(),
@@ -36,7 +37,7 @@ exports.createIdeas = async (req, res) => {
                     ideasContent: req.body.ideasContent,
                     ideasFile: req.file.path,
                     closureDateID: closureDate._id,
-                    accountID: req.accountID, // req.accountID,
+                    accountID: req.accountID, 
                     departmentID: department._id,
                     categoryID: category._id,
                     anonymous: req.body.anonymous
@@ -47,23 +48,21 @@ exports.createIdeas = async (req, res) => {
                         errorCode: 500,
                         message: err
                     })
+                    //send mail to QAC
                     if (req.body.departmentName === 'IT') {
-                        //const role = await Role.findOne({ roleName: 'QA of IT' })
-                        const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21fe' })
+                        const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21fe' }) //role id of QA of IT
                         const email = user.accountEmail
                         const link = `localhost:1000/ideas/${ideas._id}`
                         await sendEmail(email, 'New ideas uploaded', link)
                     }
                     else if (req.body.departmentName === 'business') {
-                        //const role = await Role.findOne({ roleName: 'QA of business' })
-                        const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21ff' })
+                        const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21ff' })//role id of QA of business
                         const email = user.accountEmail
                         const link = `localhost:1000/ideas/${ideas._id}`
                         await sendEmail(email, 'New ideas uploaded', link)
                     }
                     else {
-                        //const role = await Role.findOne({ roleName: 'QA of graphic design' })
-                        const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce2200' })
+                        const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce2200' })//role id of QA of graphic design
                         const email = user.accountEmail
                         const link = `localhost:1000/ideas/${ideas._id}`
                         await sendEmail(email, 'New ideas uploaded', link)
@@ -315,6 +314,7 @@ exports.dislikeIdeas = async (req, res) => {
 }
 
 exports.commentIdeas = async (req, res) => {
+    // validate input
     const schema = Joi.object({
         commentText: Joi.string().trim().error(new Error('comment text must exist')),
         anonymous: Joi.boolean().error(new Error('error anonymous')),

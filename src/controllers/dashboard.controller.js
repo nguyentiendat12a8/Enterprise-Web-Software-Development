@@ -11,6 +11,7 @@ exports.dashboard = async (req, res) => {
             //IT
             var numberIdeasIT = 0
             var listIDIT = []
+            var numberViewIT = 0
             listIdeasIT.forEach(async e => {
                 // var year = e.createdAt
                 // if (parseInt(year.getFullYear()) === 2022) {
@@ -18,24 +19,29 @@ exports.dashboard = async (req, res) => {
                 // }
                 listIDIT.push(e.accountID.toString())
                 numberIdeasIT++
+                numberViewIT += e.numberOfView
             })
             let UserITUnique = listIDIT.filter((v, i) => listIDIT.indexOf(v) === i)
 
             //graphic
             var numberIdeasGraphic = 0
             var listIDGraphic = []
+            var numberViewGraphic = 0
             listIdeasGraphic.forEach(e => {
                 listIDGraphic.push(e.accountID.toString())
                 numberIdeasGraphic++
+                numberViewGraphic += e.numberOfView
             })
             let UserGraphicUnique = listIDGraphic.filter((v, i) => listIDGraphic.indexOf(v) === i)
 
             //business
             var numberIdeasBusiness = 0
             var listIDBusiness = []
+            var numberViewBusiness = 0
             listIdeasBusiness.forEach(e => {
                 listIDBusiness.push(e.accountID.toString())
                 numberIdeasBusiness++
+                numberViewBusiness += e.numberOfView
             })
             let UserBusinessUnique = listIDBusiness.filter((v, i) => listIDBusiness.indexOf(v) === i)
 
@@ -49,7 +55,10 @@ exports.dashboard = async (req, res) => {
                 countUserBusiness: UserBusinessUnique.length,
                 countIdeas,
                 countDepartments,
-                countCategories
+                countCategories,
+                numberViewIT,
+                numberViewGraphic,
+                numberViewBusiness
             })
         })
         .catch(error => {
