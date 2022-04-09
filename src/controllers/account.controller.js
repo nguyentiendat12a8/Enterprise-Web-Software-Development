@@ -272,9 +272,9 @@ exports.listAccount = (req, res) => {
           _id: e._id,
           accountEmail: e.accountEmail,
           phone: e.phone,
-          //address: e.address,
-          //DOB: e.DOB,
-          //gender: e.gender,
+          address: e.address,
+          DOB: e.DOB,
+          gender: e.gender,
           roleName: role.roleName
         }
         return listShow.push(show)
