@@ -6,7 +6,7 @@ exports.Account = mongoose.model(
     new mongoose.Schema({
         accountEmail: {type: String, required: true},
         accountPassword: {type: String, required: true},
-        phone: {type: Number, required: true},
+        phone: {type: String, required: true},
         address: String,
         gender:String,
         DOB: {type: String},
