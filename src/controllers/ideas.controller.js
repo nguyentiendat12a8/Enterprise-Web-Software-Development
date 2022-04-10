@@ -83,6 +83,8 @@ exports.viewDetailIdeas = async (req, res) => {
         .then(async ([listComment, ideas]) => {
             var checkLike = false
             var checkDislike = false
+            const department = await Department.findById(ideas.departmentID)
+            const category = await Category.findById(ideas.categoryID)
             var check = await Like.findOne({ ideasID: req.params.ideasID, accountID: req.accountID })
             if (check) {
                 if (check.like === true) {
@@ -129,8 +131,8 @@ exports.viewDetailIdeas = async (req, res) => {
                     numberOfDislike: ideas.numberOfDislike,
                     numberOfComment: ideas.numberOfComment,
                     numberOfView: ideas.numberOfView,
-                    // departmentName: department.departmentName,
-                    // categoryName: category.categoryName,
+                    departmentName: department.departmentName,
+                    categoryName: category.categoryName,
                 }
             } else {
                 var ideasShow = {
@@ -141,8 +143,8 @@ exports.viewDetailIdeas = async (req, res) => {
                     numberOfDislike: ideas.numberOfDislike,
                     numberOfComment: ideas.numberOfComment,
                     numberOfView: ideas.numberOfView,
-                    // departmentName: department.departmentName,
-                    // categoryName: category.categoryName,
+                    departmentName: department.departmentName,
+                    categoryName: category.categoryName,
                 }
             }
             return res.status(200).send({
