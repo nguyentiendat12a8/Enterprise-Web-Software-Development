@@ -136,7 +136,7 @@ exports.signin = async (req, res, next) => {
 exports.updatePassword = async (req, res, next) => {
   try {
     const schema = Joi.object({
-      accountPassword: Joi.string().required().message('Enter old password'),
+      accountPassword: Joi.string().required(),
       newAccountPassword: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$')).message("NewPassword must have at least 6 characters and maximum 30 characters"),
       newAccountPasswordAgain: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$')).message("NewPasswordAgain must have at least 6 characters and maximum 30 characters"),
     });
@@ -160,7 +160,9 @@ exports.updatePassword = async (req, res, next) => {
     }
     if (bcrypt.compareSync(password, user.accountPassword)) {
       await Account.findByIdAndUpdate({ _id: id }, { accountPassword: bcrypt.hashSync(newAccountPassword) }, { new: true })
-      return res.status(200).send({ message: 'Change password successfully!' })
+      return res.status(200).send({ 
+        errorCode: 0,
+        message: 'Change password successfully!' })
     }
     else {
       return res.status(400).send({
