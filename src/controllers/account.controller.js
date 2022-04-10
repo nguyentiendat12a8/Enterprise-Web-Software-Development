@@ -20,7 +20,7 @@ exports.signup = async (req, res) => {
       address: Joi.string().min(10).message("Address must be more than 10 characters"),
       gender: Joi.string().valid('male', 'female'),
       DOB: Joi.string().pattern(new RegExp("([0-9]{4}[-](0[1-9]|1[0-2])[-]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-](0[1-9]|1[0-2])[-][0-9]{4})")).message("Incorrect date format, Ex : 10-10-2000"),
-      roleName: Joi.string().valid('admin', 'staff', 'QAM', "QAC")
+      roleName: Joi.string().required()
 
     });
     const { error } = schema.validate(req.body);
