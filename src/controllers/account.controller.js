@@ -100,11 +100,11 @@ exports.signin = async (req, res, next) => {
         message: "All input is required",
       });
     }
-    const user = await Account.findOne({ accountEmail: accountEmail });
+    const user = await Account.findOne({ accountEmail: accountEmail, deleted: false });
     if (!user) {
       return res.status(404).json({
         errorCode: "404",
-        message: "User not found ~~~",
+        message: "User not found!",
       });
     }
 
