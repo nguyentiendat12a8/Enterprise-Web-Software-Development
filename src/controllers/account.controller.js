@@ -136,6 +136,7 @@ exports.signin = async (req, res, next) => {
 exports.updatePassword = async (req, res, next) => {
   try {
     const schema = Joi.object({
+      accountPassword: Joi.string().required().message('Enter old password'),
       newAccountPassword: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$')).message("NewPassword must have at least 6 characters and maximum 30 characters"),
       newAccountPasswordAgain: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$')).message("NewPasswordAgain must have at least 6 characters and maximum 30 characters"),
     });
