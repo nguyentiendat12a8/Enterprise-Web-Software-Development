@@ -95,8 +95,8 @@ exports.signin = async (req, res, next) => {
     ////////////////
     const { accountEmail, accountPassword } = req.body;
     if (!(accountEmail && accountPassword)) {
-      res.status(500).json({
-        errorCode: 500,
+      res.status(400).json({
+        errorCode: 400,
         message: "All input is required",
       });
     }
