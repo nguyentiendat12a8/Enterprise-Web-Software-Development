@@ -234,7 +234,7 @@ exports.updateAccount = async (req, res, next) => {
       phone: Joi.string().pattern(new RegExp('(09|03|07|08|05)+([0-9]{8})')).message("Incorrect phone format, Ex: 0906246555"),
       address: Joi.string().min(10).message("Address must be more than 10 characters"),
       gender: Joi.string().valid('male', 'female'),
-      DOB: Joi.string().pattern(new RegExp("([0-9]{4}[-](0[1-9]|1[0-2])[-]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-](0[1-9]|1[0-2])[-][0-9]{4})")).message("Incorrect date format, Ex : 10/10/2000"),
+      DOB: Joi.string().pattern(new RegExp("([0-9]{4}[-](0[1-9]|1[0-2])[-]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-](0[1-9]|1[0-2])[-][0-9]{4})")).message("Incorrect date format, Ex : 2000-10-10"),
     });
     const { error } = schema.validate(req.body);
     if (error) return res.status(400).send({
