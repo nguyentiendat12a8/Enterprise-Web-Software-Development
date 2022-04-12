@@ -380,8 +380,6 @@ exports.forceDeleteUserAccount = async (req, res) => {
 }
 
 
-
-
 exports.sendEmailResetPass = async (req, res) => {
   try {
     const schema = Joi.object({
