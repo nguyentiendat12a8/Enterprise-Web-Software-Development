@@ -391,15 +391,6 @@ exports.sendEmailResetPass = async (req, res) => {
       message: error.message
     });
     /////////////////////////
-
-    //code validate
-    // const schema = Joi.object({ accountEmail: Joi.string().email().required() });
-    // const { error } = schema.validate(req.body);
-    // if (error) return res.status(400).send({
-    //   errorCode: 400,
-    //   message: error.details[0].message
-    // });
-
     const user = await Account.findOne({ accountEmail: req.body.accountEmail });
     if (!user)
       return res.status(400).send("user with given email doesn't exist");
