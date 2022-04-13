@@ -82,7 +82,7 @@ exports.createIdeas = async (req, res) => {
                         categoryID: category._id,
                         anonymous: req.body.anonymous
                     })
-                                    await ideas.save(async (err, ideas) => {
+                    await ideas.save(async (err, ideas) => {
                     if (err) res.status(500).send({
                         errorCode: 500,
                         message: err
@@ -114,7 +114,10 @@ exports.createIdeas = async (req, res) => {
                 }
             })
     } catch (error) {
-        console.log(error)
+        res.status(500).send({
+            errorCode: 500,
+            message: 'Upload ideas is error!'
+        })
     }
 }
 
