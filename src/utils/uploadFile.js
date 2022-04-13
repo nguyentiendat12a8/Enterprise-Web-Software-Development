@@ -13,19 +13,20 @@ const storage = multer.diskStorage({
 
 exports.upload = multer({
     storage: storage,
-    fileFilter: function(req, file, callback) {
+    fileFilter: function(req, res, file, callback) {
         if(
             file.mimetype =="application/pdf" ||
             file.mimetype == 'application/msword'
         ){
             callback(null, true)
         }else {
-            console.log('only doc/pdf file supported')
+            return res.status(400).send({
+                errorCode: 400,
+                message: 'only doc/pdf file supported!'
+            })
+            
             callback(null,false)
         }
     },
-    // limits: {
-    //     fileSize: 1024 * 1024 * 2
-    // }
 })
 
