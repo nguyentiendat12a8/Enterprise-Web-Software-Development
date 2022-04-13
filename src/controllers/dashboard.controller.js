@@ -42,28 +42,10 @@ exports.dashboard = async (req, res) => {
             let UserBusinessUnique = listIDBusiness.filter((v, i) => listIDBusiness.indexOf(v) === i)
 
             var dataIdeas = []
-            var IT = {
-                IT: numberIdeasIT
-            }
-            var GD = {
-                GD: numberIdeasGraphic
-            }
-            var BI = {
-                BI: numberIdeasBusiness
-            }
-            
-            dataCountUser.push(IT, GD, BI)
+            dataIdeas.push(numberIdeasIT,numberIdeasGraphic,numberIdeasBusiness)
+
             var dataCountUser = []
-            var ITUser = {
-                ITUser :  UserITUnique.length
-            }
-            var GDUser = {
-                GDUser : UserGraphicUnique.length,
-            }
-            var BIUser = {
-                BIUser : UserBusinessUnique.length
-            }
-            dataIdeas.push(ITUser,GDUser,BIUser)
+            dataCountUser.push(UserITUnique.length,UserGraphicUnique.length,UserBusinessUnique.length)
 
             var dataCountView = []
             dataCountView.push(numberViewIT,numberViewGraphic,numberViewBusiness)
@@ -75,8 +57,14 @@ exports.dashboard = async (req, res) => {
                 countIdeas,
                 countDepartments,
                 countCategories,
-                dataIdeas, 
-                dataCountUser,
+                dataIdeas: {
+                    dataIdeas,
+                    labels
+                },
+                dataCountUser: {
+                    dataCountUser,
+                    labels
+                },
                 dataView : {
                     dataCountView,
                     labels
