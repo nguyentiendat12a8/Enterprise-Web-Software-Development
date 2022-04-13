@@ -51,8 +51,8 @@ exports.dashboard = async (req, res) => {
             var BI = {
                 BI: numberIdeasBusiness
             }
-            dataIdeas.push(IT, GD, BI)
-
+            
+            dataCountUser.push(IT, GD, BI)
             var dataCountUser = []
             var ITUser = {
                 ITUser :  UserITUnique.length
@@ -63,7 +63,7 @@ exports.dashboard = async (req, res) => {
             var BIUser = {
                 BIUser : UserBusinessUnique.length
             }
-            dataCountUser.push(ITUser,GDUser,BIUser)
+            dataIdeas.push(ITUser,GDUser,BIUser)
 
             var dataCountView = []
             dataCountView.push(numberViewIT,numberViewGraphic,numberViewBusiness)
