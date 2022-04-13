@@ -20,12 +20,11 @@ exports.upload = multer({
         ){
             callback(null, true)
         }else {
+            callback(null,false)
             return res.status(400).send({
                 errorCode: 400,
                 message: 'only doc/pdf file supported!'
             })
-            
-            callback(null,false)
         }
     },
 })
