@@ -13,10 +13,6 @@ exports.dashboard = async (req, res) => {
             var listIDIT = []
             var numberViewIT = 0
             listIdeasIT.forEach(async e => {
-                // var year = e.createdAt
-                // if (parseInt(year.getFullYear()) === 2022) {
-                //     numberIdeasIT++
-                // }
                 listIDIT.push(e.accountID.toString())
                 numberIdeasIT++
                 numberViewIT += e.numberOfView
@@ -70,16 +66,9 @@ exports.dashboard = async (req, res) => {
             dataCountUser.push(ITUser,GDUser,BIUser)
 
             var dataCountView = []
-            var ITView = {
-                ITView :  numberViewIT
-            }
-            var GDView = {
-                GDView : numberViewGraphic,
-            }
-            var BIView = {
-                BIView : numberViewBusiness
-            }
-            dataCountView.push(ITView,GDView,BIView)
+            dataCountView.push(numberViewIT,numberViewGraphic,numberViewBusiness)
+            const labels = ['IT', 'GD', 'BI']
+            
 
             return res.status(200).send({
                 errorCode: 0,                
@@ -88,7 +77,10 @@ exports.dashboard = async (req, res) => {
                 countCategories,
                 dataIdeas, 
                 dataCountUser,
-                dataCountView
+                dataView : {
+                    dataCountView,
+                    labels
+                }
             })
         })
         .catch(error => {
