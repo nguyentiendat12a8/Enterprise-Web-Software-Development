@@ -415,10 +415,15 @@ exports.sendEmailResetPass = async (req, res) => {
     const link = `localhost:${process.env.BASE_URL}/user/confirmLink/${user._id}/${token.token}`;
     await sendEmail(user.accountEmail, "Password reset", link);
 
-    res.send("password reset link sent to your email account");
+    return res.status(200).send({
+      errorCode: 0,
+      message: "password reset link sent to your email account"
+      })
   } catch (error) {
-    res.send("An error occured");
-    console.log(error);
+    return res.status(200).send({
+      errorCode: 0,
+      message: "send mail error!"
+      })
   }
 }
 
