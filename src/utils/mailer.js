@@ -5,7 +5,7 @@ const sendEmail = async (email, subject, text) => {
     try {
         const transporter = nodemailer.createTransport({
             //host: 'smtp.gmail.com',
-            //host: "smtp.ethereal.email",
+            host: "webideasgreenwich.herokuapp.com",
             service: 'gmail',
             //port: 588,
             //secure: false,
