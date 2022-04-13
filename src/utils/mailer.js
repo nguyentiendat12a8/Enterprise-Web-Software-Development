@@ -4,14 +4,14 @@ const sendEmail = async (email, subject, text) => {
     let transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: process.env.USER || 'abc@gmail.com', // TODO: your gmail account
-            pass: process.env.PASS || '1234' // TODO: your gmail password
+            user: 'datntgch18760@fpt.edu.vn', // TODO: your gmail account
+            pass: 'Nguyendat102' // TODO: your gmail password
         }
     });
     
     // Step 2
     let mailOptions = {
-        from: process.env.USER, // TODO: email sender
+        from: 'datntgch18760@fpt.edu.vn', // TODO: email sender
         to: 'nguyentiendat12a8@gmail.com', // TODO: email receiver
         subject: 'Nodemailer - Test',
         text: 'Wooohooo it works!!'
