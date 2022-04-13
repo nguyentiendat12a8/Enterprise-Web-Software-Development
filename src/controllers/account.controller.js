@@ -411,8 +411,8 @@ exports.sendEmailResetPass = async (req, res) => {
       message: "password reset link sent to your email account"
       })
   } catch (error) {
-    return res.status(200).send({
-      errorCode: 0,
+    return res.status(500).send({
+      errorCode: 500,
       message: "send mail error!"
       })
   }
