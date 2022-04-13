@@ -18,20 +18,20 @@ exports.checkFinalClosureDate = async (req,res,next) => {
                 if (parseInt(date[2]) > parseInt(d.getDate())) {
                     next()
                 } else {
-                    return res.status(401).send({
-                        errorCode: 401,
+                    return res.status(400).send({
+                        errorCode: 400,
                         message: 'Time is expired!'
                     })
                 }
             } else {
-                return res.status(401).send({
-                    errorCode: 401,
+                return res.status(400).send({
+                    errorCode: 400,
                     message: 'Time is expired!'
                 })
             }
         } else {
-            return res.status(401).send({
-                errorCode: 401,
+            return res.status(400).send({
+                errorCode: 400,
                 message: 'Time is expired!'
             })
         }
@@ -62,20 +62,20 @@ exports.checkFirstClosureDate = async (req,res,next) => {
                 if (parseInt(date[2]) > parseInt(d.getDate())) {
                     next()
                 } else {
-                    return res.status(401).send({
-                        errorCode: 401,
+                    return res.status(400).send({
+                        errorCode: 400,
                         message: 'Time is expired!'
                     })
                 }
             } else {
-                return res.status(401).send({
-                    errorCode: 401,
+                return res.status(400).send({
+                    errorCode: 400,
                     message: 'Time is expired!'
                 })
             }
         } else {
-            return res.status(401).send({
-                errorCode: 401,
+            return res.status(400).send({
+                errorCode: 400,
                 message: 'Time is expired!'
             })
         }
