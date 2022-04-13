@@ -4,18 +4,19 @@ const sendEmail = async (email, subject, text) => {
     
     try {
         const transporter = nodemailer.createTransport({
+            //host: 'smtp.ethereal.email',
             host: "smtp.ethereal.email",
             service: 'gmail',
-            port: 587,
-            secure: false,
+            //port: 588,
+            //secure: false,
             auth: {
-                user: 'nguyentiendat.testnode@gmail.com',
-                pass:'dat123456',
+                user: process.env.USER,
+                pass: process.env.PASS,
             },
         });
 
         await transporter.sendMail({
-            from: 'nguyentiendat.testnode@gmail.com',
+            from: process.env.USER,
             to: email,
             subject: subject,
             text: text,
