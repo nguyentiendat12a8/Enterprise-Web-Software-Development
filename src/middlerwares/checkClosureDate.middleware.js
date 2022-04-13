@@ -83,7 +83,7 @@ exports.checkFirstClosureDate = async (req,res,next) => {
     catch (err) {
         res.status(500).send({
             errorCode: 500,
-            message: 'Time is expired!'
+            message: 'Date server is error!'
         })
     }
 }
