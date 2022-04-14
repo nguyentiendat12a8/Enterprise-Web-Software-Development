@@ -57,7 +57,10 @@ exports.signup = async (req, res) => {
       })
     })
   } catch (error) {
-    console.log(error)
+    return res.status(500).send({
+      errorCode: 500,
+      message: "Signup is error!"
+    })
   }
 }
 
@@ -65,7 +68,7 @@ exports.listRole = async (req, res) => {
   Role.find({}, (err, list) => {
     if (err) return res.status(500).send({
       errorCode: 500,
-      message: err
+      message: 'Role server is error!'
     })
     var show = []
     list.forEach(e => {
@@ -129,7 +132,10 @@ exports.signin = async (req, res, next) => {
       })
     }
   } catch (err) {
-    return console.log(err);
+    return res.status(500).send({
+      errorCode: 500,
+      message: "Signin is error!"
+    })
   }
 }
 
@@ -160,9 +166,10 @@ exports.updatePassword = async (req, res, next) => {
     }
     if (bcrypt.compareSync(password, user.accountPassword)) {
       await Account.findByIdAndUpdate({ _id: id }, { accountPassword: bcrypt.hashSync(newAccountPassword) }, { new: true })
-      return res.status(200).send({ 
+      return res.status(200).send({
         errorCode: 0,
-        message: 'Change password successfully!' })
+        message: 'Change password successfully!'
+      })
     }
     else {
       return res.status(400).send({
@@ -262,7 +269,7 @@ exports.listAccount = (req, res) => {
     Account.find({ deleted: false }, async (err, list) => {
       if (err) return res.status(500).send({
         errorCode: 500,
-        message: err
+        message: 'Account server is error!'
       })
       var listShow = []
       async function getRole(e) {
@@ -310,7 +317,7 @@ exports.deleteUserAccount = async (req, res) => {
   } catch (error) {
     return res.status(500).send({
       errorCode: '500',
-      message: error
+      message: 'Delete function is error!'
     })
   }
 }
@@ -318,8 +325,8 @@ exports.deleteUserAccount = async (req, res) => {
 exports.trashUserAccount = (req, res) => {
   Account.find({ deleted: true }, async (err, listDelete) => {
     if (err) return res.status(500).send({
-      errorCode: 0,
-      message: err
+      errorCode: 500,
+      message: 'Account server is error!'
     })
     var listDeleteShow = []
     for (i = 0; i < listDelete.length; i++) {
@@ -340,10 +347,6 @@ exports.trashUserAccount = (req, res) => {
       }
       listDeleteShow.push(listInfo)
     }
-    if (err) return res.status(500).send({
-      errorCode: 500,
-      message: err
-    })
     return res.status(200).send({
       errorCode: 0,
       data: listDeleteShow,
@@ -357,7 +360,7 @@ exports.restoreUserAccount = (req, res) => {
   Account.findByIdAndUpdate(req.params.accountID, { deleted: false }, { new: true }, (err) => {
     if (err) return res.status(500).send({
       errorCode: 500,
-      message: err
+      message: 'Account server is error!'
     })
     return res.status(200).send({
       errorCode: 0,
@@ -409,12 +412,12 @@ exports.sendEmailResetPass = async (req, res) => {
     return res.status(200).send({
       errorCode: 0,
       message: "password reset link sent to your email account"
-      })
+    })
   } catch (error) {
     return res.status(500).send({
       errorCode: 500,
-      message: "send mail error!"
-      })
+      message: "send mail is error!"
+    })
   }
 }
 
@@ -428,20 +431,28 @@ exports.confirmLink = async (req, res) => {
     })
 
     const user = await Account.findById(req.params.accountID);
-    if (!user) return res.status(400).send("invalid link or expired 1 ");
+    if (!user) return res.status(400).send({
+      errorCode: 400,
+      message: "invalid link or expired 1 "
+    })
 
     const token = await ResetPassword.findOne({
       accountID: user._id,
       token: req.params.token,
-    });
-    if (!token) return res.status(400).send("Invalid link or expired 2 ");
+    })
+    if (!token) return res.status(400).send({
+      errorCode: 400,
+      message: "Invalid link or expired 2 "
+    })
 
     user.accountPassword = bcrypt.hashSync(req.body.accountPassword, 8)
-    await user.save();
-    await token.delete();
-    res.send("password reset sucessfully.");
+    await user.save()
+    await token.delete()
+    res.send("password reset sucessfully.")
   } catch (error) {
-    res.send("An error occured");
-    console.log(error);
+    return res.status(500).send({
+      errorCode: 500,
+      message: "change password is error!"
+    })
   }
 }

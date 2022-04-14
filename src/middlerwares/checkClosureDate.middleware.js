@@ -3,12 +3,12 @@ const Ideas = db.ideas
 const ClosureDate = db.closureDate
 const Department = db.department
 
-exports.checkFinalClosureDate = async (req,res,next) => {
+exports.checkFinalClosureDate = async (req, res, next) => {
     try {
         const d = new Date()
         const ideas = await Ideas.findById(req.params.ideasID)
         const closureDate = await ClosureDate.findById(ideas.closureDateID)
-        const date = closureDate.finalClosureDate.split('-') 
+        const date = closureDate.finalClosureDate.split('-')
         if (parseInt(date[0]) > parseInt(d.getFullYear())) {
             next()
         } else if (parseInt(date[0]) === parseInt(d.getFullYear())) {
@@ -37,21 +37,24 @@ exports.checkFinalClosureDate = async (req,res,next) => {
         }
     }
     catch (err) {
-        console.log(err)
+        return res.status(500).send({
+            errorCode: 500,
+            message: 'Closure date server is error'
+        })
     }
 }
 
 
-exports.checkFirstClosureDate = async (req,res,next) => {
+exports.checkFirstClosureDate = async (req, res, next) => {
     try {
         const d = new Date()
-        const department = await Department.findOne({departmentName: req.body.departmentName})
-        if(department === null) return res.status(500).send({
+        const department = await Department.findOne({ departmentName: req.body.departmentName })
+        if (department === null) return res.status(500).send({
             errorCode: 500,
             message: 'department error'
         })
-        const closureDate = await ClosureDate.findOne({departmentID: department._id})
-        const date = closureDate.firstClosureDate.split('-') 
+        const closureDate = await ClosureDate.findOne({ departmentID: department._id })
+        const date = closureDate.firstClosureDate.split('-')
 
         if (parseInt(date[0]) > parseInt(d.getFullYear())) {
             next()
@@ -89,13 +92,13 @@ exports.checkFirstClosureDate = async (req,res,next) => {
 }
 
 
-exports.checkAddClosureDate = async (req,res,next) => {
-    const department = await Department.findOne({departmentName: req.body.departmentName})
+exports.checkAddClosureDate = async (req, res, next) => {
+    const department = await Department.findOne({ departmentName: req.body.departmentName })
     if (!department) return res.status(400).send({
         errorCode: 400,
         message: 'You must be select department name!'
     })
-    const check = await ClosureDate.findOne({departmentID: department._id})
+    const check = await ClosureDate.findOne({ departmentID: department._id })
     if (check) return res.status(400).send({
         errorCode: 400,
         message: 'Each department has only 1 timeline!'

@@ -33,12 +33,12 @@ exports.createIdeas = async (req, res) => {
         Promise.all([Department.findOne({ departmentName: req.body.departmentName }), Category.findOne({ categoryName: req.body.categoryName })])
             .then(async ([department, category]) => {
                 const closureDate = await ClosureDate.findOne({ departmentID: department._id })
-                if(req.file){
+                if (req.file) {
                     const ideas = new Ideas({
                         ideasContent: req.body.ideasContent,
                         ideasFile: req.file.path,
                         closureDateID: closureDate._id,
-                        accountID: req.accountID, 
+                        accountID: req.accountID,
                         departmentID: department._id,
                         categoryID: category._id,
                         anonymous: req.body.anonymous
@@ -77,40 +77,40 @@ exports.createIdeas = async (req, res) => {
                         ideasContent: req.body.ideasContent,
                         //ideasFile: req.file.path,
                         closureDateID: closureDate._id,
-                        accountID: req.accountID, 
+                        accountID: req.accountID,
                         departmentID: department._id,
                         categoryID: category._id,
                         anonymous: req.body.anonymous
                     })
                     await ideas.save(async (err, ideas) => {
-                    if (err) res.status(500).send({
-                        errorCode: 500,
-                        message: err
+                        if (err) res.status(500).send({
+                            errorCode: 500,
+                            message: 'Save ideas is error!'
+                        })
+                        //send mail to QAC
+                        if (req.body.departmentName === 'IT') {
+                            const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21fe' }) //role id of QA of IT
+                            const email = user.accountEmail
+                            const link = `localhost:1000/ideas/${ideas._id}`
+                            await sendEmail(email, 'New ideas uploaded', link)
+                        }
+                        else if (req.body.departmentName === 'business') {
+                            const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21ff' })//role id of QA of business
+                            const email = user.accountEmail
+                            const link = `localhost:1000/ideas/${ideas._id}`
+                            await sendEmail(email, 'New ideas uploaded', link)
+                        }
+                        else {
+                            const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce2200' })//role id of QA of graphic design
+                            const email = user.accountEmail
+                            const link = `localhost:1000/ideas/${ideas._id}`
+                            await sendEmail(email, 'New ideas uploaded', link)
+                        }
+                        res.status(200).send({
+                            errorCode: 0,
+                            message: 'add ideas successfuly'
+                        })
                     })
-                    //send mail to QAC
-                    if (req.body.departmentName === 'IT') {
-                        const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21fe' }) //role id of QA of IT
-                        const email = user.accountEmail
-                        const link = `localhost:1000/ideas/${ideas._id}`
-                        await sendEmail(email, 'New ideas uploaded', link)
-                    }
-                    else if (req.body.departmentName === 'business') {
-                        const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21ff' })//role id of QA of business
-                        const email = user.accountEmail
-                        const link = `localhost:1000/ideas/${ideas._id}`
-                        await sendEmail(email, 'New ideas uploaded', link)
-                    }
-                    else {
-                        const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce2200' })//role id of QA of graphic design
-                        const email = user.accountEmail
-                        const link = `localhost:1000/ideas/${ideas._id}`
-                        await sendEmail(email, 'New ideas uploaded', link)
-                    }
-                    res.status(200).send({
-                        errorCode: 0,
-                        message: 'add ideas successfuly'
-                    })
-                })
                 }
             })
     } catch (error) {
@@ -203,55 +203,36 @@ exports.viewDetailIdeas = async (req, res) => {
         .catch((err) => {
             return res.status(500).send({
                 errorCode: 500,
-                data: 'sdfdsf'
+                data: 'View detail ideas is error!'
             })
         })
 }
 
 exports.listIdeas = async (req, res) => {
-    try {
-        Ideas.find({}, async (err, list) => {
-            if (err) return res.status(500).send({
-                errorCode: 0,
-                message: 'Ideas server is error'
-            })
-            var listShow = []
-            for (i = 0; i < list.length; i++) {
-                // const departmentId = list[i].departmentID
-                // var department = await Department.findById(departmentId)
-                // if (department === null)
-                //     return res.status(500).send({
-                //         errorCode: 0,
-                //         message: 'department server is error'
-                //     })
-                // const categoryId = list[i].categoryID
-                // const category = await Category.findById(categoryId)
-                // if (category == null) return res.status(500).send({
-                //     errorCode: 0,
-                //     message: 'category server is error'
-                // })
-
-                var listInfo = {
-                    _id: list[i]._id,
-                    ideasContent: list[i].ideasContent,
-                    //ideasFile: list[i].ideasFile,
-                    numberOfLike: list[i].numberOfLike,
-                    numberOfDislike: list[i].numberOfDislike,
-                    numberOfComment: list[i].numberOfComment,
-                    numberOfView: list[i].numberOfView,
-                    //departmentName: department.departmentName,
-                }
-                listShow.push(listInfo)
-            }
-            return res.status(200).send({
-                errorCode: 0,
-                data: listShow,
-            })
+    Ideas.find({}, async (err, list) => {
+        if (err) return res.status(500).send({
+            errorCode: 0,
+            message: 'Ideas server is error'
         })
-    }
-    catch (err) {
-        console.log(err)
-    }
+        var listShow = []
+        for (i = 0; i < list.length; i++) {
+            var listInfo = {
+                _id: list[i]._id,
+                ideasContent: list[i].ideasContent,
+                //ideasFile: list[i].ideasFile,
+                numberOfLike: list[i].numberOfLike,
+                numberOfDislike: list[i].numberOfDislike,
+                numberOfComment: list[i].numberOfComment,
+                numberOfView: list[i].numberOfView,
+                //departmentName: department.departmentName,
+            }
+            listShow.push(listInfo)
+        }
+        return res.status(200).send({
+            errorCode: 0,
+            data: listShow,
+        })
+    })
 }
 
 exports.myIdeas = async (req, res) => {
@@ -290,8 +271,8 @@ exports.myIdeas = async (req, res) => {
             })
         })
         .catch(err => {
-            if (err) return res.status(500).send({
-                errorCode: 0,
+            return res.status(500).send({
+                errorCode: 500,
                 message: 'Ideas server is error'
             })
         })
@@ -323,7 +304,10 @@ exports.likeIdeas = async (req, res) => {
         })
     }
     catch (err) {
-        console.log(err)
+        return res.status(500).send({
+            errorCode: 500,
+            message: 'Like ideas function is error'
+        })
     }
 }
 
@@ -354,7 +338,10 @@ exports.dislikeIdeas = async (req, res) => {
         })
     }
     catch (err) {
-        console.log(err)
+        return res.status(500).send({
+            errorCode: 500,
+            message: 'dislike ideas function is error'
+        })
     }
 }
 
@@ -392,7 +379,7 @@ exports.commentIdeas = async (req, res) => {
         .catch(err => {
             return res.status(500).send({
                 errorCode: 500,
-                message: err
+                message: 'Comment function is error!'
             })
         })
 }
@@ -405,7 +392,7 @@ exports.downloadIdeas = async (req, res) => {
         for (i = 0; i < ideas.length; i++) {
             var closureDate = await ClosureDate.findById(ideas[i].closureDateID)
             var date = await closureDate.finalClosureDate.split('/')
-            if (parseInt(date[0]) < parseInt(d.getFullYear())) { 
+            if (parseInt(date[0]) < parseInt(d.getFullYear())) {
                 const { ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView } = ideas[i]
                 listDown.push({ ideasContent, numberOfComment, numberOfLike, numberOfDislike, numberOfView })
             } else if (parseInt(date[0]) === parseInt(d.getFullYear())) {
@@ -438,29 +425,46 @@ exports.downloadIdeas = async (req, res) => {
         })
     }
     catch (err) {
-        console.log(err)
+        return res.status(500).send({
+            errorCode: 500,
+            message: 'Download ideas function is error'
+        })
     }
 }
 
 exports.downloadZip = (req, res) => {
-    var uploadDir = fs.readdirSync(__dirname + "/../../uploads")
-    const zip = new AdmZip()
-    for (var i = 0; i < uploadDir.length; i++) {
-        zip.addLocalFile(__dirname + "/../../uploads/" + uploadDir[i]);
-    }
-    //file name
-    const downloadName = `Document.zip`
+    try {
+        var uploadDir = fs.readdirSync(__dirname + "/../../uploads")
+        const zip = new AdmZip()
+        for (var i = 0; i < uploadDir.length; i++) {
+            zip.addLocalFile(__dirname + "/../../uploads/" + uploadDir[i])
+        }
+        //file name
+        const downloadName = `Document.zip`
 
-    const data = zip.toBuffer()
-    res.setHeader('Content-Type', 'application/octet-stream');
-    res.setHeader('Content-Disposition', `attachment; filename=${downloadName}`);
-    res.set('Content-Length', data.length);
-    res.send(data);
+        const data = zip.toBuffer()
+        res.setHeader('Content-Type', 'application/octet-stream')
+        res.setHeader('Content-Disposition', `attachment; filename=${downloadName}`)
+        res.set('Content-Length', data.length)
+        res.send(data)
+    } catch (error) {
+        return res.status(500).send({
+            errorCode: 500,
+            message: 'Download zip function is error!'
+        })
+    }
 }
 
 exports.downloadFiles = (req, res) => {
-    var filename = __dirname + `/../../uploads/${req.params.ideasFile}`
-    res.download(filename)
+    try {
+        var filename = __dirname + `/../../uploads/${req.params.ideasFile}`
+        res.download(filename)
+    } catch (error) {
+        return res.status(500).send({
+            errorCode: 500,
+            message: 'Download file is error'
+        })
+    }
 }
 
 //filter 
@@ -469,7 +473,7 @@ exports.filter = async (req, res) => {
     Ideas.find({}, async (err, list) => {
         if (err) return res.status(500).send({
             errorCode: 500,
-            message: err
+            message: 'Filter function is error!'
         })
         const filter = req.query.filter
         if (filter === 'leastLike') {

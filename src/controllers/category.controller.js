@@ -7,13 +7,13 @@ const Joi = require("joi");
 exports.createCategory = async (req, res) => {
     try {
         const department = await Department.findOne({ departmentName: req.query.departmentName })
-        if(department === null) return res.status(500).send({
+        if (department === null) return res.status(500).send({
             errorCode: 500,
             message: 'Department server is err'
         })
         const category = new Category({
             categoryName: req.body.categoryName,
-            departmentID:  department._id,
+            departmentID: department._id,
         })
         category.save(err => {
             if (err) {
@@ -29,27 +29,30 @@ exports.createCategory = async (req, res) => {
         })
     }
     catch (err) {
-        console.log(err)
+        return res.status(500).send({
+            errorCode: 500,
+            message: "Category server is error!"
+        })
     }
 }
 
 exports.deleteCategory = async (req, res) => {
     const categoryDelete = req.params.categoryID
     const used = await Ideas.findOne({ categoryID: categoryDelete })
-    if(used === null){
+    if (used === null) {
         await Category.deleteOne({ _id: categoryDelete })
-        .then(()=>{
-            return res.status(200).send({
-                errorCode: 0,
-                message: 'This category is delete successfully!'
+            .then(() => {
+                return res.status(200).send({
+                    errorCode: 0,
+                    message: 'This category is delete successfully!'
+                })
             })
-        })
-        .catch(err =>{
-            return res.status(500).send({
-                errorCode: 500,
-                message: err
+            .catch(err => {
+                return res.status(500).send({
+                    errorCode: 500,
+                    message: 'Delete category function is error!'
+                })
             })
-        })
     } else {
         return res.status(400).send({
             errorCode: 400,
@@ -63,7 +66,7 @@ exports.ListCategory = async (req, res) => {
     Category.find(({ departmentID: department._id }), (err, list) => {
         if (err) return res.status(500).send({
             errorCode: 500,
-            message: err
+            message: 'Category server is error!'
         })
         return res.status(200).send({
             errorCode: 0,

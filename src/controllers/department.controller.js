@@ -1,11 +1,11 @@
 const db = require('../models/index')
 const Department = db.department
 
-exports.listDepartment = (req, res) =>{
-    Department.find({}, (err, department) =>{
-        if(err) {
+exports.listDepartment = (req, res) => {
+    Department.find({}, (err, department) => {
+        if (err) {
             return res.status(500).send({
-                errorCode : '500',
+                errorCode: 500,
                 message: 'Department server is error -.-'
             })
         }

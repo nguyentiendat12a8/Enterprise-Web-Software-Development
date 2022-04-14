@@ -5,25 +5,25 @@ const Joi = require("joi");
 
 exports.createClousureDate = async (req, res) => {
     try {
-        const schema = Joi.object({ 
+        const schema = Joi.object({
             departmentName: Joi.string(),
             firstClosureDate: Joi.string().pattern(new RegExp("([0-9]{4}[-](0[1-9]|1[0-2])[-]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-](0[1-9]|1[0-2])[-][0-9]{4})")).message("Incorrect date format, Ex : 30/03/2022"),
-            finalClosureDate : Joi.string().pattern(new RegExp("([0-9]{4}[-](0[1-9]|1[0-2])[-]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-](0[1-9]|1[0-2])[-][0-9]{4})")).message("Incorrect date format, Ex : 30/03/2022"),
-          })
-            const { error } = schema.validate(req.body);
-            if (error) return res.status(400).send({
-              errorCode: 400,
-              message: error.message
-            });
-            /////
-        if(new Date(req.body.firstClosureDate) > new Date(req.body.finalClosureDate)){
+            finalClosureDate: Joi.string().pattern(new RegExp("([0-9]{4}[-](0[1-9]|1[0-2])[-]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-](0[1-9]|1[0-2])[-][0-9]{4})")).message("Incorrect date format, Ex : 30/03/2022"),
+        })
+        const { error } = schema.validate(req.body);
+        if (error) return res.status(400).send({
+            errorCode: 400,
+            message: error.message
+        });
+        /////
+        if (new Date(req.body.firstClosureDate) > new Date(req.body.finalClosureDate)) {
             return res.status(400).send({
                 errorCode: 400,
                 message: 'Final date must more than first date!'
             })
         }
         const department = await Department.findOne({ departmentName: req.body.departmentName })
-        if(!department) {
+        if (!department) {
             return res.status(500).send({
                 errorCode: '500',
                 message: 'department not found!'
@@ -47,45 +47,44 @@ exports.createClousureDate = async (req, res) => {
         })
     }
     catch (err) {
-        console.log(err)
+        return res.status(500).send({
+            errorCode: 500,
+            message: "Closure date server is error!"
+        })
     }
 }
 
 exports.listClosureDate = (req, res) => {
-    try {
-        ClosureDate.find({},async (err, listClosureDate) => {
-            if (err) return res.status(500).send({
-                errorCode: 500,
-                message: err
-            })
-            var listShow = []
-            for(i=0; i< listClosureDate.length; i++){
-                var departmentID = listClosureDate[i].departmentID
-                var department = await Department.findOne({ _id: departmentID })
-                var show = {
-                    _id: listClosureDate[i]._id,
-                    firstClosureDate: listClosureDate[i].firstClosureDate,
-                    finalClosureDate: listClosureDate[i].finalClosureDate,
-                    departmentName: department.departmentName
-                }
-                listShow.push(show)
-            }
-                
-            return res.status(200).send({
-                errorCode: 0,
-                data: listShow
-            })
+    ClosureDate.find({}, async (err, listClosureDate) => {
+        if (err) return res.status(500).send({
+            errorCode: 500,
+            message: 'Closure date server is error!'
         })
-    } catch (error) {
-        console.log(error)
-    }
+        var listShow = []
+        for (i = 0; i < listClosureDate.length; i++) {
+            var departmentID = listClosureDate[i].departmentID
+            var department = await Department.findOne({ _id: departmentID })
+            var show = {
+                _id: listClosureDate[i]._id,
+                firstClosureDate: listClosureDate[i].firstClosureDate,
+                finalClosureDate: listClosureDate[i].finalClosureDate,
+                departmentName: department.departmentName
+            }
+            listShow.push(show)
+        }
+
+        return res.status(200).send({
+            errorCode: 0,
+            data: listShow
+        })
+    })
 }
 
-exports.editClosureDate = (req,res) =>{
+exports.editClosureDate = (req, res) => {
     ClosureDate.findById(req.params.closureDateID, (err, date) => {
         if (err) return res.status(500).send({
             errorCode: 500,
-            message: err
+            message: 'Edit closure date function is error!'
         })
         const show = {
             _id: req.params.closureDateID,
@@ -99,22 +98,22 @@ exports.editClosureDate = (req,res) =>{
     })
 }
 
-exports.updateClosureDate = (req,res) =>{
+exports.updateClosureDate = (req, res) => {
     try {
-        const schema = Joi.object({ 
+        const schema = Joi.object({
             firstClosureDate: Joi.string().pattern(new RegExp("([0-9]{4}[-||/](0[1-9]|1[0-2])[-||/]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-||/](0[1-9]|1[0-2])[-||/][0-9]{4})")).message("Incorrect date format, Ex : 30/03/2022"),
-            finalClosureDate : Joi.string().pattern(new RegExp("([0-9]{4}[-||/](0[1-9]|1[0-2])[-||/]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-||/](0[1-9]|1[0-2])[-||/][0-9]{4})")).message("Incorrect date format, Ex : 30/03/2022"),
-          });
-            const { error } = schema.validate(req.body);
-            if (error) return res.status(400).send({
-              errorCode: 400,
-              message: error.message
-            });
+            finalClosureDate: Joi.string().pattern(new RegExp("([0-9]{4}[-||/](0[1-9]|1[0-2])[-||/]([0-2]{1}[0-9]{1}|3[0-1]{1})|([0-2]{1}[0-9]{1}|3[0-1]{1})[-||/](0[1-9]|1[0-2])[-||/][0-9]{4})")).message("Incorrect date format, Ex : 30/03/2022"),
+        });
+        const { error } = schema.validate(req.body);
+        if (error) return res.status(400).send({
+            errorCode: 400,
+            message: error.message
+        });
 
         ClosureDate.findByIdAndUpdate(req.params.closureDateID, {
             firstClosureDate: req.body.firstClosureDate,
             finalClosureDate: req.body.finalClosureDate
-        }, {new: true}, (err) => {
+        }, { new: true }, (err) => {
             if (err) return res.status(500).send({
                 errorCode: 500,
                 message: err
@@ -125,6 +124,10 @@ exports.updateClosureDate = (req,res) =>{
             })
         })
     } catch (error) {
-        console.log(error)
+        return res.status(500).send({
+            errorCode: 500,
+            message: 'Update closure date function is error!'
+        })
+
     }
 }

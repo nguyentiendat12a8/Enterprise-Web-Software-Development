@@ -5,21 +5,21 @@ const Account = db.account
 const Role = db.role
 
 exports.verifyToken = async (req, res, next) => {
-    let token = req.body.token || req.query.token ||req.headers["x-access-token"];
+    let token = req.body.token || req.query.token || req.headers["x-access-token"];
     //const token = req.cookies.access_token
     //const token = req.body.access_token
-    if(!token){
-       return res.status(401).send({
-           errorCode: 401,
-           message:'token is required!'
-       })
+    if (!token) {
+        return res.status(401).send({
+            errorCode: 401,
+            message: 'token is required!'
+        })
     }
-    jwt.verify(token, config.TOKEN_KEY, (err,decoded)=>{
-        if(err){
-            if(err.name === 'JsonWebTokenError'){
-                return res.status(401).send({message:'Unauthorized!'})
+    jwt.verify(token, config.TOKEN_KEY, (err, decoded) => {
+        if (err) {
+            if (err.name === 'JsonWebTokenError') {
+                return res.status(401).send({ message: 'Unauthorized!' })
             }
-            return res.status(401).send({message: err.message})
+            return res.status(401).send({ message: err.message })
         }
         req.accountID = decoded.id
         req.email = decoded.email
@@ -45,54 +45,72 @@ exports.verifyRefreshToken = (req, res, next) => {
         })
         //req.userId = decoded.id
         //return res.json(token)
-        return res.send({token : token})
+        return res.send({ token: token })
     })
 }
 
 exports.isAdmin = (req, res, next) => {
-    Account.findById(req.accountID, (err,user)=>{
+    Account.findById(req.accountID, (err, user) => {
         if (err) {
-            return res.status(500).send({ message: err })
+            return res.status(500).send({
+                errorCode: 500,
+                message: 'Account server is error!'
+            })
         }
-        Role.findById(user.roleID, (err, role)=>{
+        Role.findById(user.roleID, (err, role) => {
             if (err) {
-                return res.status(500).send({ message: err })
+                return res.status(500).send({
+                    errorCode: 500,
+                    message: 'Role server is error!'
+                })
             }
-            if(role.roleName === 'admin'){
+            if (role.roleName === 'admin') {
                 return next()
             }
-            return res.status(403).send({ message: 'Require admin role!' })
+            return res.status(403).send({
+                errorCode: 403,
+                message: 'Require admin role!'
+            })
         })
     })
 }
 
 exports.isQA = (req, res, next) => {
-    Account.findById(req.accountID, (err,user)=>{
+    Account.findById(req.accountID, (err, user) => {
         if (err) {
-            return res.status(500).send({ message: err })
+            return res.status(500).send({
+                errorCode: 500,
+                message: 'Account server is error!'
+            })
         }
-        Role.findById(user.roleID, (err, role)=>{
+        Role.findById(user.roleID, (err, role) => {
             if (err) {
-                return res.status(500).send({ message: err })
+                return res.status(500).send({
+                    errorCode: 500,
+                    message: 'Role server is error!'
+                })
             }
-            if(role.roleName === 'QA'){
+            if (role.roleName === 'QA') {
                 return next()
             }
-            return res.status(403).send({ message: 'Require QA role!' })
+            return res.status(403).send({
+                errorCode: 403,
+                message: 'Require QA role!'
+            })
         })
     })
 }
 
 exports.isQAOfIT = (req, res, next) => {
-    Account.findById(req.accountID, (err,user)=>{
+    Account.findById(req.accountID, (err, user) => {
         if (err) {
             return res.status(500).send({ message: err })
         }
-        Role.findById(user.roleID, (err, role)=>{
+        Role.findById(user.roleID, (err, role) => {
             if (err) {
                 return res.status(500).send({ message: err })
             }
-            if(role.roleName === 'QA of IT'){
+            if (role.roleName === 'QA of IT') {
                 return next()
             }
             return res.status(403).send({ message: 'Require QA of IT role!' })
@@ -101,15 +119,15 @@ exports.isQAOfIT = (req, res, next) => {
 }
 
 exports.isQAOfBusiness = (req, res, next) => {
-    Account.findById(req.accountID, (err,user)=>{
+    Account.findById(req.accountID, (err, user) => {
         if (err) {
             return res.status(500).send({ message: err })
         }
-        Role.findById(user.roleID, (err, role)=>{
+        Role.findById(user.roleID, (err, role) => {
             if (err) {
                 return res.status(500).send({ message: err })
             }
-            if(role.roleName === 'QA of business'){
+            if (role.roleName === 'QA of business') {
                 return next()
             }
             return res.status(403).send({ message: 'Require QA of business role!' })
@@ -118,15 +136,15 @@ exports.isQAOfBusiness = (req, res, next) => {
 }
 
 exports.isQAOfGraphicDesign = (req, res, next) => {
-    Account.findById(req.accountID, (err,user)=>{
+    Account.findById(req.accountID, (err, user) => {
         if (err) {
             return res.status(500).send({ message: err })
         }
-        Role.findById(user.roleID, (err, role)=>{
+        Role.findById(user.roleID, (err, role) => {
             if (err) {
                 return res.status(500).send({ message: err })
             }
-            if(role.roleName === 'QA of graphic design'){
+            if (role.roleName === 'QA of graphic design') {
                 return next()
             }
             return res.status(403).send({ message: 'Require QA of graphic design role!' })

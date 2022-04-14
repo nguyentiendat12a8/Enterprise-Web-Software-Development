@@ -8,11 +8,17 @@ checkDuplicateEmail = (req, res, next) => {
         accountEmail: req.body.accountEmail
     }).exec((err, user) => {
         if (err) {
-            res.status(500).send({ message: err })
+            res.status(500).send({
+                errorCode: 500,
+                message: 'Account server is error!'
+            })
             return
         }
         if (user) {
-            res.status(400).send({ message: 'Failed! Email is already in use' })
+            res.status(400).send({
+                errorCode: 400,
+                message: 'Failed! Email is already in use'
+            })
             return
         }
         next()
@@ -34,7 +40,7 @@ checkDuplicateEmail = (req, res, next) => {
 //     next()
 // }
 
-const verifySignUp = 
+const verifySignUp =
 {
     checkDuplicateEmail
 }
