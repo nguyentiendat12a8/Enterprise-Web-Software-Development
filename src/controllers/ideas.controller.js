@@ -30,52 +30,19 @@ exports.createIdeas = async (req, res) => {
             message: error.message
         });
         /////
-        Promise.all([Department.findOne({ departmentName: req.body.departmentName }), Category.findOne({ categoryName: req.body.categoryName })])
+        Promise.all([Department.findOne({ departmentName: req.body.departmentName }), 
+            Category.findOne({ categoryName: req.body.categoryName })])
             .then(async ([department, category]) => {
                 const closureDate = await ClosureDate.findOne({ departmentID: department._id })
+                var file 
                 if (req.file) {
-                    const ideas = new Ideas({
-                        ideasContent: req.body.ideasContent,
-                        ideasFile: req.file.path,
-                        closureDateID: closureDate._id,
-                        accountID: req.accountID,
-                        departmentID: department._id,
-                        categoryID: category._id,
-                        anonymous: req.body.anonymous
-                    })
-                    await ideas.save(async (err, ideas) => {
-                        if (err) res.status(500).send({
-                            errorCode: 500,
-                            message: err
-                        })
-                        //send mail to QAC
-                        if (req.body.departmentName === 'IT') {
-                            const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21fe' }) //role id of QA of IT
-                            const email = user.accountEmail
-                            const link = `localhost:1000/ideas/${ideas._id}`
-                            await sendEmail(email, 'New ideas uploaded', link)
-                        }
-                        else if (req.body.departmentName === 'business') {
-                            const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21ff' })//role id of QA of business
-                            const email = user.accountEmail
-                            const link = `localhost:1000/ideas/${ideas._id}`
-                            await sendEmail(email, 'New ideas uploaded', link)
-                        }
-                        else {
-                            const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce2200' })//role id of QA of graphic design
-                            const email = user.accountEmail
-                            const link = `localhost:1000/ideas/${ideas._id}`
-                            await sendEmail(email, 'New ideas uploaded', link)
-                        }
-                        res.status(200).send({
-                            errorCode: 0,
-                            message: 'add ideas successfuly'
-                        })
-                    })
+                    file = req.file.path
                 } else {
+                    file = ''
+                }  
                     const ideas = new Ideas({
                         ideasContent: req.body.ideasContent,
-                        //ideasFile: req.file.path,
+                        ideasFile: file,
                         closureDateID: closureDate._id,
                         accountID: req.accountID,
                         departmentID: department._id,
@@ -111,7 +78,6 @@ exports.createIdeas = async (req, res) => {
                             message: 'add ideas successfuly'
                         })
                     })
-                }
             })
     } catch (error) {
         res.status(500).send({
@@ -446,7 +412,7 @@ exports.downloadZip = (req, res) => {
         res.setHeader('Content-Type', 'application/octet-stream')
         res.setHeader('Content-Disposition', `attachment; filename=${downloadName}`)
         res.set('Content-Length', data.length)
-        res.send(data)
+        return res.status(200).send(data)
     } catch (error) {
         return res.status(500).send({
             errorCode: 500,
