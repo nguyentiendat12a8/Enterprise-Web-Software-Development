@@ -16,7 +16,7 @@ exports.upload = multer({
     fileFilter: function (req, file, callback) {
         if (
             file.mimetype == "application/pdf" ||
-            file.mimetype == 'application/msword'
+            file.mimetype == "application/msword"
         ) {
             callback(null, true)
         } else {
