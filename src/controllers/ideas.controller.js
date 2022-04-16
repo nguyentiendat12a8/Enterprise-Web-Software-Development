@@ -126,6 +126,8 @@ exports.viewDetailIdeas = async (req, res) => {
             showComment.sort((a, b) => {
                 return a.createdAt - b.createdAt
             })
+            var file =  ideas.ideasFile
+
             if (ideas.anonymous === false) {
                 var user = await Account.findById(ideas.accountID)
                 if (user === null) return res.status(500).send({
@@ -142,6 +144,7 @@ exports.viewDetailIdeas = async (req, res) => {
                     numberOfView: ideas.numberOfView,
                     departmentName: department.departmentName,
                     categoryName: category.categoryName,
+                    typeOfFile: typeof(file)
                 }
             } else {
                 var ideasShow = {
@@ -154,6 +157,7 @@ exports.viewDetailIdeas = async (req, res) => {
                     numberOfView: ideas.numberOfView,
                     departmentName: department.departmentName,
                     categoryName: category.categoryName,
+                    typeOfFile: typeof(file)
                 }
             }
             return res.status(200).send({
