@@ -406,7 +406,7 @@ exports.sendEmailResetPass = async (req, res) => {
       }).save();
     }
 
-    const link = `localhost:${process.env.BASE_URL}/user/confirmLink/${user._id}/${token.token}`;
+    const link = `${process.env.URL}/user/confirmLink/${user._id}/${token.token}`;
     await sendEmail(user.accountEmail, "Password reset", link);
 
     return res.status(200).send({
