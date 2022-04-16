@@ -58,19 +58,19 @@ exports.createIdeas = async (req, res) => {
                         if (req.body.departmentName === 'IT') {
                             const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21fe' }) //role id of QA of IT
                             const email = user.accountEmail
-                            const link = `localhost:1000/ideas/${ideas._id}`
+                            const link = process.env.URL
                             await sendEmail(email, 'New ideas uploaded', link)
                         }
                         else if (req.body.departmentName === 'business') {
                             const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce21ff' })//role id of QA of business
                             const email = user.accountEmail
-                            const link = `localhost:1000/ideas/${ideas._id}`
+                            const link = process.env.URL
                             await sendEmail(email, 'New ideas uploaded', link)
                         }
                         else {
                             const user = await Account.findOne({ roleID: '621dadf98ddbf30945ce2200' })//role id of QA of graphic design
                             const email = user.accountEmail
-                            const link = `localhost:1000/ideas/${ideas._id}`
+                            const link = process.env.URL
                             await sendEmail(email, 'New ideas uploaded', link)
                         }
                         res.status(200).send({
@@ -333,7 +333,7 @@ exports.commentIdeas = async (req, res) => {
     await Promise.all([comment.save(), Ideas.findById(ideasID)])
         .then(async ([comment, ideas]) => {
             var user = await Account.findById(ideas.accountID)
-            link = `localhost:1000/ideas/list-comment-ideas/${ideasID}`
+            link = process.env.URL
             await sendEmail(user.accountEmail, 'Someone commented on your idea', link)
             const number = await Comment.countDocuments({ ideasID: ideasID })
             await Ideas.findByIdAndUpdate({ _id: ideasID }, { numberOfComment: number }, { new: true })
