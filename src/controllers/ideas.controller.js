@@ -411,7 +411,6 @@ exports.downloadZip = (req, res) => {
         }
         //file name
         const downloadName = `Document.zip`
-
         const data = zip.toBuffer()
         res.setHeader('Content-Type', 'application/octet-stream')
         res.setHeader('Content-Disposition', `attachment; filename=${downloadName}`)
