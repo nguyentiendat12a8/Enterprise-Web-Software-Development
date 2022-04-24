@@ -4,7 +4,7 @@ const { Role } = require('../models/role.schema')
 
 exports.connectDB = async () =>{
     try {
-        await mongoose.connect('mongodb+srv://nguyentiendat12a8:sofm27112000@cluster0.qaz2s.mongodb.net/universityProject', {
+        await mongoose.connect(process.env.DB, {
             autoIndex:true
         })
         console.log("Connect to database successfully!")
