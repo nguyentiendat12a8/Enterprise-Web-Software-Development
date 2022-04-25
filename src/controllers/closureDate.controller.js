@@ -16,7 +16,7 @@ exports.createClousureDate = async (req, res) => {
             message: error.message
         });
         /////
-        if (new Date(req.body.firstClosureDate) > new Date(req.body.finalClosureDate)) {
+        if (new Date(req.body.firstClosureDate) > new Date(req.body.finalClosureDate > new Date())) {
             return res.status(400).send({
                 errorCode: 400,
                 message: 'Final date must more than first date!'
