@@ -16,18 +16,13 @@ exports.createClousureDate = async (req, res) => {
             message: error.message
         });
         /////
-        if(new Date(req.body.firstClosureDate) > new Date()) {
+        if(new Date(req.body.firstClosureDate) < new Date() || new Date(req.body.finalClosureDate) < new Date()) {
             return res.status(400).send({
                 errorCode: 400,
                 message: 'Time must be more than time now!'
             })
         }
-        if(new Date(req.body.finalClosureDate) > new Date()){
-            return res.status(400).send({
-                errorCode: 400,
-                message: 'Time must be more than time now!'
-            })
-        }
+
         if (new Date(req.body.firstClosureDate) > new Date(req.body.finalClosureDate)) {
             
             return res.status(400).send({
